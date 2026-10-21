@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Segoe UI", Tahoma, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; background: #111612; font-family: var(--font-sans); }
+button { font: inherit; }
+.lcd-no-scroll::-webkit-scrollbar { display: none; }
+.lcd-no-scroll { scrollbar-width: none; }
+.key-3d { transition: transform .07s ease, box-shadow .07s ease; }
+.key-3d:active { transform: translateY(3px); box-shadow: 0 0 #151a15, inset 0 1px #ffffff22 !important; }
+.cursor-blink { animation: cursor-blink 1.05s steps(1) infinite; }
+@keyframes cursor-blink { 50% { opacity: 0; } }
