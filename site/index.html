@@ -17,7 +17,7 @@
   --amber:#f0a53c;       /* SHIFT key orange */
   --silver:#c9cfc9;
   --text:#e8ece7;
-  --dim:#9aa39b;
+  --dim:#a9b2a9;
   --mono:ui-monospace,'Cascadia Mono','SF Mono',Consolas,monospace;
   --arabic:'Noto Kufi Arabic','Segoe UI',Tahoma,'Helvetica Neue',sans-serif;
 }
@@ -123,6 +123,7 @@ section{padding:46px 0}
 .term-bar span{margin-inline-start:auto;color:var(--dim);font-family:var(--mono);font-size:11px}
 .term pre{padding:18px 20px;font-family:var(--mono);font-size:13.5px;line-height:2;
   color:var(--silver);direction:ltr;text-align:left;overflow-x:auto}
+.term pre .ar{unicode-bidi:isolate;direction:rtl;display:inline-block}
 .term .c{color:#6f7a6e}      /* comment */
 .term .p{color:var(--amber)} /* prompt  */
 .term .u{color:#8fd6a4}      /* command */
@@ -222,16 +223,16 @@ footer .en{font-family:var(--mono);direction:ltr}
   <h2>البناء والتشغيل</h2></div>
   <div class="term">
     <div class="term-bar"><i></i><i></i><i></i><span>terminal — linux / windows</span></div>
-    <pre><span class="c"># بناء المشروع وتشغيل الاختبارات</span>
+    <pre><span class="c"><span class="ar">بناء المشروع وتشغيل الاختبارات</span></span>
 <span class="p">$</span> <span class="u">git clone https://github.com/mohammedalhinaki-cloud/Study-tools.git</span>
 <span class="p">$</span> <span class="u">cmake -S Study-tools -B build -DCMAKE_BUILD_TYPE=Release</span>
 <span class="p">$</span> <span class="u">cmake --build build --parallel</span>
 <span class="p">$</span> <span class="u">ctest --test-dir build --output-on-failure</span>
 
-<span class="c"># الواجهة الرسومية (يلزم libsdl2-dev) — توفر ROM من آلة تملكها</span>
+<span class="c"><span class="ar">الواجهة الرسومية — يلزم libsdl2-dev — توفر ROM من آلة تملكها</span></span>
 <span class="p">$</span> <span class="u">./build/u8gui --rom rom.bin --steps-per-frame 50000</span>
 
-<span class="c"># أو المشغّل بلا واجهة: سجلات + إطار شاشة</span>
+<span class="c"><span class="ar">أو المشغّل بلا واجهة: سجلات وإطار شاشة</span></span>
 <span class="p">$</span> <span class="u">./build/u8emu --rom rom.bin --steps 1000000 --regs --vram frame.raw</span></pre>
   </div>
 </section>
@@ -269,12 +270,12 @@ footer .en{font-family:var(--mono);direction:ltr}
 /* the signature element: draw "U8-EMU_" into a 5×7 dot-matrix LCD,
  * the way a real 96×32 Casio panel lights pixels */
 (function(){
-  var G=[
-    ["10001","11011","10101","10101","10001","10001","10001"], /* M */
-    ["11111","10000","10000","11110","10000","10000","11111"], /* E */
-    ["00000","00000","00000","01110","00000","00000","00000"], /* - */
+  var G=[ /* laid out left-to-right: U 8 - E M + cursor */
     ["01110","10001","10001","10001","10001","10001","01110"], /* U */
     ["01110","10001","10001","01110","10001","10001","01110"], /* 8 */
+    ["00000","00000","00000","01110","00000","00000","00000"], /* - */
+    ["11111","10000","10000","11110","10000","10000","11111"], /* E */
+    ["10001","11011","10101","10101","10001","10001","10001"], /* M */
     ["01110","10001","10001","01110","00000","00000","00000"]  /* cursor bar */
   ];
   var W=5,SPACE=2,grid=document.getElementById('lcd');
