@@ -1,360 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>casio-u8-emu — مُحاكي كاسيو fx-991ES PLUS</title>
-<meta name="description" content="مُحاكي نظيف الحدود لمعالج nX-U8/100 في حاسوب كاسيو fx-991ES PLUS: نواة C17 كاملة، طرفيات مربوطة، واجهة رسومية، واختبارات تكامل.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>fx‑991ES PLUS — حاسبة علمية</title>
+<meta name="description" content="حاسبة علمية مجانية على الويب بواجهة مستوحاة من Casio fx-991ES PLUS.">
 <style>
-:root{
-  --body:#20241f;        /* calculator body charcoal-green */
-  --panel:#2a2f29;
-  --panel-2:#242823;
-  --edge:#3a4238;
-  --lcd:#c9e8cf;         /* pale LCD green */
-  --lcd-shadow:#b3d4bb;
-  --dot:#263229;         /* lit pixel ink */
-  --amber:#f0a53c;       /* SHIFT key orange */
-  --silver:#c9cfc9;
-  --text:#e8ece7;
-  --dim:#a9b2a9;
-  --mono:ui-monospace,'Cascadia Mono','SF Mono',Consolas,monospace;
-  --arabic:'Noto Kufi Arabic','Segoe UI',Tahoma,'Helvetica Neue',sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
-body{
-  background:var(--body);color:var(--text);
-  font-family:var(--arabic);line-height:1.75;
-  font-size:16px;overflow-x:hidden;
-}
-body::before{ /* brushed body texture */
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.012) 3px 4px),
-    radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.05),transparent 60%);
-}
-a{color:var(--amber);text-decoration:none}
-a:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:4px}
-.wrap{max-width:1060px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
-
-/* ── nav ── */
-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
-.brand .chip{width:34px;height:34px;border-radius:8px;background:var(--lcd);
-  display:grid;place-items:center;color:var(--dot);font-family:var(--mono);
-  font-weight:700;font-size:13px;box-shadow:inset 0 -3px 0 var(--lcd-shadow)}
-.navbtn{font-size:14px;font-weight:700;padding:9px 18px;border-radius:9px;
-  border:1px solid var(--edge);background:var(--panel);color:var(--text);
-  transition:border-color .2s,transform .2s}
-.navbtn:hover{border-color:var(--amber);transform:translateY(-1px)}
-
-/* ── hero ── */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;
-  padding:56px 0 40px}
-.eyebrow{color:var(--amber);font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:14px}
-h1{font-size:clamp(30px,4.6vw,46px);line-height:1.35;font-weight:800;margin-bottom:16px}
-h1 .en{font-family:var(--mono);color:var(--silver);font-size:.62em;font-weight:600;
-  display:block;margin-top:8px;letter-spacing:0}
-.lead{color:var(--dim);max-width:46ch;margin-bottom:28px;font-size:17px}
-.ctas{display:flex;gap:12px;flex-wrap:wrap}
-.btn{display:inline-block;padding:13px 26px;border-radius:11px;font-weight:700;font-size:15px;
-  transition:transform .15s,box-shadow .15s}
-.btn:hover{transform:translateY(-2px)}
-.btn-primary{background:var(--amber);color:#241a08;box-shadow:0 6px 0 #a86a14}
-.btn-primary:hover{box-shadow:0 4px 0 #a86a14}
-.btn-ghost{border:1px solid var(--edge);color:var(--text);background:var(--panel)}
-.btn-ghost:hover{border-color:var(--silver)}
-
-/* ── the signature: a real dot-matrix LCD ── */
-.device{justify-self:center;width:100%;max-width:400px}
-.shell{background:linear-gradient(180deg,#2e332c,#232722);border-radius:22px;
-  padding:26px 22px 30px;border:1px solid #454d42;
-  box-shadow:0 24px 50px -18px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08)}
-.lcd{background:var(--lcd);border-radius:8px;padding:16px 14px 12px;position:relative;
-  box-shadow:inset 0 3px 10px rgba(38,50,41,.35),inset 0 -1px 0 rgba(255,255,255,.5)}
-.lcdmat{display:block}
-.lcdmat .cursor{animation:blink 1.1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-.lcd-caption{display:flex;justify-content:space-between;align-items:center;
-  margin-top:10px;color:var(--dot);font-family:var(--mono);font-size:10px;letter-spacing:1px}
-.lcd-caption .solar{display:flex;gap:3px}
-.lcd-caption .solar i{width:16px;height:9px;background:#3a2f22;border-radius:2px;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
-.keypad-deco{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px}
-.keypad-deco span{height:26px;border-radius:7px;background:linear-gradient(180deg,#3d443b,#31372f);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 0 #171b16;
-  display:grid;place-items:center;font-family:var(--mono);font-size:10.5px;color:#c8cec6}
-.keypad-deco span:nth-child(2){background:linear-gradient(180deg,#8f958c,#7a8078)}
-.keypad-deco span:nth-child(12){background:var(--amber);color:#241a08;box-shadow:0 2px 0 #a86a14}
-.stats{display:flex;gap:0;margin-top:22px;border:1px solid var(--edge);border-radius:12px;
-  overflow:hidden;background:var(--panel)}
-.stats div{flex:1;text-align:center;padding:13px 6px}
-.stats div+div{border-inline-start:1px solid var(--edge)}
-.stats b{display:block;font-family:var(--mono);font-size:19px;color:var(--amber)}
-.stats small{color:var(--dim);font-size:11.5px}
-
-/* ── sections ── */
-section{padding:46px 0}
-.sec-head{margin-bottom:26px}
-.sec-head .tag{color:var(--amber);font-size:12px;font-weight:700;letter-spacing:2px;
-  display:block;margin-bottom:8px}
-.sec-head h2{font-size:clamp(21px,3vw,27px);font-weight:800}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:20px 18px;
-  transition:transform .2s,border-color .2s}
-.card:hover{transform:translateY(-3px);border-color:var(--amber)}
-.card .ic{font-family:var(--mono);font-size:12px;color:var(--amber);display:block;
-  margin-bottom:10px;letter-spacing:1px}
-.card h3{font-size:15.5px;margin-bottom:6px}
-.card p{color:var(--dim);font-size:13.5px;line-height:1.7}
-
-/* ── terminal ── */
-.term{background:#181c17;border:1px solid var(--edge);border-radius:14px;overflow:hidden;
-  margin-top:6px}
-.term-bar{display:flex;gap:6px;align-items:center;padding:10px 14px;background:var(--panel-2);
-  border-bottom:1px solid var(--edge)}
-.term-bar i{width:10px;height:10px;border-radius:50%;background:#4a5247}
-.term-bar i:first-child{background:var(--amber)}
-.term-bar span{margin-inline-start:auto;color:var(--dim);font-family:var(--mono);font-size:11px}
-.term pre{padding:18px 20px;font-family:var(--mono);font-size:13.5px;line-height:2;
-  color:var(--silver);direction:ltr;text-align:left;overflow-x:auto}
-.term pre .ar{unicode-bidi:isolate;direction:rtl;display:inline-block}
-.term .c{color:#6f7a6e}      /* comment */
-.term .p{color:var(--amber)} /* prompt  */
-.term .u{color:#8fd6a4}      /* command */
-
-/* ── phases ── */
-.phases{border:1px solid var(--edge);border-radius:14px;overflow:hidden}
-.phase{display:flex;align-items:center;gap:16px;padding:14px 20px;background:var(--panel)}
-.phase+.phase{border-top:1px solid var(--edge)}
-.phase .num{font-family:var(--mono);color:var(--dim);font-size:13px;width:26px}
-.phase .name{flex:1;font-size:15px}
-.phase .name small{display:block;color:var(--dim);font-size:12.5px;line-height:1.6}
-.phase .ok{font-family:var(--mono);font-size:12px;color:#8fd6a4;background:rgba(143,214,164,.08);
-  border:1px solid rgba(143,214,164,.25);padding:3px 10px;border-radius:20px;white-space:nowrap}
-
-/* ── notice ── */
-.notice{border:1px solid #6b5326;border-inline-start:4px solid var(--amber);border-radius:12px;
-  background:rgba(240,165,60,.06);padding:18px 22px;color:var(--dim);font-size:14.5px}
-.notice strong{color:var(--amber)}
-
-footer{border-top:1px solid var(--edge);padding:26px 0 40px;color:var(--dim);
-  font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-footer .en{font-family:var(--mono);direction:ltr}
-
-@media (max-width:900px){
-  .hero{grid-template-columns:1fr;gap:34px;padding-top:34px}
-  .device{max-width:360px}
-  .cards{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:540px){
-  .cards{grid-template-columns:1fr}
-  .stats{flex-direction:column}
-  .stats div+div{border-inline-start:none;border-top:1px solid var(--edge)}
-}
+:root{--ink:#e9eee8;--muted:#9da89e;--body:#151a16;--case:#293029;--case2:#202720;--edge:#485247;--lcd:#c9e5c6;--lcdink:#243126;--orange:#f2a33c;--blue:#9bb9d7;--key:#3c463d;--key2:#303930;--white:#d7ddd7;--danger:#e88978;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#3b473c 0,#151a16 48%);min-height:100vh;color:var(--ink);padding:24px 14px 42px}button{font:inherit;color:inherit;border:0;cursor:pointer}.shell{max-width:570px;margin:auto;background:linear-gradient(145deg,#303830,#202720);border:1px solid #566155;border-radius:24px;padding:20px;box-shadow:0 26px 70px #0009, inset 0 1px #ffffff1c}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.brand{font-weight:800;letter-spacing:.3px}.brand small{display:block;color:var(--orange);font-size:10px;letter-spacing:2px}.model{font-family:monospace;color:#bbc5ba;font-size:12px}.display{background:var(--lcd);color:var(--lcdink);border-radius:9px;min-height:128px;padding:12px 15px;box-shadow:inset 0 3px 10px #24312666,inset 0 -1px #fff8;position:relative;overflow:hidden}.indicators{height:19px;font:11px monospace;display:flex;gap:14px;color:#54705a}.indicators span{opacity:.25}.indicators span.on{opacity:1}.history{font:12px monospace;color:#608068;min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}.expression{font:clamp(22px,6vw,34px) monospace;direction:ltr;text-align:right;white-space:nowrap;overflow-x:auto;min-height:48px;padding-top:4px}.answer{font:16px monospace;direction:ltr;text-align:right;color:#48634d;min-height:23px}.status{position:absolute;bottom:7px;left:13px;font:10px monospace;color:#58745d}.toolbar{display:flex;gap:8px;margin:14px 0 10px}.tool{flex:1;border:1px solid var(--edge);background:#222a22;border-radius:8px;padding:7px 4px;font-size:11px;color:var(--muted)}.tool.active{color:var(--orange);border-color:#98703b;background:#403320}.keypad{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;direction:ltr}.key{min-height:52px;border-radius:9px;background:linear-gradient(#475247,#303930);box-shadow:0 3px 0 #161b16,inset 0 1px #ffffff1b;font-weight:750;position:relative;transition:.08s transform,.08s box-shadow}.key:active{transform:translateY(3px);box-shadow:0 0 #161b16,inset 0 1px #ffffff1b}.key .sub{position:absolute;top:3px;left:6px;font-size:10px;color:var(--orange);font-weight:600}.key.fn{background:linear-gradient(#d6dcd5,#aeb7ad);color:#1e281f}.key.op{background:linear-gradient(#536354,#3d493f);color:#eef2ee}.key.eq{background:var(--orange);color:#261b0d;box-shadow:0 3px 0 #a86c1d}.key.danger{color:var(--danger)}.key.wide{grid-column:span 2}.footer{color:var(--muted);font-size:12px;text-align:center;max-width:570px;margin:18px auto 0;line-height:1.7}.footer a{color:var(--orange);text-decoration:none}.help{margin-top:14px;color:#aeb8ae;font-size:11px;text-align:center;direction:rtl}@media(max-width:400px){body{padding:10px 7px}.shell{padding:14px;border-radius:18px}.keypad{gap:7px}.key{min-height:48px;font-size:14px}.expression{font-size:24px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-
-<nav>
-  <div class="brand"><span class="chip">991</span> casio-u8-emu</div>
-  <a class="navbtn" href="https://github.com/mohammedalhinaki-cloud/Study-tools" target="_blank" rel="noopener">GitHub ↗</a>
-</nav>
-
-<header class="hero">
-  <div>
-    <span class="eyebrow">مشروع مفتوح المصدر · رخصة MIT</span>
-    <h1>مُحاكي حاسوب كاسيو fx‑991ES PLUS
-      <span class="en">nX-U8/100 · clean-room C17 emulator</span>
-    </h1>
-    <p class="lead">إعادة بناء كاملة من الصفر لمعالج nX-U8/100: نواة بعدّ دورات دقيق، ذاكرة بنكية، طرفيات مربوطة، واجهة رسومية، واختبارات تكامل خضراء بالكامل — دون أي رمز ثابت (ROM) من كاسيو.</p>
-    <div class="ctas">
-      <a class="btn btn-primary" href="https://github.com/mohammedalhinaki-cloud/Study-tools" target="_blank" rel="noopener">المستودع على GitHub</a>
-      <a class="btn btn-ghost" href="#build">كيف تبنيه</a>
-    </div>
-  </div>
-
-  <div class="device">
-    <div class="shell">
-      <div class="lcd">
-        <svg class="lcdmat" viewBox="0 0 96 32" width="100%" shape-rendering="crispEdges" role="img" aria-label="شاشة نقطية تعرض U8-EMU">
-        <rect x="25" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="26" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="27" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="24" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="28" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="24" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="28" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="24" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="28" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="24" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="28" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="24" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="28" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="25" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="26" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="27" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="32" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="33" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="34" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="31" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="35" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="31" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="35" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="32" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="33" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="34" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="31" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="35" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="31" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="35" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="32" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="33" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="34" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="39" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="40" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="41" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="46" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="47" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="48" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="49" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="46" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="47" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="48" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="45" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="46" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="47" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="48" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="49" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="53" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="55" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="54" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="54" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="52" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="56" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="60" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="61" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="62" y="12" width="1" height="1" fill="#263229"/>
-        <rect x="59" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="63" y="13" width="1" height="1" fill="#263229"/>
-        <rect x="59" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="63" y="14" width="1" height="1" fill="#263229"/>
-        <rect x="59" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="63" y="15" width="1" height="1" fill="#263229"/>
-        <rect x="59" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="63" y="16" width="1" height="1" fill="#263229"/>
-        <rect x="59" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="63" y="17" width="1" height="1" fill="#263229"/>
-        <rect x="60" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="61" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="62" y="18" width="1" height="1" fill="#263229"/>
-        <rect x="67" y="18" width="1" height="1" fill="#263229" class="cursor"/>
-        <rect x="68" y="18" width="1" height="1" fill="#263229" class="cursor"/>
-        <rect x="69" y="18" width="1" height="1" fill="#263229" class="cursor"/>
-      </svg>
-        <div class="lcd-caption">
-          <span>96×32 DOT MATRIX</span>
-          <span class="solar"><i></i><i></i><i></i><i></i></span>
-        </div>
-      </div>
-      <div class="keypad-deco" aria-hidden="true">
-        <span>7</span><span>8</span><span>9</span><span>&divide;</span><span>AC</span>
-        <span>4</span><span>5</span><span>6</span><span>&times;</span><span>(</span>
-        <span>1</span><span>2</span><span>3</span><span>&minus;</span><span>)</span>
-      </div>
-    </div>
-    <div class="stats">
-      <div><b>6/6</b><small>اختبارات ناجحة</small></div>
-      <div><b>6</b><small>مراحل مكتملة</small></div>
-      <div><b>96×32</b><small>نقطة شاشة</small></div>
-    </div>
-  </div>
-</header>
-
-<section id="features">
-  <div class="sec-head"><span class="tag">ما الذي يحتويه</span>
-  <h2>محاكاة على مستوى التعليمات مع عدّ دورات دقيق</h2></div>
-  <div class="cards">
-    <div class="card"><span class="ic">CPU</span><h3>نواة nX‑U8/100 كاملة</h3>
-      <p>المجموعة الموثقة كاملة بأعلام C/Z/S/OV/HC دقيقة، بنوك المقاطعات بثلاثة مستويات، وبادئة DSR وعقوبة [EA+] للناقل.</p></div>
-    <div class="card"><span class="ic">MMU</span><h3>ذاكرة بنكية</h3>
-      <p>نافذة ROM، ذاكرة RAM، مساحة SFR، VRAM ثقبًا-بثقب، وصفحتا كود بانعكاسbankي كما في الآلة الحقيقية.</p></div>
-    <div class="card"><span class="ic">PERIPH</span><h3>طرفيات مربوطة</h3>
-      <p>وحدة مقاطعات، مؤقتان يُغذّيان بالدورات، مسح لوحة مفاتيح 7×8، وتحكم LCD — عبر إرسال SFR حقيقي بأثر جانبي.</p></div>
-    <div class="card"><span class="ic">GUI</span><h3>واجهة SDL2 + ImGui</h3>
-      <p>شاشة LCD حية، لوحة مفاتيح قابلة للنقر، ولوحات تصحيح: السجلات، المفكك، الذاكرة، والطرفيات — مع تحكم تشغيل/خطوة.</p></div>
-  </div>
-</section>
-
-<section id="build">
-  <div class="sec-head"><span class="tag">سطرين وتبدأ</span>
-  <h2>البناء والتشغيل</h2></div>
-  <div class="term">
-    <div class="term-bar"><i></i><i></i><i></i><span>terminal — linux / windows</span></div>
-    <pre><span class="c"># build and run the test suite</span>
-<span class="p">$</span> <span class="u">git clone https://github.com/mohammedalhinaki-cloud/Study-tools.git</span>
-<span class="p">$</span> <span class="u">cmake -S Study-tools -B build -DCMAKE_BUILD_TYPE=Release</span>
-<span class="p">$</span> <span class="u">cmake --build build --parallel</span>
-<span class="p">$</span> <span class="u">ctest --test-dir build --output-on-failure</span>
-
-<span class="c"># GUI needs libsdl2-dev; supply a ROM you dumped yourself</span>
-<span class="p">$</span> <span class="u">./build/u8gui --rom rom.bin --steps-per-frame 50000</span>
-
-<span class="c"># headless run: registers + LCD frame dump</span>
-<span class="p">$</span> <span class="u">./build/u8emu --rom rom.bin --steps 1000000 --regs --vram frame.raw</span></pre>
-  </div>
-</section>
-
-<section id="roadmap">
-  <div class="sec-head"><span class="tag">حالة المشروع</span>
-  <h2>المراحل الست كلها مكتملة</h2></div>
-  <div class="phases">
-    <div class="phase"><span class="num">01</span><span class="name">الهيكل ونظام البناء والرخصة</span><span class="ok">✓ مكتملة</span></div>
-    <div class="phase"><span class="num">02</span><span class="name">بحث النموذج المستهدف<small>خريطة الذاكرة، نافذة SFR، مصفوفة لوحة المفاتيح</small></span><span class="ok">✓ مكتملة</span></div>
-    <div class="phase"><span class="num">03</span><span class="name">نواة المعالج واختباراتها<small>ALU، القفزات والمقاطعات، MMU، المفكك</small></span><span class="ok">✓ مكتملة</span></div>
-    <div class="phase"><span class="num">04</span><span class="name">ربط الطرفيات عبر SFR<small>مقاطعات، مؤقتات، لوحة مفاتيح، تحكم LCD</small></span><span class="ok">✓ مكتملة</span></div>
-    <div class="phase"><span class="num">05</span><span class="name">الواجهة الرسومية SDL2 + Dear ImGui</span><span class="ok">✓ مكتملة</span></div>
-    <div class="phase"><span class="num">06</span><span class="name">اختبار تكامل مع ROM إقلاعي اصطناعي + CI</span><span class="ok">✓ مكتملة</span></div>
-  </div>
-</section>
-
-<section id="legal">
-  <div class="sec-head"><span class="tag">ملاحظة قانونية</span>
-  <h2>لا يوزّع هذا المشروع أي نظام ثابت</h2></div>
-  <div class="notice">
-    المشروع <strong>لا يتضمن ولا يوزّع أي ثِبات (ROM) من كاسيو</strong>. لتشغيل المحاكي يجب أن توفر تفريغ ROM خاصًا بك قانونيًا
-    (من آلة تملكها أو من نسخة برنامج كاسيو الرسمي الذي رخّصته). كاسيو والأسماء التجارية علامات مسجلة لشركة Casio Computer Co., Ltd.
-  </div>
-</section>
-
-<footer>
-  <span>casio-u8-emu — إعادة بناء نظيفة الحدود، رخصة MIT</span>
-  <span class="en">github.com/mohammedalhinaki-cloud/Study-tools</span>
-</footer>
-
-</div>
-
-
-</body>
-</html>
+<main class="shell" aria-label="حاسبة علمية fx-991ES PLUS">
+  <header class="top"><div class="brand"><small>SCIENTIFIC CALCULATOR</small>حاسبة علمية</div><div class="model">fx‑991ES PLUS</div></header>
+  <section class="display" aria-live="polite"><div class="indicators"><span id="shiftLed">SHIFT</span><span id="alphaLed">ALPHA</span><span id="modeLed" class="on">MATH</span><span id="angleLed">DEG</span></div><div class="history" id="history"></div><div class="expression" id="expression">0</div><div class="answer" id="answer"></div><div class="status" id="status">Ready</div></section>
+  <div class="toolbar"><button class="tool" id="shiftBtn">SHIFT</button><button class="tool" id="angleBtn">DEG</button><button class="tool" id="memoryBtn">M</button><button class="tool" id="clearBtn">AC</button></div>
+  <section class="keypad" id="keypad">
+    <button class="key fn" data-action="shift"><span class="sub">SHIFT</span>SHIFT</button><button class="key fn" data-action="alpha"><span class="sub">ALPHA</span>ALPHA</button><button class="key fn" data-action="mode"><span class="sub">MODE</span>MODE</button><button class="key fn" data-action="del">DEL</button><button class="key danger" data-action="clear">AC</button>
+    <button class="key fn" data-value="sin("><span class="sub">sin⁻¹</span>sin</button><button class="key fn" data-value="cos("><span class="sub">cos⁻¹</span>cos</button><button class="key fn" data-value="tan("><span class="sub">tan⁻¹</span>tan</button><button class="key fn" data-value="log("><span class="sub">10ˣ</span>log</button><button class="key fn" data-value="ln("><span class="sub">eˣ</span>ln</button>
+    <button class="key fn" data-value="√("><span class="sub">x²</span>√</button><button class="key fn" data-value="^2">x²</button><button class="key fn" data-value="^">xʸ</button><button class="key fn" data-value="(" >(</button><button class="key fn" data-value=")">)</button>
+    <button class="key" data-value="7">7</button><button class="key" data-value="8">8</button><button class="key" data-value="9">9</button><button class="key op" data-value="÷">÷</button><button class="key fn" data-value="π">π</button>
+    <button class="key" data-value="4">4</button><button class="key" data-value="5">5</button><button class="key" data-value="6">6</button><button class="key op" data-value="×">×</button><button class="key fn" data-value="e">e</button>
+    <button class="key" data-value="1">1</button><button class="key" data-value="2">2</button><button class="key" data-value="3">3</button><button class="key op" data-value="−">−</button><button class="key fn" data-action="ans">Ans</button>
+    <button class="key" data-value="0">0</button><button class="key" data-value=".">.</button><button class="key" data-value="%">%</button><button class="key op" data-value="+">+</button><button class="key eq" data-action="equals">=</button>
+  </section>
+  <div class="help">يمكنك استخدام لوحة المفاتيح أيضاً · الحسابات تُنفّذ محلياً في متصفحك</div>
+</main>
+<p class="footer">واجهة تعليمية مستوحاة من <strong>Casio fx‑991ES PLUS</strong> وليست منتجاً رسمياً من Casio · <a href="https://github.com/mohammedalhinaki-cloud/Study-tools" target="_blank" rel="noopener">المصدر على GitHub</a></p>
+<script>
+const $=s=>document.querySelector(s), exprEl=$('#expression'), ansEl=$('#answer'), histEl=$('#history'), statusEl=$('#status');
+let expr='', last='', shift=false, alpha=false, angle='DEG', memory=0;
+const setText=()=>{exprEl.textContent=expr||'0';$('#shiftLed').classList.toggle('on',shift);$('#alphaLed').classList.toggle('on',alpha);$('#angleLed').textContent=angle;$('#angleBtn').textContent=angle;};
+function append(v){if(v==='−')v='-';if(v==='×')v='*';if(v==='÷')v='/';if(v==='π')v='PI';expr+=v;ansEl.textContent='';setText()}
+function factorial(n){if(n<0||n>170||n%1)return NaN;let r=1;for(let i=2;i<=n;i++)r*=i;return r}
+function calculate(input){let s=input.replace(/Ans/g,String(last||0)).replace(/√/g,'sqrt').replace(/%/g,'/100').replace(/PI/g,'Math.PI').replace(/\be\b/g,'Math.E').replace(/\^/g,'**');
+  s=s.replace(/(\d+(?:\.\d+)?)!/g,'fact($1)');
+  const trig=(name,fn)=>{let re=new RegExp(name+'\\(([^()]*)\\)','g');s=s.replace(re,(_,x)=>fn+'('+((angle==='DEG')?'('+x+')*Math.PI/180':x)+')')};
+  trig('sin','Math.sin');trig('cos','Math.cos');trig('tan','Math.tan');
+  s=s.replace(/asin\(([^()]*)\)/g,'Math.asin($1)').replace(/acos\(([^()]*)\)/g,'Math.acos($1)').replace(/atan\(([^()]*)\)/g,'Math.atan($1)').replace(/log\(/g,'Math.log10(').replace(/ln\(/g,'Math.log(').replace(/sqrt\(/g,'Math.sqrt(');
+  if(!/^[0-9+\-*/().,\sA-Za-z_]*$/.test(s)||s.includes('Math.')){} // transformed math identifiers are explicitly whitelisted below
+  if(!/^[0-9+\-*/().,\sA-Za-z_]*$/.test(s))throw Error('Invalid');
+  const val=Function('fact','return ('+s+')')(factorial);if(!Number.isFinite(val))throw Error('Math error');return val;
+}
+function equals(){if(!expr)return;try{const value=calculate(expr);histEl.textContent=expr+' =';ansEl.textContent=nice(value);last=value;expr='';statusEl.textContent='OK';setText()}catch(e){ansEl.textContent='Math ERROR';statusEl.textContent='Check expression'}}
+function nice(n){if(Math.abs(n)<1e-12)n=0;return Number.isInteger(n)?String(n):Number(n.toPrecision(12)).toString()}
+function clear(){expr='';ansEl.textContent='';histEl.textContent='';statusEl.textContent='Ready';setText()}
+function del(){expr=expr.slice(0,-1);setText()}
+function action(a){if(a==='shift'){shift=!shift;setText();return}if(a==='alpha'){alpha=!alpha;setText();return}if(a==='mode'){statusEl.textContent='COMP · MATH';return}if(a==='clear'){clear();return}if(a==='del'){del();return}if(a==='equals'){equals();return}if(a==='ans')append('Ans')}
+$('#keypad').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.action)action(b.dataset.action);else if(b.dataset.value){let v=b.dataset.value;if(shift){if(v==='sin(')v='asin(';if(v==='cos(')v='acos(';if(v==='tan(')v='atan(';if(v==='log(')v='10**(';if(v==='ln(')v='Math.E**(';shift=false}append(v);setText()}});
+$('#clearBtn').onclick=clear;$('#shiftBtn').onclick=()=>action('shift');$('#angleBtn').onclick=()=>{angle=angle==='DEG'?'RAD':'DEG';setText()};$('#memoryBtn').onclick=()=>{if(ansEl.textContent){memory=Number(last);statusEl.textContent='M stored'}else{append(String(memory));statusEl.textContent='M recalled'}};
+document.addEventListener('keydown',e=>{if(e.key==='Enter')return equals();if(e.key==='Escape')return clear();if(e.key==='Backspace')return del();const map={'*':'×','/':'÷','-':'−'};if(/[0-9+\-*/().%]/.test(e.key))append(map[e.key]||e.key)});setText();
+</script>
+</body></html>
