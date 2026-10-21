@@ -88,9 +88,10 @@ h1 .en{font-family:var(--mono);color:var(--silver);font-size:.62em;font-weight:6
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
 .keypad-deco{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px}
 .keypad-deco span{height:26px;border-radius:7px;background:linear-gradient(180deg,#3d443b,#31372f);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 0 #171b16}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 0 #171b16;
+  display:grid;place-items:center;font-family:var(--mono);font-size:10.5px;color:#c8cec6}
 .keypad-deco span:nth-child(2){background:linear-gradient(180deg,#8f958c,#7a8078)}
-.keypad-deco span:nth-child(12){background:var(--amber);box-shadow:0 2px 0 #a86a14}
+.keypad-deco span:nth-child(12){background:var(--amber);color:#241a08;box-shadow:0 2px 0 #a86a14}
 .stats{display:flex;gap:0;margin-top:22px;border:1px solid var(--edge);border-radius:12px;
   overflow:hidden;background:var(--panel)}
 .stats div{flex:1;text-align:center;padding:13px 6px}
@@ -190,9 +191,9 @@ footer .en{font-family:var(--mono);direction:ltr}
         </div>
       </div>
       <div class="keypad-deco" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
+        <span>7</span><span>8</span><span>9</span><span>&divide;</span><span>AC</span>
+        <span>4</span><span>5</span><span>6</span><span>&times;</span><span>(</span>
+        <span>1</span><span>2</span><span>3</span><span>&minus;</span><span>)</span>
       </div>
     </div>
     <div class="stats">
@@ -223,16 +224,16 @@ footer .en{font-family:var(--mono);direction:ltr}
   <h2>البناء والتشغيل</h2></div>
   <div class="term">
     <div class="term-bar"><i></i><i></i><i></i><span>terminal — linux / windows</span></div>
-    <pre><span class="c"><span class="ar">بناء المشروع وتشغيل الاختبارات</span></span>
+    <pre><span class="c"># build and run the test suite</span>
 <span class="p">$</span> <span class="u">git clone https://github.com/mohammedalhinaki-cloud/Study-tools.git</span>
 <span class="p">$</span> <span class="u">cmake -S Study-tools -B build -DCMAKE_BUILD_TYPE=Release</span>
 <span class="p">$</span> <span class="u">cmake --build build --parallel</span>
 <span class="p">$</span> <span class="u">ctest --test-dir build --output-on-failure</span>
 
-<span class="c"><span class="ar">الواجهة الرسومية — يلزم libsdl2-dev — توفر ROM من آلة تملكها</span></span>
+<span class="c"># GUI needs libsdl2-dev; supply a ROM you dumped yourself</span>
 <span class="p">$</span> <span class="u">./build/u8gui --rom rom.bin --steps-per-frame 50000</span>
 
-<span class="c"><span class="ar">أو المشغّل بلا واجهة: سجلات وإطار شاشة</span></span>
+<span class="c"># headless run: registers + LCD frame dump</span>
 <span class="p">$</span> <span class="u">./build/u8emu --rom rom.bin --steps 1000000 --regs --vram frame.raw</span></pre>
   </div>
 </section>
