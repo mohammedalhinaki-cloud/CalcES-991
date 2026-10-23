@@ -131,3 +131,13 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
  .native-android .ad-reservation { grid-column:1 / -1; }
  .native-android [aria-label="لوحة مفاتيح الحاسبة"] { grid-row:2 / -1; }
 }
+
+/* Native top-layer dialogs preserve the editor selection and hide banners via the existing observer. */
+.engagement-dialog { background:#0f172a; width:min(94vw,520px); max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); line-height:1.85; overflow-wrap:anywhere; touch-action:pan-y; }
+.engagement-dialog h2 { font-size:1.15rem; font-weight:700; margin-bottom:12px; }
+.engagement-dialog h3 { font-weight:700; color:#ddd6fe; margin-bottom:6px; }
+.engagement-dialog p,.engagement-dialog section { margin-bottom:14px; }
+.engagement-dialog a { color:#c4b5fd; text-decoration:underline; }
+.engagement-actions { display:grid; gap:10px; margin-top:18px; }
+.engagement-actions button { min-height:44px; white-space:normal; padding:10px; }
+.engagement-actions .rating-primary { background:#6650a4; color:#fff; }

@@ -19,7 +19,7 @@ if (realAds && (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}') || appId.contai
 android {
     buildFeatures { buildConfig true }
     defaultConfig {
-        versionCode value('APP_VERSION_CODE', '1').toInteger()
+        versionCode value('APP_VERSION_CODE', '2').toInteger()
         versionName value('APP_VERSION_NAME', '1.0.0')
         manifestPlaceholders = [admobAppId: appId]
         buildConfigField 'String', 'PRIVACY_POLICY_URL', quoted(value('PRIVACY_POLICY_URL', ''))

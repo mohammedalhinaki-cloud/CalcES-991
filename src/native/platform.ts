@@ -11,4 +11,4 @@ export interface AndroidConfiguration {
  supportEmail:string
  versionName:string
 }
-export const AppConfiguration=registerPlugin<{getConfiguration:()=>Promise<AndroidConfiguration>}>('AppConfiguration')
+export const AppConfiguration=registerPlugin<{getConfiguration:()=>Promise<AndroidConfiguration>;openStore:()=>Promise<void>}>('AppConfiguration')

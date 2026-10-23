@@ -1,3 +1,4 @@
+import RatingPrompt from './RatingPrompt'
 import { useState } from 'react'
 import AdvancedWorkspaces from './workspaces/AdvancedWorkspaces'
 import Keypad from './keypad/Keypad'
@@ -23,6 +24,7 @@ export default function CalculatorShell() {
    </aside>
    <Keypad/>
   </article>
+  <RatingPrompt/>
   <ModeMenu/>
   <HistoryPanel open={historyOpen} onClose={()=>setHistoryOpen(false)}/>
  </div>

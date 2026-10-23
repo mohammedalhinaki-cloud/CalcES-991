@@ -1,3 +1,4 @@
+import {recordSuccessfulCalculation} from '../engagement/rating'
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { calculatorReducer, initialState } from './calculatorReducer'
@@ -36,7 +37,10 @@ function useCalculatorController(){
   const sequence=useRef(0)
   const pendingHistory=useRef<HistoryEntry|null>(null)
   const recordedResult=useRef<unknown>(null)
-  const record=useCallback((entry:HistoryEntry)=>setHistory(previous=>appendHistory(previous,entry)),[])
+  const record=useCallback((entry:HistoryEntry)=>{
+    setHistory(previous=>appendHistory(previous,entry))
+    recordSuccessfulCalculation()
+  },[])
   const runAdvanced=useCallback((request:AdvancedRequest)=>{
     pendingHistory.current={id:String(++sequence.current),snapshot:structuredClone(state),tool,title:'',value:null,request:structuredClone(request)}
     advanced.run(request)

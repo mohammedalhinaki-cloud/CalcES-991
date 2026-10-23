@@ -1,6 +1,8 @@
 package calces991.calculator;
 
 import com.google.android.gms.ads.AdSize;
+import android.content.Intent;
+import android.net.Uri;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -24,5 +26,17 @@ public class AppConfigurationPlugin extends Plugin {
         value.put("supportEmail", BuildConfig.SUPPORT_EMAIL);
         value.put("versionName", BuildConfig.VERSION_NAME);
         call.resolve(value);
+    }
+    @PluginMethod
+    public void openStore(PluginCall call) {
+        // Fixed publisher-provided destination: never accept an arbitrary intent from web content.
+        getActivity().runOnUiThread(() -> {
+            try {
+                getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://study-tools-calculator.pages.dev/")));
+                call.resolve();
+            } catch (Exception failure) {
+                call.reject("Unable to open the publisher website", failure);
+            }
+        });
     }
 }

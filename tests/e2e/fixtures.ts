@@ -3,6 +3,8 @@ import { test as base, expect } from '@playwright/test'
 // Every default page is checked, including errors emitted before the first click.
 export const test=base.extend<{runtimeChecks:void}>({
  runtimeChecks:[async({page},use,testInfo)=>{
+  // Keep unrelated calculator acceptance flows independent of the engagement prompt.
+  await page.addInitScript(()=>localStorage.setItem('rate_done','1'))
   const failures:string[]=[]
   const pageError=(error:Error)=>failures.push(`Runtime: ${error.message}`)
   const consoleMessage=(message:import('@playwright/test').ConsoleMessage)=>{
