@@ -34,3 +34,7 @@
 [تحميل AAB الموقّع باللغتين](https://github.com/mohammedalhinaki-cloud/Study-tools/raw/refs/heads/main/releases/android/CalcES-991-1.1.0-build4-signed.aab). يظهر اختيار العربية أو English مرة واحدة ويُحفظ على الجهاز، مع ترجمة كاملة للواجهة والأدوات والرسائل وتخطيط ثابت في اللغتين. الحزمة بالمفتاح نفسه وApplication ID `calces991.calculator`.
 
 [ملف Google Play الجاهز للنسخ واللصق، مع السياسة الكاملة](../../docs/play/console-ready/Google-Play-Console-Copy-Paste.ar.txt) — [تقرير التحقق](../../docs/play/console-ready/build4-verification.ar.md). الإعلانات معطلة وأذونات الإعلان والخدمة الأمامية غير المستخدمة مستبعدة من release. الجمهور المعتمد 13+ وغير موجّه للأطفال. الصور الفعلية للجهاز والهوية القانونية واستبيان IARC ومتطلبات اختبار الحساب تُستكمل لدى المالك.
+
+## البناء 5 — الإصدار 1.0.1
+
+[تحميل AAB الموقّع](https://github.com/mohammedalhinaki-cloud/Study-tools/raw/refs/heads/main/releases/android/CalcES-991-1.0.1-build5-signed.aab). تم تعديل versionCode إلى 5 وversionName إلى 1.0.1 كما طلب المالك، مع الاحتفاظ بمعرّف الحزمة ومفتاح الرفع واللغات والمنطق وإعدادات الإعلانات كما كانت. تحقق البناء والتوقيع وقيم manifest داخل الحزمة. لم يُعد بناء APK ولم يُرفع شيء إلى Play Console.
