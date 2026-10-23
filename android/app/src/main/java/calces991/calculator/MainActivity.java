@@ -1,4 +1,4 @@
-package com.mohammedalhinaki.studytools.calculator;
+package calces991.calculator;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;

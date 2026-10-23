@@ -1,6 +1,6 @@
 # نتيجة تجهيز Android — نسخة مراجعة وليست رفعًا نهائيًا
 
-- الاسم الحالي ومعرّف الحزمة: CalcES 991 - حاسبة علمية / `com.mohammedalhinaki.studytools.calculator`، الإصدار 1.0.0 ورمز الإصدار 1.
+- الاسم الحالي ومعرّف الحزمة: CalcES 991 - حاسبة علمية / `calces991.calculator`، الإصدار 1.0.0 ورمز الإصدار 1.
 - Android: min API 24، target/compile API 36، JDK 21، Gradle 8.14.3، AGP 8.13.0، System WebView 107+.
 - نجحت مهام `assembleDebug` و`bundleRelease` و`lintDebug`.
 - Android Lint: صفر أخطاء وثلاثة تنبيهات غير مانعة: إصدار GMA أحدث متاح، وموردَا config.xml وAppTheme.NoActionBar اللذان يراجعان من التوليد/الاعتمادات. لم تُعطّل فحوص Lint لإخفائها.

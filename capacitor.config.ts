@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 // Confirm this applicationId before the first Play upload; it identifies the app permanently.
 const config:CapacitorConfig={
- appId:'com.mohammedalhinaki.studytools.calculator',
+ appId:'calces991.calculator',
  appName:'CalcES 991 - حاسبة علمية',
  webDir:'build/web',
  backgroundColor:'#15171c',

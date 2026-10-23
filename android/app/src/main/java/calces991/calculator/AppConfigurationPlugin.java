@@ -1,4 +1,4 @@
-package com.mohammedalhinaki.studytools.calculator;
+package calces991.calculator;
 
 import com.google.android.gms.ads.AdSize;
 import com.getcapacitor.JSObject;
