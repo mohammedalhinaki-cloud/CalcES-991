@@ -1,3 +1,4 @@
+import { localize } from '../../i18n/locale'
 import { useEffect, useRef, useState } from 'react'
 import type { MathfieldElement } from 'mathlive'
 import { loadMathLive } from '../../editor/mathliveAdapter'
@@ -28,7 +29,7 @@ export default function MathEditor({ onChange, onReady, off, onEditIntent }: Pro
       editor.current = field
       field.mathVirtualKeyboardPolicy = 'manual'
       field.disabled = offRef.current
-      field.setAttribute('aria-label', 'محرر المعادلة')
+      field.setAttribute('aria-label', localize('محرر المعادلة'))
       field.setAttribute('dir', 'ltr')
       field.setAttribute('default-mode', 'math')
       field.addEventListener('input', handleInput)
@@ -65,9 +66,9 @@ export default function MathEditor({ onChange, onReady, off, onEditIntent }: Pro
   // Uncontrolled custom element: React never writes its value/selection on input.
   return (
     <div>
-      <p id="editor-help" className="sr-only">المس أي موضع للتحرير، أو اسحب لتحديد جزء من المعادلة.</p>
+      <p id="editor-help" className="sr-only">{localize("المس أي موضع للتحرير، أو اسحب لتحديد جزء من المعادلة.")}</p>
       <div ref={host} className="math-editor-host" aria-describedby="editor-help" />
-      {error && <p role="alert">{error}</p>}
+      {localize(error && <p role="alert">{localize(error)}</p>)}
     </div>
   )
 }

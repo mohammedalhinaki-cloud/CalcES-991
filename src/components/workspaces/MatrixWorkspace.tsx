@@ -1,3 +1,4 @@
+import { localize } from '../../i18n/locale'
 import { useEffect, useState } from 'react'
 import { useCalculator } from '../../state/CalculatorProvider'
 import MatrixGrid from './MatrixGrid'
@@ -12,5 +13,5 @@ export default function MatrixWorkspace(){
  useWorkspaceSubmit(active,submit)
  if(!active)return null
  const resize=(size:number)=>{advanced.cancel();setA(Array.from({length:size},(_,i)=>Array.from({length:size},(_,j)=>a[i]?.[j]??(i===j?'1':'0'))));setB(Array.from({length:size},(_,i)=>Array.from({length:size},(_,j)=>b[i]?.[j]??(i===j?'1':'0'))))}
- return <section className="mt-3" aria-label="مساحة المصفوفات"><Choices value={operation} choices={[["det","محدد A"],["inverse","معكوس A"],["multiply","A × B"]]} onChange={value=>{advanced.cancel();setTool(value)}}/><Choices value={String(a.length)} choices={[["2","2 × 2"],["3","3 × 3"]]} onChange={value=>resize(Number(value))}/><MatrixGrid label="A" values={a} onChange={setA}/>{operation==='multiply'&&<MatrixGrid label="B" values={b} onChange={setB}/>}<ComputeButton onClick={submit}/></section>
+ return <section className="mt-3" aria-label={localize("مساحة المصفوفات")}><Choices value={operation} choices={[["det","محدد A"],["inverse","معكوس A"],["multiply","A × B"]]} onChange={value=>{advanced.cancel();setTool(value)}}/><Choices value={String(a.length)} choices={[["2","2 × 2"],["3","3 × 3"]]} onChange={value=>resize(Number(value))}/><MatrixGrid label="A" values={a} onChange={setA}/>{localize(operation==='multiply'&&<MatrixGrid label="B" values={b} onChange={setB}/>)}<ComputeButton onClick={submit}/></section>
 }

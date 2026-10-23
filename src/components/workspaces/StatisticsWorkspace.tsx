@@ -1,3 +1,4 @@
+import { localize } from '../../i18n/locale'
 import { useEffect, useState } from 'react'
 import { useCalculator } from '../../state/CalculatorProvider'
 import DataEntry from './DataEntry'
@@ -10,5 +11,5 @@ export default function StatisticsWorkspace(){
  const submit=()=>runAdvanced({kind:'statistics',operation,data:operation==='summary'?summary:pairs})
  useWorkspaceSubmit(active,submit)
  if(!active)return null
- return <section className="mt-3" aria-label="مساحة الإحصاء"><Choices value={operation} choices={[["summary","متغير واحد"],["regression","انحدار خطي"]]} onChange={value=>{advanced.cancel();setTool(value)}}/><p className="mb-2 text-xs leading-6">{operation==='summary'?'افصل القيم بمسافة أو سطر أو فاصلة.':'كل سطر زوج x,y. حد أقصى 1000 صف.'}</p><DataEntry label="بيانات الإحصاء" multiline value={operation==='summary'?summary:pairs} onChange={operation==='summary'?setSummary:setPairs}/><ComputeButton onClick={submit}/></section>
+ return <section className="mt-3" aria-label={localize("مساحة الإحصاء")}><Choices value={operation} choices={[["summary","متغير واحد"],["regression","انحدار خطي"]]} onChange={value=>{advanced.cancel();setTool(value)}}/><p className="mb-2 text-xs leading-6">{localize(operation==='summary'?'افصل القيم بمسافة أو سطر أو فاصلة.':'كل سطر زوج x,y. حد أقصى 1000 صف.')}</p><DataEntry label={localize("بيانات الإحصاء")} multiline value={operation==='summary'?summary:pairs} onChange={operation==='summary'?setSummary:setPairs}/><ComputeButton onClick={submit}/></section>
 }

@@ -1,3 +1,4 @@
+import {translate} from '../i18n/locale'
 import { useEffect, useRef, useState } from 'react'
 import { isAndroidApp, PUBLIC_APP_URL } from '../native/platform'
 interface InstallPrompt extends Event {
@@ -24,10 +25,10 @@ export function useAppActions(){
  async function share(){
   setNotice('')
   if(isAndroidApp()){
-   try{const {Share}=await import('@capacitor/share');await Share.share({title:'CalcES 991 - حاسبة علمية',text:'حاسبة علمية تفاعلية',url});return}catch(error){if(error instanceof Error&&/cancel/i.test(error.message))return}
+   try{const {Share}=await import('@capacitor/share');await Share.share({title:translate('CalcES 991 - حاسبة علمية'),text:translate('حاسبة علمية تفاعلية'),url});return}catch(error){if(error instanceof Error&&/cancel/i.test(error.message))return}
   }
   if(navigator.share){
-   try{await navigator.share({title:'CalcES 991 - حاسبة علمية',text:'حاسبة علمية تفاعلية',url});return}
+   try{await navigator.share({title:translate('CalcES 991 - حاسبة علمية'),text:translate('حاسبة علمية تفاعلية'),url});return}
    catch(error){if(error instanceof DOMException&&error.name==='AbortError')return}
   }
   try{await navigator.clipboard.writeText(url);setNotice('تم نسخ رابط الحاسبة للمشاركة')}

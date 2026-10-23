@@ -1,0 +1,126 @@
+CalcES 991 — سياسة الخصوصية / Privacy Policy
+العربيةEnglishCalcES 991
+
+
+سياسة الخصوصية — العربية
+
+
+التطبيق: CalcES 991 - حاسبة علمية
+الناشر: Maaoun Studio
+معرّف تطبيق Android: calces991.calculator
+آخر تحديث: 23 أكتوبر 2026
+الدعم: jy906675@gmail.com
+
+
+
+الحسابات والحسابات الشخصية
+
+تعمل وظائف الحاسبة على جهازك دون اتصال، ولا تتطلب إنشاء حساب أو تسجيل الدخول. لا يرسل كود الحاسبة المعادلات أو النتائج أو المتغيرات أو سجل العمليات إلى خادم للحساب، ولا يتضمن أدوات تحليل استخدام أو تتبّع خاصة بالناشر. يبقى سجل الحسابات والذاكرة خلال الجلسة فقط.
+
+
+
+
+التخزين على الجهاز
+
+نحفظ اللغة التي تختارها عند التشغيل الأول، وعدد العمليات الناجحة، وتفضيلات إغلاق أو تأجيل تذكير التقييم في التخزين المحلي على جهازك. لا تُرسل هذه المعلومات إلينا، ولا يحتوي عداد التقييم على المعادلات أو النتائج. تبقى حتى حذف بيانات التطبيق أو الموقع أو إلغاء التثبيت. حذف التطبيق من Android يمسح بياناته المحلية؛ وبيانات نسخة المتصفح يمكن حذفها من إعدادات الموقع في المتصفح. لا توجد خدمة سحابية لمزامنة هذه البيانات، والنسخ الاحتياطي السحابي لبيانات Android معطل.
+
+
+
+
+الأذونات
+
+لا نطلب أذونات الوصول إلى الموقع الجغرافي أو الكاميرا أو الميكروفون أو جهات الاتصال أو ملفاتك الخاصة. تتضمن حزمة Android إمكانية الاتصال بالإنترنت لفتح الروابط التي تختارها وخدمات الإصدارات الداعمة للإعلان. أذونات معرّف الإعلان وخدمات الإعلان مستبعدة من إصدار النشر الحالي. في إصدار 1.1.0، البناء 4، الإعلانات معطلة ولا يهيئ التطبيق مزود الإعلانات أو يطلب إعلانات.
+
+
+
+
+الإعلانات وخدمات Google
+
+تتضمن بنية التطبيق مكتبات Google Mobile Ads (AdMob) وGoogle User Messaging Platform لدعم بانر علوي اختياري في إصدارات لاحقة. لا يعرض البناء 4 إعلانات ولا يبدأ مزود الإعلان. إذا فُعلت الإعلانات في إصدار لاحق، فسيحتاج تحميلها للإنترنت وقد تعالج Google بيانات مثل معرّفات الجهاز أو الإعلان وعنوان IP ومعلومات التفاعل والتشخيص وفق إعدادات SDK والموافقة. قد يستنتج مزود الإعلان موقعاً تقريبياً من IP؛ لا نطلب إذن GPS. يلزم تحديث هذه السياسة وإقرارات المتجر قبل تفعيل الإعلان.
+
+في الإصدارات الداعمة للإعلانات، تُراجع موافقة Google UMP قبل طلب الإعلان، وتتوفر خيارات خصوصية الإعلان من نافذة الخصوصية عندما تتطلبها المنطقة. لا توجد إعلانات كاملة الشاشة. سياسة خصوصية Google — تقنيات إعلانات Google.
+
+
+
+
+المشاركة والتقييم والدعم
+
+المشاركة تفتح قائمة المشاركة على جهازك أو تنسخ رابط التطبيق، دون تضمين المعادلات أو السجل. التقييم يفتح Google Play خارج التطبيق. فتح سياسة الخصوصية أو الموقع يفتح المتصفح؛ تخضع الخدمات الخارجية لسياساتها. يستضيف Cloudflare موقع الويب وصفحة السياسة وقد يعالج طلبات الشبكة وبياناتها التقنية لتقديمها وتأمينها؛ هذه ليست بيانات حسابات يرسلها تطبيق Android أثناء الاستخدام دون اتصال. عند مراسلة الدعم نتلقى عنوان بريدك والمحتوى الذي ترسله، ونستخدمهما للرد ومعالجة طلبك، لا للإعلان أو البيع.
+
+
+
+
+الأطفال والجمهور
+
+لا تتطلب الحاسبة بيانات شخصية من أي مستخدم ولا تتضمن حسابات أو دردشة أو محتوى ينشئه المستخدمون للعموم. الجمهور المعتمد للتطبيق هو 13 سنة فأكثر، والتطبيق غير موجّه للأطفال دون 13 سنة. هذه السياسة ليست ادعاءً باعتماد Families. لا يجوز تفعيل الإعلانات للأطفال أو للجمهور المختلط دون استكمال الإعدادات والسياسات المناسبة.
+
+
+
+
+الاحتفاظ والحقوق والتواصل
+
+يمكنك مسح البيانات المحلية بنفسك كما سبق. لا توجد قاعدة بيانات للناشر تحتوي سجل حساباتك. لطلب حذف مراسلات دعم أرسلتها أو للاستفسار عن الخصوصية، تواصل مع jy906675@gmail.com؛ نعالج الطلب حسب القوانين المطبقة، مع الاحتفاظ بما يلزم قانوناً أو لمعالجة نزاع. لا نبيع بياناتك الشخصية. تُنشر تغييرات السياسة في هذه الصفحة مع تحديث التاريخ.
+
+
+
+
+
+
+Privacy Policy — English
+
+
+App: CalcES 991 - Scientific Calculator
+Publisher: Maaoun Studio
+Android application ID: calces991.calculator
+Last updated: October 23, 2026
+Support: jy906675@gmail.com
+
+
+
+Calculations and accounts
+
+Calculator functions run offline on your device without an account or sign-in. Calculator code does not send expressions, results, variables, or calculation history to a calculation server and contains no publisher analytics or tracking tools. Calculation history and variables are held for the current session only.
+
+
+
+
+On-device storage
+
+We save your first-launch language choice, successful calculation count, and rating reminder dismissal or postponement preferences in local device storage. These are not sent to us; the rating counter contains no expressions or results. They remain until you clear app or site data or uninstall the Android app. Browser data can be cleared through browser site settings. There is no cloud synchronization service, and Android app-data cloud backup is disabled.
+
+
+
+
+Permissions
+
+We do not request access to your location, camera, microphone, contacts, or private files. The Android package supports network access for links you choose to open and services in ad-enabled versions. Advertising-ID and AdServices permissions are excluded from the current release. In version 1.1.0, build 4, ads are disabled: the app does not initialize the advertising provider or request ads.
+
+
+
+
+Ads and Google services
+
+The project includes Google Mobile Ads (AdMob) and Google User Messaging Platform to support an optional top banner in later versions. Build 4 does not display ads or start the ad provider. If ads are enabled in a future release, they will require network access and Google may process device or advertising identifiers, IP addresses, interaction information, and diagnostics according to SDK configuration and consent. An ad provider may infer approximate location from IP; the app does not request GPS permission. This policy and store declarations must be updated before ads are enabled.
+
+In ad-enabled versions, Google UMP consent is checked before ad requests, with ad privacy options available in the Privacy dialog when required in your region. There are no full-screen ads. Google Privacy Policy — Google advertising technologies.
+
+
+
+
+Sharing, rating, and support
+
+Sharing opens your device's share sheet or copies the app link without including your expressions or history. Rating opens Google Play outside the app. Policy and website links open a browser; external services have their own policies. Cloudflare hosts the website and this policy and may process network requests and technical information to deliver and secure them. These are not calculation records sent by the offline Android app. When you email support, we receive your email address and message and use them to respond and resolve your request, not for advertising or sale.
+
+
+
+
+Children and audience
+
+The calculator does not require personal information and provides no accounts, chat, or public user-generated content. The intended audience is ages 13 and older. The app is not directed at children under 13, and this policy does not claim Families approval. Advertising for children or mixed audiences must not be enabled without the relevant configuration and policy requirements.
+
+
+
+
+Retention, rights, and contact
+
+You can delete local data using the methods above. The publisher has no database of your calculations. To request deletion of support messages you have sent, or to ask privacy questions, email jy906675@gmail.com. Requests are handled under applicable law, including any legally required retention or dispute handling. We do not sell your personal data. Policy changes will be posted here with an updated date.

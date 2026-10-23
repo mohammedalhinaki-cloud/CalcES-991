@@ -1,15 +1,15 @@
 # Copy to android/publisher.properties (ignored). These are settings, not a request to publish.
 # Confirm capacitor.config.ts and android/app/build.gradle applicationId before first upload.
-APP_VERSION_CODE=2
-APP_VERSION_NAME=1.0.0
+APP_VERSION_CODE=4
+APP_VERSION_NAME=1.1.0
 # Live advertising stays off until configured. Debug always uses Google's test IDs.
 ADS_ENABLED=false
 ADMOB_APP_ID=
 ADMOB_BANNER_ID=
 # Choose general or children. Mixed-age ad targeting needs a neutral age gate first.
-APP_AUDIENCE=unconfigured
-PRIVACY_POLICY_URL=
-SUPPORT_EMAIL=
+APP_AUDIENCE=general
+PRIVACY_POLICY_URL=https://study-tools-calculator.pages.dev/privacy.html
+SUPPORT_EMAIL=jy906675@gmail.com
 # Use an existing upload key or create one in Android Studio. Never commit it or these passwords.
 UPLOAD_KEYSTORE_PATH=
 UPLOAD_KEY_ALIAS=

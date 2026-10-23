@@ -28,3 +28,9 @@
 ## AAB المحدّث — البناء 3
 
 [تحميل AAB البناء 3](https://github.com/mohammedalhinaki-cloud/Study-tools/raw/refs/heads/main/releases/android/CalcES-991-1.0.0-build3-signed.aab). يحتفظ بالإصدار 1.0.0 ومعرّف calces991.calculator ومفتاح الرفع نفسه، مع versionCode=3. يفتح زرا التقييم صفحة التطبيق الصحيحة على Google Play، عبر market:// في Android وHTTPS احتياطيًا. لا توجد تغييرات في الواجهة أو الحساب أو التذكير، ولم يُعد بناء APK في هذا التحديث. للبناء مجددًا اضبط APP_VERSION_CODE=3، واستعمل قيمة أكبر من 3 للتحديث التالي.
+
+## الإصدار الأحدث: 1.1.0 — البناء 4
+
+[تحميل AAB الموقّع باللغتين](https://github.com/mohammedalhinaki-cloud/Study-tools/raw/refs/heads/main/releases/android/CalcES-991-1.1.0-build4-signed.aab). يظهر اختيار العربية أو English مرة واحدة ويُحفظ على الجهاز، مع ترجمة كاملة للواجهة والأدوات والرسائل وتخطيط ثابت في اللغتين. الحزمة بالمفتاح نفسه وApplication ID `calces991.calculator`.
+
+[ملف Google Play الجاهز للنسخ واللصق، مع السياسة الكاملة](../../docs/play/console-ready/Google-Play-Console-Copy-Paste.ar.txt) — [تقرير التحقق](../../docs/play/console-ready/build4-verification.ar.md). الإعلانات معطلة وأذونات الإعلان والخدمة الأمامية غير المستخدمة مستبعدة من release. الجمهور المعتمد 13+ وغير موجّه للأطفال. الصور الفعلية للجهاز والهوية القانونية واستبيان IARC ومتطلبات اختبار الحساب تُستكمل لدى المالك.

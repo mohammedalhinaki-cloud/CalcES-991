@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0f172a"/><stop offset="1" stop-color="#292035"/></linearGradient></defs>
+<rect width="1024" height="500" fill="url(#bg)"/>
+<circle cx="995" cy="15" r="270" fill="#a78bfa" opacity=".055"/>
+<circle cx="70" cy="500" r="210" fill="#fbbf24" opacity=".04"/>
+<g font-family="Arial,sans-serif"><text x="64" y="105" fill="#c4b5fd" font-size="19" letter-spacing="4">MAAOUN STUDIO</text>
+<text x="60" y="198" fill="#fff" font-size="70" font-weight="700">CalcES 991</text>
+<text x="64" y="255" fill="#e2e8f0" font-size="30">Scientific Calculator</text>
+<rect x="64" y="293" width="108" height="4" rx="2" fill="#fbbf24"/>
+<text x="64" y="352" fill="#c4b5fd" font-size="22">Arabic + English</text>
+<text x="64" y="391" fill="#cbd5e1" font-size="22">Natural math editing. Works offline.</text>
+<text x="64" y="450" fill="#94a3b8" font-size="15" letter-spacing="2">CALCULUS · MATRICES · STATISTICS</text></g>
+<g transform="translate(712 53)"><rect width="240" height="392" rx="31" fill="#050a12" opacity=".6" transform="translate(6 9)"/>
+<rect width="240" height="392" rx="31" fill="#30313a" stroke="#64748b" stroke-width="2"/>
+<rect x="20" y="26" width="200" height="111" rx="13" fill="#d5e4e5"/>
+<g fill="#1e293b" font-family="Arial,sans-serif"><text x="37" y="66" font-size="26">1/2 + √9</text><text x="160" y="114" font-size="30">3.5</text></g>
+<g fill="#9b86cf"><rect x="20" y="161" width="40" height="29" rx="7"/><rect x="73" y="161" width="40" height="29" rx="7"/></g>
+<g fill="#54545f"><rect x="126" y="161" width="40" height="29" rx="7"/><rect x="179" y="161" width="40" height="29" rx="7"/></g>
+<g fill="#202632"><rect x="20" y="207" width="56" height="40" rx="8"/><rect x="92" y="207" width="56" height="40" rx="8"/><rect x="164" y="207" width="56" height="40" rx="8"/><rect x="20" y="260" width="56" height="40" rx="8"/><rect x="92" y="260" width="56" height="40" rx="8"/><rect x="164" y="260" width="56" height="40" rx="8"/><rect x="20" y="313" width="56" height="40" rx="8"/><rect x="92" y="313" width="56" height="40" rx="8"/></g>
+<rect x="164" y="313" width="56" height="40" rx="8" fill="#ec9148"/>
+<g fill="#f8fafc" font-family="Arial,sans-serif" font-size="23" text-anchor="middle"><text x="48" y="236">7</text><text x="120" y="236">8</text><text x="192" y="236">9</text><text x="48" y="289">4</text><text x="120" y="289">5</text><text x="192" y="289">6</text><text x="48" y="342">1</text><text x="120" y="342">2</text><text x="192" y="342" fill="#15171c">=</text></g></g></svg>

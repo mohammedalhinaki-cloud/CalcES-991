@@ -79,7 +79,8 @@ test('mouse hits denominator and radical; drag selects content', async ({ page }
 
 test('touch can focus and edit fraction branches without warnings', async ({ browser }) => {
   const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}})
-  const page=await context.newPage()
+  await context.addInitScript(()=>localStorage.setItem('calces_language','ar'))
+ const page=await context.newPage()
   const diagnostics:string[]=[]
   page.on('pageerror', error=>diagnostics.push(error.message))
   page.on('console', message=>{if(['warning','error'].includes(message.type())) diagnostics.push(message.text())})

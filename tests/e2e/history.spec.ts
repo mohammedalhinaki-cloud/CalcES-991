@@ -44,6 +44,7 @@ test('advanced history restores matrix data and does not add another entry on re
 })
 test('mobile and desktop layouts have no horizontal overflow and retain editor selection on resize',async({browser})=>{
  const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}})
+ await context.addInitScript(()=>localStorage.setItem('calces_language','ar'))
  const page=await context.newPage();const errors:string[]=[]
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))errors.push(m.text())})
  await page.goto('http://127.0.0.1:5174/');await expect(page.locator('math-field')).toBeVisible()

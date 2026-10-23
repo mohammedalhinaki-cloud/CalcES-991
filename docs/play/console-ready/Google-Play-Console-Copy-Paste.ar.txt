@@ -1,0 +1,289 @@
+CALCES 991 — دليل Google Play Console والنصوص الجاهزة
+Maaoun Studio | calces991.calculator | الإصدار 1.1.0 | versionCode 4
+آخر تحديث: 23 أكتوبر 2026
+هذا الملف مخصص للحزمة: CalcES-991-1.1.0-build4-signed.aab فقط.
+
+1) إنشاء التطبيق / Create app
+نوع المنتج: App / تطبيق
+التسعير: Free / مجاني
+الفئة: Tools / الأدوات
+لغة إدراج المتجر الافتراضية المقترحة: العربية (أضف إدراج English أيضاً)
+اسم العربية للنسخ:
+CalcES 991 - حاسبة علمية
+اسم English للنسخ:
+CalcES 991 - Scientific Calc
+المطور/العلامة في الوصف: Maaoun Studio
+معرّف الحزمة الثابت: calces991.calculator
+بيانات الاسم القانوني والعنوان والهاتف وتحقق الهوية: استخدم بيانات صاحب الحساب الحقيقية؛ ليست Maaoun Studio بديلاً تلقائياً عن الاسم القانوني الذي تطلبه Google.
+
+2) الوصف المختصر — العربية (انسخ النص التالي فقط)
+حاسبة علمية بالعربية والإنجليزية، للكسور والمصفوفات والتكامل دون اتصال.
+
+3) الوصف الكامل — العربية (انسخ النص التالي فقط)
+CalcES 991 من Maaoun Studio حاسبة علمية تساعدك في الدراسة والعمل الحسابي، مع محرر رياضي تفاعلي لكتابة الكسور والأسس والجذور وتعديلها باللمس.
+
+اختر العربية أو English عند التشغيل الأول. يحفظ التطبيق اختيارك على الجهاز ويعرض القوائم والأدوات ورسائل الحساب باللغة المختارة، دون تكرار سؤال اللغة عند كل تشغيل.
+
+المزايا:
+• الحسابات الأساسية والنسب المئوية والأسس والجذور والمضروب.
+• sin وcos وtan ودوالها العكسية، واللوغاريتمات، مع DEG وRAD وGRA.
+• التكامل المحدد العددي والاشتقاق الرمزي والتقييم عند نقطة.
+• حل جذر عددي داخل مجال، وكثيرات الحدود من الدرجة الثانية والثالثة، وأنظمة خطية حتى ثلاثة مجاهيل.
+• محدد المصفوفة ومعكوسها وضرب المصفوفات ضمن الأحجام المدعومة.
+• الأعداد المركبة والتمثيل الديكارتي والقطبي.
+• المتوسط والانحراف المعياري والانحدار الخطي.
+• BIN وOCT وDEC وHEX وعمليات منطقية بأعداد صحيحة موقعة 32 بت.
+• سجل آخر 50 عملية ناجحة خلال الجلسة، وذاكرة متغيرات وAns.
+• شاشة قابلة للتحرير باللمس، وتخطيط يتكيف مع الهاتف دون الحاجة للتمرير للوصول إلى الأزرار.
+
+تعمل وظائف الحاسبة دون اتصال ولا تتطلب حساباً أو تسجيل دخول. يحفظ التطبيق اللغة وتفضيلات تذكير التقييم محلياً، ولا يرسل معادلاتك إلى خادم للحساب. إصدار 1.1.0، البناء 4، لا يعرض إعلانات ولا يتضمن شراءً داخل التطبيق.
+
+الحسابات العددية محدودة الدقة، وقد تتطلب مسائل التكامل والجذور شروط مجال وتقارب. التطبيق أداة تعليمية ومساعدة؛ تحقّق من النتائج المهمة بشكل مستقل. التطبيق مستقل وغير تابع لشركة CASIO أو معتمد منها.
+
+الدعم: jy906675@gmail.com
+سياسة الخصوصية: https://study-tools-calculator.pages.dev/privacy.html
+
+4) Short description — English (copy only the next line)
+Offline scientific calculator with natural math editing, Arabic and English.
+
+5) Full description — English (copy the following section)
+CalcES 991 by Maaoun Studio is a scientific calculator for study and everyday mathematical work. Write fractions, powers, and roots naturally, then tap inside the expression to edit it.
+
+Choose Arabic or English on first launch. Your choice is saved on your device, with menus, tools, and calculation messages in your selected language.
+
+Features:
+• Basic arithmetic, percentages, powers, roots, and factorials.
+• Trigonometric and inverse functions, logarithms, and DEG/RAD/GRA angle units.
+• Numerical definite integration, symbolic differentiation, and evaluation at a point.
+• A bracketed numerical root solver, quadratic and cubic polynomials, and linear systems with up to three unknowns.
+• Matrix determinants, inverses, and multiplication within supported sizes.
+• Complex numbers in Cartesian and polar form.
+• Mean, standard deviation, and linear regression.
+• BIN/OCT/DEC/HEX conversion and signed 32-bit bitwise operations.
+• The last 50 successful calculations in the current session, variable memory, and Ans.
+• A touch-editable display and a responsive keypad that fits the phone screen.
+
+Calculator functions work offline without an account or sign-in. Language and rating reminder preferences stay on your device. Expressions are not sent to a calculation server. Version 1.1.0, build 4, displays no ads and includes no in-app purchases.
+
+Numerical computations have finite precision. Integration and root finding require appropriate domains and convergence conditions. Use the app as an educational aid and independently verify important results. This is an independent app and is not affiliated with or endorsed by CASIO.
+
+Support: jy906675@gmail.com
+Privacy policy: https://study-tools-calculator.pages.dev/privacy.html
+
+6) جهة الاتصال في إدراج المتجر / Store contact
+البريد: jy906675@gmail.com
+الموقع: https://study-tools-calculator.pages.dev/
+رابط الخصوصية (رابط عام، لا تضع رابط GitHub raw الخاص بالحزمة):
+https://study-tools-calculator.pages.dev/privacy.html
+النص الكامل للسياسة موجود في الملف Privacy-Policy.ar-en.txt وفي الصفحة نفسها بالعربية والإنجليزية.
+
+7) App access / الوصول إلى التطبيق — إجابة جاهزة
+All functionality is available without special access.
+لا توجد حسابات أو بيانات دخول أو اشتراكات أو رموز وصول. لا تضف حساب مراجعة وهمياً.
+نص توضيح إن ظهر حقل إضافي:
+The app requires no account or sign-in. On first launch, choose Arabic or English. Calculator functions are available offline. No special access instructions are needed.
+
+8) Ads / الإعلانات — لهذا البناء فقط
+Does your app contain ads? No.
+البناء 4 لا يطلب إعلانات، وتهيئة مزود Google Mobile Ads معطلة. حجز مساحة أعلى الشاشة ليس إعلاناً فعلياً. إذا فُعلت الإعلانات في إصدار لاحق، غيّر الإجابة والسياسة وإقرارات Data safety أولاً.
+
+9) Advertising ID / معرّف الإعلان — لهذا البناء فقط
+Does your app use advertising ID? No.
+أذونات AD_ID وACCESS_ADSERVICES_AD_ID/ATTRIBUTION/TOPICS مستبعدة من manifest الخاص بإصدار release، ومزود الإعلان معطل. راجع manifest النهائي المرفق بالتحقق قبل الإجابة، ولا تستخدم إجابة نسخة debug التي تدعم إعلانات الاختبار.
+إذا كانت Play تعرض تحذيراً عن إذن قديم، تأكد أنك تراجع حزمة البناء 4 وليس ملف AAB أقدم محفوظاً في مسار آخر. الإقرار قد يشمل جميع الحزم الفعالة في حسابك؛ إذا بقيت حزمة أقدم بإذن AD_ID في مسار فعّال، راجع جميع المسارات ولا تستخدم No لهذا الحساب حتى تعالج التعارض. إذا أعدت تفعيل الإعلان، راجع الأذونات وإجابات Google من جديد.
+
+10) Data safety / أمان البيانات — خاص بالبناء 4 كما هو
+Does your app collect or share any of the required user data types? No.
+لا يرسل هذا البناء البيانات الشخصية أو المعادلات أو النتائج إلى الناشر، ولا يهيئ مزود الإعلان، ولا يتضمن تحليلات استخدام. اللغة والعداد والتذكير بيانات محلية فقط. لا تحدد «جمع بيانات» بسبب التخزين المحلي وحده؛ نموذج Play يتعلق بالبيانات المنقولة خارج الجهاز.
+إذا تغيّر الكود أو فُعلت SDKs أو أُضيفت تحليلات أو إعلانات، تصبح هذه الإجابة غير صالحة ويجب مراجعة جميع أنواع البيانات حسب الإصدار الفعلي.
+حسابات المستخدم: التطبيق لا يدعم إنشاء حسابات؛ لا يوجد رابط حذف حساب مطلوب لهذه الوظيفة.
+إذا سُئلت عن البيانات المشفرة أثناء النقل: لا تجمع الحاسبة بيانات مستخدم لنقلها. لا تدّع تدقيق تشفير SDK غير مستخدم. اتبع الفروع التي يعرضها النموذج بعد اختيار No؛ لا تملأ أقساماً لم يطلبها النموذج.
+رسائل الدعم التي يرسلها المستخدم من تطبيق البريد، والخدمات الخارجية التي يفتحها باختياره، موضحة في سياسة الخصوصية ولا تعني أن الحاسبة ترفع سجله تلقائياً.
+
+11) Target audience / الجمهور — حسب إجابة المالك
+اختر الأعمار: 13–15، 16–17، و18 سنة فأكثر (أو الخيارات المكافئة التي تظهر لحسابك).
+لا تختَر أي فئة دون 13 سنة.
+التطبيق غير موجّه للأطفال، وليس إدراجاً يدّعي الاشتراك في Designed for Families.
+هذه فئات الاستهداف وليست نتيجة استبيان التصنيف العمري؛ Google/IARC يحددان التصنيف بعد الاستبيان.
+
+12) Content rating / التصنيف العمري — مساعدة لإكمال الاستبيان
+البريد للاستبيان: jy906675@gmail.com
+نوع المحتوى: تطبيق أدوات/حاسبة؛ ليس لعبة.
+الوظائف الفعلية: لا عنف، لا محتوى جنسي، لا مقامرة أو مراهنات، لا مخدرات، لا لغة نابية، لا محتوى ينشئه المستخدمون للعموم، لا دردشة، لا تعقّب موقع، ولا مشتريات رقمية.
+توجد روابط خارجية ثابتة للدعم والخصوصية وGoogle Play، ومشاركة رابط التطبيق عبر قائمة النظام. إذا سأل الاستبيان عن «روابط خارجية» أو هذه الإمكانات بالتحديد، أجب وفق وجودها؛ لا تنسخ No لجميع الأسئلة آلياً.
+لا تكتب تصنيفاً مثل Everyone أو PEGI 3 قبل توليد نتيجة IARC؛ انسخ النتيجة التي يصدرها الاستبيان.
+
+13) إقرارات محتوى إضافية إذا ظهرت لحسابك
+تطبيق حكومي: No، التطبيق مستقل وليس خدمة حكومية.
+تطبيق أخبار: No.
+ميزات صحية/طبية: لا يقدم خدمات أو ادعاءات صحية أو تشخيصاً أو علاجاً.
+ميزات مالية: لا يقدم قروضاً أو تداولاً أو تحويل أموال أو خدمات مالية؛ هو حاسبة رياضية عامة.
+صلاحيات حساسة (موقع/رسائل/SMS/سجل مكالمات/جميع الملفات/إمكانية الوصول/VPN): غير مستخدمة.
+اشتراكات ومشتريات داخل التطبيق: غير موجودة.
+Foreground services: لا تستخدم الحاسبة خدمات أمامية؛ إذن FOREGROUND_SERVICE مستبعد من حزمة release الحالية، ولا تحتاج اختلاق وظيفة أو فيديو لاستخدام غير موجود.
+الحذف: لا حسابات منشأة؛ يمكن مسح بيانات التطبيق من Android. سياسة التعامل مع مراسلات الدعم في صفحة الخصوصية.
+الفروع التي تظهر في Console تتغير حسب نوع الحساب والدولة والإصدار؛ أكمل ما يظهر فعلياً فقط.
+
+14) Assets / الصور المطلوبة — ملفات جاهزة وصور عليك التقاطها
+أيقونة المتجر 512×512: docs/play/assets/store-icon-512.png
+صورة مميزة 1024×500: docs/play/assets/feature-graphic-calces991-1024x500.png (صورة ترويجية بالاسم الحالي، وليست لقطة شاشة لجهاز).
+صور الهاتف: التقط الصور المطلوبة من التطبيق النهائي على جهاز حقيقي، بالعربية والإنجليزية إن أمكن. صور المتصفح ليست إثباتاً لاختبار Android الفعلي.
+لا يمكن استبدال متطلبات الصور بنصوص، ولا اختلاق تقارير اختبار أو صور جهاز لم يُختبر.
+
+15) Release notes / ما الجديد — العربية (انسخ النص التالي فقط)
+<ar>
+اختيار العربية أو الإنجليزية عند التشغيل الأول، مع حفظ اللغة على الجهاز.
+ترجمة القوائم والأزرار والأدوات العلمية ورسائل النتائج والأخطاء.
+تحسين اتجاه الواجهة والخصوصية، مع الحفاظ على الحساب دون اتصال.
+</ar>
+<en-US>
+Choose Arabic or English on first launch, with your choice saved on the device.
+Translated menus, controls, scientific tools, results, and error messages.
+Improved interface direction and privacy while preserving offline calculations.
+</en-US>
+قد تطلب Play اختيار اللغة من قائمة بدلاً من الوسوم؛ ضع محتوى كل قسم في حقله حينها.
+
+16) رفع الإصدار والتوقيع
+الحزمة: CalcES-991-1.1.0-build4-signed.aab
+Application ID: calces991.calculator
+versionCode: 4
+versionName: 1.1.0
+موقعة بمفتاح الرفع نفسه المستخدم للبناء 3. فعّل Play App Signing إذا لم يكن مفعلاً. لا ترفع ملف المفتاح أو كلمة مروره أو نسخة debug إلى المتجر أو GitHub.
+إذا استُخدم رقم إصدار 4 في حسابك خارج هذه المهمة، يلزم رقم أعلى قبل إعادة البناء. لا يمكننا الاطلاع على كل مسارات إصدار حسابك من الكود.
+اختبر عبر Internal testing أولاً، وأكمل اختبار Closed testing والتحقق من الجهاز والحساب إذا طلبته Play Console. متطلبات الاختبار ليست بيانات يمكن نسخها ولصقها أو تجاوزها بهذا الملف.
+
+17) ما لا يمكن توليده بصدق نيابة عنك
+الاسم القانوني والعنوان ورقم الهاتف وتحقق الهوية والضرائب والدفعات؛ استخدم بيانات حسابك الحقيقية.
+الموافقة على اتفاقيات التوزيع وحقوق النشر؛ يراجعها صاحب الحساب.
+إجابات IARC التي تتغير صياغتها، نتائج الاختبار على هاتف فعلي، وعدد المختبرين ومدد الاختبار.
+لا يوجد ضمان قبول تلقائي؛ هذه النصوص تصف الإصدار المحدد، وليست رفعاً تم إلى Play Console.
+
+
+18) نص سياسة الخصوصية الكامل — صالح للنسخ والاحتفاظ
+
+CalcES 991 — سياسة الخصوصية / Privacy Policy
+العربيةEnglishCalcES 991
+
+
+سياسة الخصوصية — العربية
+
+
+التطبيق: CalcES 991 - حاسبة علمية
+الناشر: Maaoun Studio
+معرّف تطبيق Android: calces991.calculator
+آخر تحديث: 23 أكتوبر 2026
+الدعم: jy906675@gmail.com
+
+
+
+الحسابات والحسابات الشخصية
+
+تعمل وظائف الحاسبة على جهازك دون اتصال، ولا تتطلب إنشاء حساب أو تسجيل الدخول. لا يرسل كود الحاسبة المعادلات أو النتائج أو المتغيرات أو سجل العمليات إلى خادم للحساب، ولا يتضمن أدوات تحليل استخدام أو تتبّع خاصة بالناشر. يبقى سجل الحسابات والذاكرة خلال الجلسة فقط.
+
+
+
+
+التخزين على الجهاز
+
+نحفظ اللغة التي تختارها عند التشغيل الأول، وعدد العمليات الناجحة، وتفضيلات إغلاق أو تأجيل تذكير التقييم في التخزين المحلي على جهازك. لا تُرسل هذه المعلومات إلينا، ولا يحتوي عداد التقييم على المعادلات أو النتائج. تبقى حتى حذف بيانات التطبيق أو الموقع أو إلغاء التثبيت. حذف التطبيق من Android يمسح بياناته المحلية؛ وبيانات نسخة المتصفح يمكن حذفها من إعدادات الموقع في المتصفح. لا توجد خدمة سحابية لمزامنة هذه البيانات، والنسخ الاحتياطي السحابي لبيانات Android معطل.
+
+
+
+
+الأذونات
+
+لا نطلب أذونات الوصول إلى الموقع الجغرافي أو الكاميرا أو الميكروفون أو جهات الاتصال أو ملفاتك الخاصة. تتضمن حزمة Android إمكانية الاتصال بالإنترنت لفتح الروابط التي تختارها وخدمات الإصدارات الداعمة للإعلان. أذونات معرّف الإعلان وخدمات الإعلان مستبعدة من إصدار النشر الحالي. في إصدار 1.1.0، البناء 4، الإعلانات معطلة ولا يهيئ التطبيق مزود الإعلانات أو يطلب إعلانات.
+
+
+
+
+الإعلانات وخدمات Google
+
+تتضمن بنية التطبيق مكتبات Google Mobile Ads (AdMob) وGoogle User Messaging Platform لدعم بانر علوي اختياري في إصدارات لاحقة. لا يعرض البناء 4 إعلانات ولا يبدأ مزود الإعلان. إذا فُعلت الإعلانات في إصدار لاحق، فسيحتاج تحميلها للإنترنت وقد تعالج Google بيانات مثل معرّفات الجهاز أو الإعلان وعنوان IP ومعلومات التفاعل والتشخيص وفق إعدادات SDK والموافقة. قد يستنتج مزود الإعلان موقعاً تقريبياً من IP؛ لا نطلب إذن GPS. يلزم تحديث هذه السياسة وإقرارات المتجر قبل تفعيل الإعلان.
+
+في الإصدارات الداعمة للإعلانات، تُراجع موافقة Google UMP قبل طلب الإعلان، وتتوفر خيارات خصوصية الإعلان من نافذة الخصوصية عندما تتطلبها المنطقة. لا توجد إعلانات كاملة الشاشة. سياسة خصوصية Google — تقنيات إعلانات Google.
+
+
+
+
+المشاركة والتقييم والدعم
+
+المشاركة تفتح قائمة المشاركة على جهازك أو تنسخ رابط التطبيق، دون تضمين المعادلات أو السجل. التقييم يفتح Google Play خارج التطبيق. فتح سياسة الخصوصية أو الموقع يفتح المتصفح؛ تخضع الخدمات الخارجية لسياساتها. يستضيف Cloudflare موقع الويب وصفحة السياسة وقد يعالج طلبات الشبكة وبياناتها التقنية لتقديمها وتأمينها؛ هذه ليست بيانات حسابات يرسلها تطبيق Android أثناء الاستخدام دون اتصال. عند مراسلة الدعم نتلقى عنوان بريدك والمحتوى الذي ترسله، ونستخدمهما للرد ومعالجة طلبك، لا للإعلان أو البيع.
+
+
+
+
+الأطفال والجمهور
+
+لا تتطلب الحاسبة بيانات شخصية من أي مستخدم ولا تتضمن حسابات أو دردشة أو محتوى ينشئه المستخدمون للعموم. الجمهور المعتمد للتطبيق هو 13 سنة فأكثر، والتطبيق غير موجّه للأطفال دون 13 سنة. هذه السياسة ليست ادعاءً باعتماد Families. لا يجوز تفعيل الإعلانات للأطفال أو للجمهور المختلط دون استكمال الإعدادات والسياسات المناسبة.
+
+
+
+
+الاحتفاظ والحقوق والتواصل
+
+يمكنك مسح البيانات المحلية بنفسك كما سبق. لا توجد قاعدة بيانات للناشر تحتوي سجل حساباتك. لطلب حذف مراسلات دعم أرسلتها أو للاستفسار عن الخصوصية، تواصل مع jy906675@gmail.com؛ نعالج الطلب حسب القوانين المطبقة، مع الاحتفاظ بما يلزم قانوناً أو لمعالجة نزاع. لا نبيع بياناتك الشخصية. تُنشر تغييرات السياسة في هذه الصفحة مع تحديث التاريخ.
+
+
+
+
+
+
+Privacy Policy — English
+
+
+App: CalcES 991 - Scientific Calculator
+Publisher: Maaoun Studio
+Android application ID: calces991.calculator
+Last updated: October 23, 2026
+Support: jy906675@gmail.com
+
+
+
+Calculations and accounts
+
+Calculator functions run offline on your device without an account or sign-in. Calculator code does not send expressions, results, variables, or calculation history to a calculation server and contains no publisher analytics or tracking tools. Calculation history and variables are held for the current session only.
+
+
+
+
+On-device storage
+
+We save your first-launch language choice, successful calculation count, and rating reminder dismissal or postponement preferences in local device storage. These are not sent to us; the rating counter contains no expressions or results. They remain until you clear app or site data or uninstall the Android app. Browser data can be cleared through browser site settings. There is no cloud synchronization service, and Android app-data cloud backup is disabled.
+
+
+
+
+Permissions
+
+We do not request access to your location, camera, microphone, contacts, or private files. The Android package supports network access for links you choose to open and services in ad-enabled versions. Advertising-ID and AdServices permissions are excluded from the current release. In version 1.1.0, build 4, ads are disabled: the app does not initialize the advertising provider or request ads.
+
+
+
+
+Ads and Google services
+
+The project includes Google Mobile Ads (AdMob) and Google User Messaging Platform to support an optional top banner in later versions. Build 4 does not display ads or start the ad provider. If ads are enabled in a future release, they will require network access and Google may process device or advertising identifiers, IP addresses, interaction information, and diagnostics according to SDK configuration and consent. An ad provider may infer approximate location from IP; the app does not request GPS permission. This policy and store declarations must be updated before ads are enabled.
+
+In ad-enabled versions, Google UMP consent is checked before ad requests, with ad privacy options available in the Privacy dialog when required in your region. There are no full-screen ads. Google Privacy Policy — Google advertising technologies.
+
+
+
+
+Sharing, rating, and support
+
+Sharing opens your device's share sheet or copies the app link without including your expressions or history. Rating opens Google Play outside the app. Policy and website links open a browser; external services have their own policies. Cloudflare hosts the website and this policy and may process network requests and technical information to deliver and secure them. These are not calculation records sent by the offline Android app. When you email support, we receive your email address and message and use them to respond and resolve your request, not for advertising or sale.
+
+
+
+
+Children and audience
+
+The calculator does not require personal information and provides no accounts, chat, or public user-generated content. The intended audience is ages 13 and older. The app is not directed at children under 13, and this policy does not claim Families approval. Advertising for children or mixed audiences must not be enabled without the relevant configuration and policy requirements.
+
+
+
+
+Retention, rights, and contact
+
+You can delete local data using the methods above. The publisher has no database of your calculations. To request deletion of support messages you have sent, or to ask privacy questions, email jy906675@gmail.com. Requests are handled under applicable law, including any legally required retention or dispute handling. We do not sell your personal data. Policy changes will be posted here with an updated date.

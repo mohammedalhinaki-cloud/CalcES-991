@@ -1,3 +1,4 @@
+import { localize } from '../../i18n/locale'
 import { useCallback, useEffect, useRef } from 'react'
 import { useCalculator } from '../../state/CalculatorProvider'
 import type { EditorHandle } from '../../state/CalculatorProvider'
@@ -29,5 +30,5 @@ export default function DataEntry({label,value,onChange,multiline=false,textKeyb
   move:direction=>{const selection=focusRange();selection.modify('move',direction==='Left'||direction==='Up'?'backward':'forward',direction==='Up'||direction==='Down'?'line':'character')},
   clear:()=>{host.current!.textContent='';changed()},focus:()=>host.current?.focus(),
  }
- return <label className="block min-w-0 text-xs"><span className="mb-1 block">{label}</span><div ref={host} role="textbox" aria-label={label} aria-multiline={multiline} contentEditable={!state.off} suppressContentEditableWarning inputMode={multiline||textKeyboard?'text':'decimal'} spellCheck={false} onInput={changed} onFocus={()=>{unregister.current?.();unregister.current=registerDataTarget(handle)}} dir="ltr" className={`min-h-11 min-w-0 overflow-x-auto whitespace-pre-wrap break-words rounded border border-white/25 bg-black/15 p-2 text-base text-gray-100 outline-none focus:border-amber-300 ${multiline?'min-h-28':''}`} /></label>
+ return <label className="block min-w-0 text-xs"><span className="mb-1 block">{localize(label)}</span><div ref={host} role="textbox" aria-label={localize(label)} aria-multiline={multiline} contentEditable={!state.off} suppressContentEditableWarning inputMode={multiline||textKeyboard?'text':'decimal'} spellCheck={false} onInput={changed} onFocus={()=>{unregister.current?.();unregister.current=registerDataTarget(handle)}} dir="ltr" className={`min-h-11 min-w-0 overflow-x-auto whitespace-pre-wrap break-words rounded border border-white/25 bg-black/15 p-2 text-base text-gray-100 outline-none focus:border-amber-300 ${multiline?'min-h-28':''}`} /></label>
 }

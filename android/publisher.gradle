@@ -19,11 +19,11 @@ if (realAds && (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}') || appId.contai
 android {
     buildFeatures { buildConfig true }
     defaultConfig {
-        versionCode value('APP_VERSION_CODE', '2').toInteger()
-        versionName value('APP_VERSION_NAME', '1.0.0')
-        manifestPlaceholders = [admobAppId: appId]
-        buildConfigField 'String', 'PRIVACY_POLICY_URL', quoted(value('PRIVACY_POLICY_URL', ''))
-        buildConfigField 'String', 'SUPPORT_EMAIL', quoted(value('SUPPORT_EMAIL', ''))
+        versionCode value('APP_VERSION_CODE', '4').toInteger()
+        versionName value('APP_VERSION_NAME', '1.1.0')
+        manifestPlaceholders = [admobAppId: appId, mobileAdsEnabled: realAds.toString()]
+        buildConfigField 'String', 'PRIVACY_POLICY_URL', quoted(value('PRIVACY_POLICY_URL', 'https://study-tools-calculator.pages.dev/privacy.html'))
+        buildConfigField 'String', 'SUPPORT_EMAIL', quoted(value('SUPPORT_EMAIL', 'jy906675@gmail.com'))
     }
     signingConfigs {
         debug { storeFile rootProject.file('../.android-local/debug.keystore') }
@@ -40,7 +40,7 @@ android {
     buildTypes {
         debug {
             // Official Google sample IDs only: debug requests can never monetize live units.
-            manifestPlaceholders = [admobAppId: 'ca-app-pub-3940256099942544~3347511713']
+            manifestPlaceholders = [admobAppId: 'ca-app-pub-3940256099942544~3347511713', mobileAdsEnabled: 'true']
             buildConfigField 'boolean', 'ADS_ENABLED', 'true'
             buildConfigField 'String', 'ADMOB_BANNER_ID', quoted('ca-app-pub-3940256099942544/9214589741')
             buildConfigField 'String', 'APP_AUDIENCE', quoted(audience == 'unconfigured' ? 'general' : audience)

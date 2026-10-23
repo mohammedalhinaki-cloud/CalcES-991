@@ -1,3 +1,4 @@
+import { localize } from '../i18n/locale'
 import {recordSuccessfulCalculation} from '../engagement/rating'
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -156,6 +157,6 @@ function useCalculatorController(){
 const CalculatorContext=createContext<ReturnType<typeof useCalculatorController>|null>(null)
 export function CalculatorProvider({children}:{children:ReactNode}){
   const controller=useCalculatorController()
-  return <CalculatorContext.Provider value={controller}>{children}</CalculatorContext.Provider>
+  return <CalculatorContext.Provider value={controller}>{localize(children)}</CalculatorContext.Provider>
 }
 export function useCalculator(){const value=useContext(CalculatorContext);if(!value)throw new Error('CalculatorProvider is required');return value}

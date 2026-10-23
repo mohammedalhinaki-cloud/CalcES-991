@@ -73,7 +73,8 @@ test('mode menus preserve the field, switch key functions and gate base digits',
 
 test('setup, AC, power and touch keypad preserve normal interaction',async({browser})=>{
   const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}})
-  const page=await context.newPage()
+  await context.addInitScript(()=>localStorage.setItem('calces_language','ar'))
+ const page=await context.newPage()
   const errors:string[]=[]
   page.on('pageerror',e=>errors.push(e.message))
   page.on('console',m=>{if(['warning','error'].includes(m.type()))errors.push(m.text())})

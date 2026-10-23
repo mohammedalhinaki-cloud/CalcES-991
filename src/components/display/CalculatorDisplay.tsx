@@ -1,3 +1,4 @@
+import { localize } from '../../i18n/locale'
 import { useCalculator } from '../../state/CalculatorProvider'
 import Indicators from './Indicators'
 import MathEditor from './MathEditor'
@@ -5,7 +6,7 @@ import ResultDisplay from './ResultDisplay'
 export default function CalculatorDisplay() {
   const {state,tool,result,edit,registerEditor,beginEdit}=useCalculator()
   return (
-    <section className="calculator-display" aria-label="الشاشة التفاعلية">
+    <section className="calculator-display" aria-label={localize("الشاشة التفاعلية")}>
       <div className={state.off?'invisible':''} aria-hidden={state.off}>
         <Indicators />
         <div className="lcd-panel">
@@ -13,7 +14,7 @@ export default function CalculatorDisplay() {
         <ResultDisplay result={result} />
         </div>
       </div>
-      <p role="status" className="mt-1 break-words text-xs leading-5 [overflow-wrap:anywhere]" aria-live="polite">{state.off?'اضغط ON للتشغيل':state.notice}</p>
+      <p role="status" className="mt-1 break-words text-xs leading-5 [overflow-wrap:anywhere]" aria-live="polite">{localize(state.off?'اضغط ON للتشغيل':state.notice)}</p>
     </section>
   )
 }

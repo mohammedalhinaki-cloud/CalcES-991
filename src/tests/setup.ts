@@ -6,3 +6,6 @@ afterEach(cleanup)
 
 // jsdom has no display-mode media query implementation.
 Object.defineProperty(window,'matchMedia',{writable:true,value:vi.fn(query=>({matches:false,media:query,addEventListener:vi.fn(),removeEventListener:vi.fn()}))})
+
+// Existing calculator tests start after onboarding; first-launch behavior has dedicated tests.
+localStorage.setItem('calces_language','ar')

@@ -9,7 +9,7 @@ button:disabled { cursor:default; opacity:.4; }
 .calculator-layout { width:100%; max-width:480px; margin:0 auto; }
 .calculator-body { min-width:0; }
 .ad-reservation { height:clamp(64px,10dvh,110px); }
-[aria-label="مؤشرات الحاسبة"] { margin:0 3px 8px; color:#f5f5f5; font-size:10px; min-height:15px; }
+.calculator-indicators { margin:0 3px 8px; color:#f5f5f5; font-size:10px; min-height:15px; }
 .lcd-panel { min-height:155px; display:flex; flex-direction:column; justify-content:space-between; padding:12px; border-radius:10px; background:#d5e4e5; color:#1b282c; box-shadow:inset 0 1px 4px #0002; }
 .math-editor-host { min-height:70px; min-width:0; }
 math-field { display:block; width:100%; min-height:70px; padding:6px 0; border:0; border-radius:4px; background:transparent; color:#17272d; font-size:26px; direction:ltr; --caret-color:#17272d; --selection-background-color:#9b72cf55; --selection-color:#17272d; --contains-highlight-background-color:#9b72cf25; }
@@ -25,8 +25,8 @@ math-field::part(menu-toggle) { display:none; }
 .workspace-toggle[aria-expanded="true"] { background:#b58af422; border-color:#b58af4; }
 .angle-button b { display:grid; align-items:center; min-height:25px; font-size:16px; }
 .toolbar-notice { padding:6px; color:#cfb3fa; font-size:12px; }
-[aria-label="لوحة مفاتيح الحاسبة"] { margin-top:3px; }
-[aria-label="مفاتيح التحكم"],[aria-label="الدوال العلمية"] { column-gap:6px; row-gap:3px; }
+.calculator-keypad { margin-top:3px; }
+.keypad-controls,.keypad-functions { column-gap:6px; row-gap:3px; }
 .arrow-key { min-width:0; padding-top:16px; }
 .calculator-key { min-height:44px; border:1px solid #ffffff1c; border-radius:9px; background:#504f55; color:#f5f4f7; box-shadow:0 2px 0 #06070a,inset 0 1px 1px #ffffff25; transition:transform 70ms ease,box-shadow 70ms ease; font-size:clamp(12px,3.7vw,18px); font-weight:500; }
 .calculator-key:not(:disabled):active { transform:translateY(2px); box-shadow:none; }
@@ -38,8 +38,8 @@ math-field::part(menu-toggle) { display:none; }
 .key-legend { font-size:9px; color:#ffe034; }
 .key-legend > :first-child { color:#ffe034; }
 .key-legend > :last-child { color:#b28aef; }
-[aria-label="الأرقام والعمليات"] { gap:7px; padding-top:2px; }
-[aria-label="الأرقام والعمليات"] .calculator-key { height:49px; }
+.keypad-numbers { gap:7px; padding-top:2px; }
+.keypad-numbers .calculator-key { height:49px; }
 .direction-key { height:44px; }
 .utility-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:8px 12px; border:1px solid #ffffff28; border-radius:8px; background:#ffffff08; color:inherit; font-size:12px; text-decoration:none; touch-action:manipulation; }
 .workspace-panel { min-width:0; margin:8px 0; padding:12px; background:#25252eef; border:1px solid #a47ee75c; border-radius:12px; }
@@ -47,7 +47,7 @@ math-field::part(menu-toggle) { display:none; }
 .history-dialog::backdrop { background:#000b; }
 .history-entry { display:block; width:100%; min-width:0; padding:12px; text-align:start; border:1px solid #ffffff25; border-radius:10px; background:#ffffff06; touch-action:manipulation; }
 @media (min-width:700px) { .app-shell { padding-top:16px; padding-bottom:24px; } .calculator-layout { padding:0 12px 16px; } }
-@media (max-width:340px) { [aria-label="الدوال العلمية"],[aria-label="مفاتيح التحكم"] { column-gap:4px; } .key-legend { font-size:7px; } .lcd-panel { padding:9px; } }
+@media (max-width:340px) { .keypad-functions,.keypad-controls { column-gap:4px; } .key-legend { font-size:7px; } .lcd-panel { padding:9px; } }
 @media (prefers-reduced-motion:reduce) { .calculator-key { transition:none; } }
 
 .fraction-key { display:inline-flex; flex-direction:column; line-height:16px; min-width:18px; }
@@ -71,7 +71,7 @@ math-field::part(menu-toggle) { display:none; }
 .ad-reservation { grid-row:1; height:auto; min-height:0; }
 .calculator-display { grid-row:2; display:grid; grid-template-rows:minmax(0,1fr) auto; min-height:0; }
 .calculator-display > div:first-child { display:grid; grid-template-rows:auto minmax(0,1fr); min-height:0; }
-[aria-label="مؤشرات الحاسبة"] { min-height:0; margin:0 3px 4px; font-size:clamp(8px,1.2dvh,10px); line-height:1.2; }
+.calculator-indicators { min-height:0; margin:0 3px 4px; font-size:clamp(8px,1.2dvh,10px); line-height:1.2; }
 .lcd-panel { min-height:0; display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) auto; justify-content:stretch; gap:2px; padding:clamp(5px,1dvh,10px); }
 .lcd-panel > div:first-child { min-height:0; overflow:auto; overscroll-behavior:contain; }
 .math-editor-host, math-field { min-height:0; }
@@ -87,16 +87,16 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 .angle-button b { min-height:0; font-size:clamp(12px,2dvh,17px); line-height:1.2; }
 /* Notifications use the reserved top area and never push keys below the viewport. */
 .toolbar-notice { position:absolute; top:4px; inset-inline:6px; z-index:2; margin:0; max-height:calc(7dvh - 8px); overflow:auto; border-radius:6px; background:#25252e; }
-[aria-label="لوحة مفاتيح الحاسبة"] { grid-row:4; min-height:0; height:100%; margin:0; display:grid; grid-template-rows:minmax(0,1fr) minmax(0,4fr) minmax(0,4fr); row-gap:4px; }
-[aria-label="لوحة مفاتيح الحاسبة"] > div { min-height:0; height:100%; margin:0; padding-top:0; align-items:stretch; }
-[aria-label="مفاتيح التحكم"] { grid-template-rows:minmax(0,1fr); }
-[aria-label="الدوال العلمية"], [aria-label="الأرقام والعمليات"] { grid-template-rows:repeat(4,minmax(0,1fr)); row-gap:3px; }
-[aria-label="مفاتيح التحكم"] > div:not(.arrow-key),
-[aria-label="الدوال العلمية"] > div:not(.arrow-key),
-[aria-label="الأرقام والعمليات"] > div { min-height:0; display:grid; grid-template-rows:var(--legend-height) minmax(0,1fr); row-gap:var(--legend-gap); }
+.calculator-keypad { grid-row:4; min-height:0; height:100%; margin:0; display:grid; grid-template-rows:minmax(0,1fr) minmax(0,4fr) minmax(0,4fr); row-gap:4px; }
+.calculator-keypad > div { min-height:0; height:100%; margin:0; padding-top:0; align-items:stretch; }
+.keypad-controls { grid-template-rows:minmax(0,1fr); }
+.keypad-functions, .keypad-numbers { grid-template-rows:repeat(4,minmax(0,1fr)); row-gap:3px; }
+.keypad-controls > div:not(.arrow-key),
+.keypad-functions > div:not(.arrow-key),
+.keypad-numbers > div { min-height:0; display:grid; grid-template-rows:var(--legend-height) minmax(0,1fr); row-gap:var(--legend-gap); }
 .key-legend { height:var(--legend-height); margin:0; font-size:clamp(6px,1.05dvh,9px); line-height:var(--legend-height); }
 .arrow-key { min-height:0; padding-top:calc(var(--legend-height) + var(--legend-gap)); }
-.calculator-key, [aria-label="الأرقام والعمليات"] .calculator-key, .direction-key { height:100%; min-height:0; max-height:100%; display:flex; align-items:center; justify-content:center; padding-block:0; line-height:1; }
+.calculator-key, .keypad-numbers .calculator-key, .direction-key { height:100%; min-height:0; max-height:100%; display:flex; align-items:center; justify-content:center; padding-block:0; line-height:1; }
 .calculator-key { font-size:clamp(10px,1.9dvh,18px); }
 .key-number, .key-equals { font-size:clamp(16px,3.4dvh,32px); }
 .key-clear, .key-delete { font-size:clamp(14px,2.8dvh,26px); }
@@ -117,7 +117,7 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
  .ad-reservation { grid-column:1; grid-row:1; }
  .calculator-display { grid-column:1; grid-row:2; direction:rtl; }
  .app-toolbar { grid-column:1; grid-row:3; }
- [aria-label="لوحة مفاتيح الحاسبة"] { grid-column:2; grid-row:1 / -1; }
+ .calculator-keypad { grid-column:2; grid-row:1 / -1; }
  .workspace-panel { direction:rtl; right:auto; left:0; width:calc(36% - 5px); bottom:clamp(28px,11dvh,48px); }
 }
 
@@ -129,7 +129,7 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 @media (orientation:landscape) and (min-width:600px) and (max-height:540px) {
  .native-android .calculator-body { grid-template-rows:var(--native-banner-slot,62px) minmax(0,1fr) clamp(28px,11dvh,48px); }
  .native-android .ad-reservation { grid-column:1 / -1; }
- .native-android [aria-label="لوحة مفاتيح الحاسبة"] { grid-row:2 / -1; }
+ .native-android .calculator-keypad { grid-row:2 / -1; }
 }
 
 /* Native top-layer dialogs preserve the editor selection and hide banners via the existing observer. */
@@ -141,3 +141,19 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 .engagement-actions { display:grid; gap:10px; margin-top:18px; }
 .engagement-actions button { min-height:44px; white-space:normal; padding:10px; }
 .engagement-actions .rating-primary { background:#6650a4; color:#fff; }
+
+.language-root { display:contents; }
+.language-onboarding { min-height:100dvh; display:grid; place-items:center; padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); background:#15171c; color:#f1f0f5; }
+.language-card { width:min(100%,420px); padding:24px; border:1px solid #ffffff30; border-radius:20px; background:#0f172a; text-align:center; }
+.language-brand { color:#c4b5fd; letter-spacing:0.1em; margin-bottom:16px; font-weight:700; }
+.language-card h1 { font-size:1.35rem; line-height:1.8; font-weight:700; }
+.language-hint { font-size:0.875rem; color:#cbd5e1; margin:14px 0; line-height:1.8; }
+.language-card button { min-height:52px; border:1px solid #c4b5fd70; border-radius:12px; background:#6650a4; color:white; font-size:1.1rem; touch-action:manipulation; }
+.language-card button:focus-visible { outline:3px solid #fbbf24; outline-offset:3px; }
+@media (max-height:500px) {
+ .language-card { padding:12px 18px; }
+ .language-card .language-brand { margin-bottom:4px; }
+ .language-card h1 { font-size:1.1rem; }
+ .language-card .language-hint { margin:8px 0; }
+ .language-card .engagement-actions { grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:10px; }
+}
