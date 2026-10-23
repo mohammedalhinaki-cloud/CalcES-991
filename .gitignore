@@ -2,3 +2,27 @@ build/
 node_modules/
 site/assets/
 *.user
+public/mathlive/
+playwright-report/
+test-results/
+
+# Android build outputs and private publisher/signing settings
+.android-local/
+android/.gradle/
+android/**/build/
+android/local.properties
+android/publisher.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/capacitor-cordova-android-plugins/
+*.jks
+*.keystore
+
+# Signing exports and local credentials (including private repository exports)
+*.pepk
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example

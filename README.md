@@ -1,128 +1,152 @@
-# casio-u8-emu
+# CalcES 991 - حاسبة علمية
 
-An emulator for the **Casio nX-U8/100** CPU core, targeting Casio scientific
-calculators — starting with the **fx-991ES PLUS**. The goal is to run the
-calculator's original firmware (ROM) with behaviour identical to the real
-machine, not to be a new calculator engine.
+النسخة الحالية: **واجهة مستوحاة من الصورة المرجعية، مع المشاركة والتثبيت وإخفاء الأدوات**. نُشرت على [Cloudflare Pages](https://study-tools-calculator.pages.dev/) وتعمل بالكامل داخل المتصفح. نتائج المراجعات في [تقرير القبول](docs/acceptance.md).
 
-**Status: all six phases complete** — CPU core (full documented instruction
-set), memory system with banking, wired peripherals (interrupt controller,
-two cycle-fed timers, keypad scan lines, LCD control), disassembler,
-debugger core, headless runner, unit tests, a graphical front-end
-(SDL2 + Dear ImGui: LCD view, keypad input, debug panels, run control), an
-end-to-end integration test on a synthetic boot ROM, and Windows CI.
+## تطبيق Android وGoogle Play
 
-## Legal notice — read this first
+أضيف مشروع Android باستخدام Capacitor 8 مع SDK 36، وبانر AdMob علوي متكيف فقط. لا توجد إعلانات كاملة الشاشة. Android يستخدم الملفات المضمنة محليًا، ومشاركة Android الأصلية، ومدخل خصوصية بدل زر تثبيت PWA. لا يغير ذلك وظائف الحاسبة أو يفعّل إعلانات على الموقع.
 
-This project **does not include and does not distribute any Casio firmware**.
-To use the emulator you must supply your own ROM image at runtime
-(`--rom FILE`). You are responsible for obtaining the ROM legally — typically
-by dumping it from a calculator you own, or by extracting it from a copy of
-Casio's official emulator software that you licensed. Do not ask the project
-maintainers for ROMs. Casio and the model names are trademarks of Casio
-Computer Co., Ltd.
-
-## Build
-
-Linux (gcc/clang + CMake ≥ 3.16):
+نسخة debug تستخدم معرّفات Google التجريبية فقط؛ إعلانات release معطلة حتى تضبط بياناتك. يوجد دعم Google UMP للموافقة قبل تهيئة الإعلان وطلبه، وحجز لحجم البانر المقاس قبل عرضه، وإخفاء عند فتح النوافذ. راجع [دليل Android والنشر](docs/play/README.ar.md) قبل بناء الحزمة الموقعة، و[مسودة إدراج المتجر](docs/play/store-listing.ar.md). لا ترفع APK الاختبار أو AAB غير الموقعة إلى Production.
 
 ```sh
-cmake -S . -B build
-cmake --build build
-ctest --test-dir build      # runs the unit tests
+npm run android:sync
+npm run android:open
+npm run android:debug
+npm run android:check-release
+npm run android:release
 ```
 
-Windows (Visual Studio 2019+ or MinGW):
+الاسم المعتمد هو **CalcES 991 - حاسبة علمية**. معرّف الحزمة ما زال للمراجعة قبل أول رفع، ولم تُملأ بيانات الناشر أو سياسة الخصوصية المنشورة أو معرّفات AdMob الحقيقية أو مفتاح الرفع. توجد قوالبها في `android/publisher.properties.example` و`docs/play/`؛ ملف الإعداد الفعلي والمفاتيح مستبعدة من Git. لم يُنشر تعديل على Cloudflare في مهمة تجهيز Android.
+
+## التثبيت والتشغيل
+
+Node.js 22.12+ أو 24، وnpm 10.9.2.
 
 ```sh
-cmake -S . -B build -G "Visual Studio 17 2022"   # or "-G MinGW Makefiles"
-cmake --build build --config Release
-ctest --test-dir build -C Release
+npm ci
+npm run dev -- --host 0.0.0.0
+npm run typecheck
+npm test
+npm run build
+npm run preview
 ```
 
-No third-party libraries are needed for the core, tests, and headless runner.
+React + TypeScript وVite للتطبيق، Tailwind CSS للتصميم، MathLive للتحرير، وmath.js مصدر الحساب. لا توجد خدمة حساب خلفية أو مفاتيح API. خطوط MathLive تنسخ محليًا تلقائيًا في `predev` و`prebuild`، والأصوات معطلة. مخرجات البناء في `build/web/`، ولا تُكتب فوق `site/`. بقي تحذير حجم غير مانع للحزم؛ لم يُعطل.
 
-For the GUI, install the SDL2 development headers first (`sudo apt install
-libsdl2-dev pkg-config`, or the equivalent on Windows/macOS); Dear ImGui
-v1.93.0 is vendored under `third_party/imgui` (MIT). When SDL2 is absent,
-CMake skips the GUI target automatically.
+## ما أصبح متاحًا
 
-## Usage
+| الوضع | الوظائف |
+| --- | --- |
+| COMP | الحساب العلمي والذاكرة، التكامل المحدد، الاشتقاق الرمزي وتقييمه عند نقطة، SOLVE |
+| CMPLX | تعبيرات مركبة، الصيغة الديكارتية، نصف القطر والزاوية الرئيسية، إدخال قطبي |
+| STAT | المتوسط، الانحراف السكاني والعيني، انحدار خطي مع r وR² |
+| MATRIX | المحدد، المعكوس، الضرب؛ واجهة لمصفوفات 2×2 و3×3 |
+| EQUATION | جذر عددي، نظام خطي بمجهولين أو ثلاثة، كثيرات حدود حتى الدرجة الثالثة |
+| BASE-N | BIN/OCT/DEC/HEX وAND/OR/XOR/NOT، بأعداد موقعة 32 بت |
+
+## التصميم والمشاركة والتثبيت
+
+- مساحة علوية فارغة محجوزة لإعلان مستقبلي، يتكيف ارتفاعها مع مساحة العرض المتاحة. لا توجد شبكة إعلانات أو شيفرة تتبع مضافة.
+- شاشة فاتحة، خلفية منقطة داكنة، أرقام داكنة، SHIFT أصفر وALPHA بنفسجي وأزرار مسح برتقالية. يبقى ترتيب الدوال ستة أعمدة والأرقام خمسة؛ الأسهم الأفقية في صف التحكم والرأسية في الصف التالي.
+- مساحة العمل مخفية افتراضيًا، ويمكن فتحها بزر أيقونة «الأدوات» أسفل الشاشة. تظهر أيضًا عند اختيار وضع متقدم أو وظيفة مثل التكامل. «إخفاء ×» يطويها دون مسح البيانات أو إعادة إنشاء المحرر، وتظل = متصلة بالنموذج عند إخفائه.
+- أيقونة المشاركة تفتح قائمة مشاركة الجهاز عندما يدعمها المتصفح. البديل نسخ رابط الموقع، ثم عرض الرابط للتحديد والنسخ يدويًا إذا تعذر ذلك. إلغاء قائمة المشاركة لا ينسخ الرابط تلقائيًا.
+- أيقونة التثبيت تستخدم نافذة تثبيت المتصفح عند توفرها؛ وإلا تشرح الإضافة إلى الشاشة الرئيسية في Android وSafari على iPhone وiPad أو التثبيت في Chrome/Edge على الحاسوب. لا يمكن لموقع الويب فرض نافذة تثبيت على جميع المتصفحات.
+- يوجد Web App Manifest وأيقونات PNG بحجمي 192 و512 وأيقونة Apple بحجم 180. يبني `postbuild` عامل خدمة بقائمة ملفات الإنتاج وبصمة محتواها، ويخزن ملفات التطبيق والخطوط وعامل الحساب محليًا. بعد اكتمال التحميل الأول يمكن فتح الحاسبة والحساب دون اتصال. البيانات والذاكرة تبقيان ضمن الجلسة؛ عامل الخدمة لا يخزن حسابات المستخدم.
+- تحديث عامل الخدمة ينتظر إغلاق نوافذ النسخة السابقة؛ لا تعاد الصفحة تلقائيًا أثناء تحرير المعادلة. تحميل الموقع عبر الشبكة يعرض النسخة الجديدة، وتُجهز ملفاتها للتشغيل اللاحق.
+
+## مراجعة المرحلة السابعة
+
+- أضيف تشغيل اختبارات المتصفح على ملفات الإنتاج نفسها، مع رصد أخطاء JavaScript وتحذيرات Console وأخطاء HTTP وفشل الموارد. على الصفحات الافتراضية في مجموعة الإنتاج تُحظر الطلبات الخارجية حتى لا تخفي الاختبارات اعتمادًا على CDN أو خدمة حساب.
+- توسعت المراجع العددية لتشمل دوال أسية ومثلثية وعكسية، وقاعدة السلسلة، وتكامل دالة مستمرة ذات زاوية حادة. أصلح فشل تكامل `abs(x−0.3)` بزيادة عمق Simpson من 20 إلى 32 دون تغيير تسامح الخطأ أو حد التقييمات أو المهلة.
+- أضيف فحص التعافي بعد المدخلات الخاطئة وعدم إضافتها للسجل، وتحميل خطوط MathLive وعامل الإنتاج، وإعادة تحميل الصفحة. اختبارات العامل تغطي أيضًا استدعاء السجل أثناء حساب جارٍ والتعافي من فشل العامل.
+
+## مراجعة المرحلة السادسة
+
+- حُدث الشكل لاحقًا بحسب الصورة المرجعية: شاشة فاتحة وأزرار داكنة مع إبقاء ستة أعمدة للدوال وخمسة للأرقام. حُذف العنوان واللوح الزخرفي من الواجهة لإتاحة المساحة العلوية للإعلان مستقبلًا.
+- حلّ زر «الأدوات» محل مساحة العمل الدائمة. تظهر اللوحة القابلة للطي في المنطقة العلوية عند طلبها فقط، مع تمرير داخلي دون إزاحة أزرار الحاسبة. يبقى المحرر وحقول البيانات مركبة عند الإخفاء لتجنب ضياع المؤشر والمدخلات.
+- تتوزع مساحة الإعلان والشاشة وشريط الأدوات وصفوف المفاتيح بحسب ارتفاع العرض المتاح باستخدام 100dvh؛ لا يتطلب الوصول إلى أي زر تمرير الصفحة. يتكيف ارتفاع المفاتيح والخطوط مع الهواتف القصيرة، مع دعم المساحات الآمنة وتفضيل تقليل الحركة. في الوضع الأفقي القصير تظهر الشاشة بجانب الأزرار مع بقاء ترتيب المفاتيح نفسه.
+- «السجل» يعرض آخر 50 حسابًا ناجحًا فقط خلال الجلسة، دون تخزين دائم. المعاينة التلقائية والأخطاء والطلبات الملغاة لا تدخل السجل. «مسح السجل» يزيل المدخلات من السجل دون مسح الذاكرة الحالية.
+- اختيار حساب يعيد وضعه ووحدة زاويته وأساسه ومتغيراته وقيمة Ans المستخدمة **قبل الحساب**، والمعادلة والنتيجة. العمليات المتقدمة تعيد أيضًا حدود التكامل أو المصفوفات أو بيانات الإحصاء وغيرها، دون تشغيل الحساب تلقائيًا. يمكن تعديلها ثم الضغط على = أو احسب. هذا يمنع تغيّر نتيجة `Ans+1` بسبب استخدام Ans أحدث عند الاستدعاء.
+- لفحص اللمس: أدخل كسرًا، المس المقام وعدّله، ثم اسحب لتحديد جزء واحذفه بزر DEL. غيّر عرض النافذة وتحقق من بقاء موضع المؤشر. احسب محددًا بعد تعديل A11، غيّر وضع الآلة ثم استدعه من السجل وتحقق من عودة الخلية والوضع والنتيجة.
+
+## مراجعة المرحلة الخامسة
+
+**التفاضل والتكامل:** في COMP اكتب `x²` في المحرر الرئيسي ثم اضغط ∫ أو «تكامل محدد». الحدود الافتراضية 0 و1، والنتيجة تقارب `1/3`. اختر «اشتقاق رمزي»، واكتب 3 في نقطة الاشتقاق للحصول على 6. اترك النقطة فارغة لعرض المشتقة فقط. الضغط مجددًا على اختيار الأداة في شريط COMP يعيد الحساب العادي. تستخدم الدوال المثلثية وحدة DEG/RAD/GRA الظاهرة؛ مشتقة sin عند الصفر تساوي 1 في RAD وπ/180 في DEG.
+
+**المعادلات:** MODE ثم EQUATION. في الجذر العددي اكتب `x²−2` أو `x²=2`، وحدد مجالًا مثل [0,2]، ثم «احسب» أو `=`. يقبل متغير الدالة x أو X. «كثير حدود» يطلب المعاملات من أعلى قوة إلى الثابت. «نظام خطي» يعرض جدول المعاملات ومتجه b.
+
+**المصفوفات:** MODE ثم MATRIX. افتراضيًا A هي [[1,2],[3,4]]؛ المحدد −2، والمعكوس [[−2,1],[1.5,−0.5]]. اختر A×B لإظهار المصفوفة الثانية. «Mat» و«det» و«Mat⁻¹» في اللوحة يختارون العملية؛ ثم اضغط `=`. البيانات تبقى عند الانتقال لوضع آخر والعودة خلال الجلسة.
+
+**الإحصاء:** MODE ثم STAT. افصل قيم المتغير الواحد بمسافة أو سطر أو فاصلة. للانحدار أدخل زوج x,y في كل سطر. البيانات الافتراضية (1,3)، (2,5)، (3,7) تعطي الثابت 1 والميل 2 وr=1.
+
+**المركبات:** MODE ثم CMPLX. اكتب `(1+i)²` ليظهر `2i`، أو اختر الإدخال القطبي. في DEG، نصف قطر 2 وزاوية 90 يعطيان عددًا يقارب 2i. يمكن أيضًا كتابة `r∠θ` في المحرر؛ استخدم الأقواس حول هذا الجزء عند جمعه مع تعبير آخر. arg وAbs يحترمان وحدة الزاوية والصيغة الرياضية المناسبة.
+
+**BASE-N:** اختر الأساس الذي كُتب به المدخل، ثم العملية. التحويل يعرض الأسس الأربعة معًا. NOT للصفر يعطي DEC=−1 وHEX=FFFFFFFF. تغيير الأساس يعيد تفسير المدخل ولا يحوله تلقائيًا؛ زر التحويل هو الذي يعرض المقابلات. DEC ضمن −2147483648 إلى 2147483647، ويعرض السالب في الأسس الأخرى بالمتمم الثنائي ذي 32 بت.
+
+في الجداول وحقول البيانات: المس الحقل أولًا ثم اكتب أو الصق أو استخدم أرقام اللوحة. الحقول العددية تقبل أعدادًا عشرية وإشارة وكتابة علمية مثل `1e-3`؛ ليست محررات صيغ. السحب والنسخ والحذف داخل المعادلات يبقى تحت إدارة MathLive.
+
+## الحساب العددي والدقة
+
+- الحساب الحقيقي والمصفوفات والإحصاء يستخدم BigNumber بدقة 64 رقمًا، والعرض عادة 14 رقمًا معنويًا. الدقة العددية محدودة وليست حسابًا رمزيًا دقيقًا لكل عملية.
+- المركبات ومحلّل polynomialRoot في math.js يستخدمان دقة الآلة، تقريبًا 15 رقمًا. تعرض الواجهة ذلك، ولا تدعي دقة 64 رقمًا للمركبات أو جذور كثيرات الحدود.
+- التكامل يستخدم Simpson تكيفيًا مع 16 جزءًا أوليًا، وحد أقصى 20000 تقييم وعمق 32، وتسامح مطلق ونسبي 1e−10. يعرض تقدير الخطأ؛ هذا التقدير ليس برهانًا رياضيًا، وقد تفوّت المعاينة العددية قممًا ضيقة أو تذبذبات سريعة. المطلوب دالة حقيقية مستمرة على مجال منتهٍ دون أقطاب. التكاملات غير الصحيحة أو اللانهائية ليست مدعومة.
+- الاشتقاق عبر math.derivative، بعد إدخال تحويلات DEG/GRA في التعبير قبل الاشتقاق لتطبيق قاعدة السلسلة صحيحة. المتغير المستقل x/X؛ عوّض المعاملات الأخرى بأعداد. الدوال غير القابلة للاشتقاق أو النقاط الحرجة تحتاج فحص المجال الرياضي.
+- الجذر العددي لجذر واحد، بتقسيم مجال تتغير فيه الإشارة؛ لا يحصر جميع الجذور. يلزم مجال متصل. معيار التوقف يجمع عرض المجال وباقيًا مقاسًا نسبة لقيم طرفي المجال؛ لا يُعتبر عدد ثابت صغير جدًا جذرًا. قد تفوت الطريقة جذورًا زوجية لا تغيّر الإشارة.
+- معكوس المصفوفة وحل النظام الخطي يتحققان من الباقي عند دقة 1e−25، ويرفضان نتائج لا يمكن التحقق منها. النظام المنفرد لا يملك حلًا وحيدًا.
+- جذور كثيرات الحدود تتحقق بباقٍ نسبي، وقد تدمج المكتبة الجذور المكررة. المعاملات السيئة التكييف قد تُرفض.
+- الإحصاء محدود بـ1000 قيمة/صف. الانحراف العيني غير معرف لقيمة واحدة؛ الانحدار غير معرف عندما تتساوى جميع قيم x. الارتباط وR² غير معرفين لثبات y.
+
+## الاستجابة وإلغاء الحساب
+
+الحسابات المتقدمة تعمل في Web Worker مستقل. يمكن إلغاء الحساب، وتُنهي مهلة 10 ثوانٍ العامل عند الحاجة. تغيير البيانات أو الوضع أو وحدة الزاوية يلغي النتيجة السابقة. معرف الطلب يمنع اعتماد استجابة قديمة بعد الإلغاء. تبقى بيانات المصفوفات والإحصاء والمعاملات محفوظة عند تبديل الأوضاع خلال الجلسة.
+
+النتائج الحقيقية المفردة، مثل التكامل والمحدد والجذر، تحدّث Ans بقيمتها العددية. النتائج متعددة المكونات لا تملك Ans عدديًا واحدًا. الذاكرة الحالية للمتغيرات قيم حقيقية، وليست مخزنًا عامًا للمصفوفات أو الأعداد المركبة.
+
+## الوظائف السابقة
+
+sin/cos/tan وعكسها، الدوال الزائدية، ln وlog وقاعدة لوغاريتم اختيارية، الجذور والأسس والمضروب والقيمة المطلقة. المضروب الحقيقي من 0 إلى 1000؛ في الوضع المركب من 0 إلى 170. النسبة المئوية قسمة على 100: `200×10%=20`، و`100+10%=100.1`.
+
+STO/RCL وM+/M− وAns تحفظ القيم العددية كاملة الدقة المتاحة، دون إعادة تقييم المعادلة السابقة عند تغيير الإعدادات. S⇔D يعرض كسرًا صغيرًا بعد التحقق منه (مقام حتى مليون)، وإلا يبقى عشريًا. ENG وDMS تنسيقان لا يغيران قيمة المحرر. AC يبقي الذاكرة في الجلسة الحالية، وإعادة تحميل الصفحة تعيد الحالة الابتدائية.
+
+## الملفات
+
+- `src/engine/calculus.ts`, `equations.ts`, `matrices.ts`, `statistics.ts`, `complex.ts`, `baseN.ts`: محركات العمليات.
+- `src/engine/advancedTypes.ts`, `advancedDispatcher.ts`, `calculation.worker.ts`: بروتوكول العامل وإرسال العمليات.
+- `src/hooks/useAdvancedCalculation.ts`: التشغيل والإلغاء والمهلة ومنع الاستجابات القديمة.
+- `src/components/workspaces/`: واجهات إدخال الأوضاع وحقول البيانات والجداول والنتائج.
+- `src/editor/latexToExpression.ts`: قواعد LaTeX محددة؛ لا eval() أو تعيين أو أوامر عامة.
+- `src/components/toolbar/` و`src/hooks/useAppActions.ts`: المشاركة والتثبيت وطيّ الأدوات.
+- `public/manifest.webmanifest` و`public/icons/` و`scripts/build-service-worker.mjs`: تعريف التطبيق وأيقوناته وذاكرة ملفات الإنتاج.
+- `src/components/HistoryPanel.tsx` و`src/state/history.ts`: السجل المحدود ولقطات الاستدعاء.
+- `src/app/styles.css` و`src/components/CalculatorShell.tsx`: تخطيط الهاتف والشاشات الكبيرة.
+- `src/state/`: انتقالات الحالة وربط اللوحة والمحرر والذاكرة والأوضاع.
+
+## الاختبارات
 
 ```sh
-./build/u8emu --rom /path/to/rom.bin --steps 1000000 --regs --vram frame.raw
-./build/u8emu --rom /path/to/rom.bin --key 0x23 --steps 2000000 --vram frame.raw
+npm test
+npx playwright install chromium
+npm run test:e2e
+npm run test:e2e:production
 ```
 
-- `--rom, -r FILE` — ROM image (up to 128 KiB = 2 × 64 KiB code pages).
-- `--steps, -s N` — maximum number of instructions to execute.
-- `--key CODE` — hold a key pressed during the run (hex matrix code,
-  e.g. `0x23`; repeatable).
-- `--regs` — dump register state plus peripheral diagnostics after
-  execution (unhandled SFR accesses, IRQ latch/delivery counts, LCD state).
-- `--vram, -v FILE` — dump the LCD frame (96×32 bytes) after execution.
-
-GUI (SDL2 window: LCD view, clickable keypad, registers / disassembly /
-memory / peripherals panels, run-pause-step-reset):
+أو عند وجود Chromium:
 
 ```sh
-./build/u8gui --rom /path/to/rom.bin [--steps-per-frame N] [--zoom Z]
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e:production
 ```
 
-- `--frames N` and `--screenshot FILE` are smoke-test options: quit after N
-  frames and save the final frame as a BMP (used for off-screen checks).
+Playwright يشغل خادمًا على المنفذ 5174؛ يجب أن يكون المنفذ متاحًا. `test:e2e` يستخدم خادم التطوير، و`test:e2e:production` يبني التطبيق ثم يستخدم `vite preview` لملفات `build/web`، ويضيف فحص الموارد والعامل بعد إعادة التحميل. اختبار الموارد المخصص للإنتاج يُتجاوز في تشغيل التطوير فقط. اختبارات المحركات تقارن نتائج مرجعية للتكامل والاشتقاق والجذور والأنظمة والمصفوفات والمركبات والإحصاء وحدود 32 بت. اختبارات العامل تغطي الاستجابات القديمة والمهلة والتنظيف. اختبارات المتصفح تغطي الأوضاع الفعلية والأزرار والتحرير والنسخ واللمس وConsole وAns المتقدم. اختبارات المرحلة السادسة تغطي استدعاء Ans والمصفوفات ومسح السجل وإغلاقه بلوحة المفاتيح، وثبات المحرر والتحديد وعدم التمرير الأفقي عند عروض 280 و390 و768 و1024px. فحوص اللمس بمحاكاة Chromium ولا تغني عن المراجعة على هاتف فعلي.
 
-## Project layout
+ملفات JavaScript القديمة خارج `src/main.tsx` بقيت للمراجعة؛ اختباراتها منفصلة بـ`npm run test:legacy` ولا تُحسب للتطبيق الجديد. تعليمات محاكي C في [docs/emulator-build.md](docs/emulator-build.md).
 
-```
-src/core/    CPU: registers, flags, fetch/decode/execute, interrupts
-src/mem/     MMU: code pages, 32 KiB ROM window, region map, bus routing
-src/sfr/     SFR space: register file + device dispatch, interrupt controller
-src/periph/  LCD (VRAM raster + control reg), keypad matrix + scan, timers
-src/machine/ Machine layer: SFR routing, timer feeding, IRQ polling
-src/gui/     SDL2 + Dear ImGui front-end (LCD, keypad, debug panels)
-src/disasm/  nX-U8/100 disassembler
-src/debug/   Breakpoints, stepping, register/memory dumps
-tests/       Unit tests: ALU/flags, branches/interrupts, MMU, disassembler,
-             peripherals, integration (synthetic boot ROM)
-docs/        Memory map, SFR map, references
-third_party/ Vendored dependencies (Dear ImGui v1.93.0, MIT)
-.github/     CI workflow (Windows Debug/Release + Linux with the GUI)
-```
+## مخرجات الإنتاج والاستضافة
 
-## Accuracy statement
+للاستضافة على Cloudflare Pages: أمر البناء `npm run build` ومجلد المخرجات `build/web`، مع إصدار Node متوافق مما سبق. لا تحتاج الحاسبة إلى API Token أو أسرار في كود المتصفح. يجب رفع المجلد كاملًا، بما فيه `assets/` و`mathlive/fonts/` و`icons/` و`manifest.webmanifest` و`sw.js` و`_headers`، حتى تعمل الخطوط وWeb Worker. نُشر التحديث بعد مراجعة المرحلة السابعة بناءً على طلب المستخدم؛ تفاصيل النشر وفحص الموقع العام في تقرير القبول.
 
-The emulator implements the documented ISA behaviour: exact flag semantics
-(C/Z/S/OV/HC), segment banking (CSR/DSR with mirroring), the DSR-prefix and
-`[EA+]` bus-delay timing quirks, interrupt levels with backup registers, and
-per-instruction cycle counts feeding a cycle counter. This is
-**instruction-level accuracy with cycle accounting** — bus-level (wait-state,
-pipeline) accuracy is not publicly documented for this chip and is out of
-scope until verified against hardware. Deviations and open questions are
-listed in `docs/` and the comments.
+إذا لم تظهر الرموز، شغّل `npm run prepare:mathlive` ثم أعد البناء وتحقق من تحميل ملفات `mathlive/fonts/`. إذا تعذر تشغيل اختبارات المتصفح، ثبّت Chromium أو حدّد مساره كما في الأوامر أعلاه. تحذير حجم الحزم من Vite ما زال قائمًا ولا يمنع البناء؛ لا يمثل نجاح الاختبارات قياسًا لسرعة التحميل على الشبكات البطيئة.
 
-## References and clean-room statement
+اختبارات `tests/e2e/app-actions.spec.ts` تتحقق من المشاركة الأصلية وإلغائها، ونسخ الرابط وبديله اليدوي، وتعليمات التثبيت واستهلاك نافذته مرة واحدة، وإخفاء الأدوات وحفظ خلاياها. اختبار الإنتاج يتحقق أيضًا من شروط تثبيت Chromium ومن تشغيل التكامل بعد إعادة التحميل دون اتصال بعد اكتمال التخزين المحلي.
 
-Written from scratch after studying the public reverse-engineering work of
-the Casio calculator community; behaviour was derived from documentation and
-observation, no source lines were copied. See `docs/references.md` for the
-full list (SimU8, CasioEmuX, u8_emu) and their licenses.
-
-## Roadmap
-
-1. ✅ Scaffolding, build system, license
-2. ✅ Target model research (fx-991ES PLUS memory map, SFR window, keypad)
-3. ✅ CPU core + unit tests (ALU, branches, MMU, disassembler)
-4. ✅ Peripheral SFR wiring (interrupt controller, timers, keypad scan,
-   LCD control — provisional register map in `docs/sfr-map.md`)
-5. ✅ GUI: SDL2 + Dear ImGui (LCD view, key input, debug panels)
-6. ✅ Integration testing with a synthetic boot ROM; Windows CI
-
-CI runs the full test suite on `windows-latest` (MSVC, Debug + Release;
-the GUI target is skipped there without SDL2) and on `ubuntu-latest`
-(with SDL2, so the GUI target is compiled as well) — see
-`.github/workflows/ci.yml`.
-
-## License
-
-MIT — see `LICENSE`.
+تحديث ملاءمة الشاشة محصور في CSS دون تغيير أوامر الأزرار أو إدارة الحالة أو محرك الحساب. يتحقق `tests/e2e/viewport.spec.ts` من وجود الأزرار الخمسين كلها داخل العرض، ومن عدم زيادة ارتفاع الصفحة على ارتفاع النافذة في 11 حالة قياس وتغيير حجم، بما فيها 320×568 و360×640 و390×844 و844×390. يختبر أيضًا بقاء الأزرار متاحة عند عرض التنبيهات وفتح الأدوات.

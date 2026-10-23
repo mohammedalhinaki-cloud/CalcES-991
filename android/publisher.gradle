@@ -1,0 +1,67 @@
+import groovy.json.JsonOutput
+
+// publisher.properties is local/ignored. Environment variables and -P options override it.
+def publisher = new Properties()
+def publisherFile = rootProject.file('publisher.properties')
+if (publisherFile.exists()) publisherFile.withInputStream { publisher.load(it) }
+def value = { String key, String fallback ->
+    (project.findProperty(key) ?: System.getenv(key) ?: publisher.getProperty(key) ?: fallback).toString()
+}
+def quoted = { String text -> JsonOutput.toJson(text) }
+def realAds = value('ADS_ENABLED', 'false').toBoolean()
+def appId = value('ADMOB_APP_ID', 'ca-app-pub-3940256099942544~3347511713')
+def bannerId = value('ADMOB_BANNER_ID', '')
+def audience = value('APP_AUDIENCE', 'unconfigured')
+if (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}')) throw new GradleException('ADMOB_APP_ID has an invalid format; the Mobile Ads provider cannot start with a placeholder.')
+if (realAds && (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}') || appId.contains('3940256099942544') || !bannerId.matches('ca-app-pub-[0-9]{16}/[0-9]{10}') || bannerId.contains('3940256099942544') || !['general', 'children'].contains(audience))) {
+    throw new GradleException('Live ads require your own AdMob App/Banner IDs and an explicit APP_AUDIENCE (general or children).')
+}
+android {
+    buildFeatures { buildConfig true }
+    defaultConfig {
+        versionCode value('APP_VERSION_CODE', '1').toInteger()
+        versionName value('APP_VERSION_NAME', '1.0.0')
+        manifestPlaceholders = [admobAppId: appId]
+        buildConfigField 'String', 'PRIVACY_POLICY_URL', quoted(value('PRIVACY_POLICY_URL', ''))
+        buildConfigField 'String', 'SUPPORT_EMAIL', quoted(value('SUPPORT_EMAIL', ''))
+    }
+    signingConfigs {
+        debug { storeFile rootProject.file('../.android-local/debug.keystore') }
+        release {
+            def keyPath = value('UPLOAD_KEYSTORE_PATH', '')
+            if (keyPath) {
+                storeFile new File(keyPath).isAbsolute() ? file(keyPath) : rootProject.file('../' + keyPath)
+                storePassword value('UPLOAD_KEYSTORE_PASSWORD', '')
+                keyAlias value('UPLOAD_KEY_ALIAS', '')
+                keyPassword value('UPLOAD_KEY_PASSWORD', '')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            // Official Google sample IDs only: debug requests can never monetize live units.
+            manifestPlaceholders = [admobAppId: 'ca-app-pub-3940256099942544~3347511713']
+            buildConfigField 'boolean', 'ADS_ENABLED', 'true'
+            buildConfigField 'String', 'ADMOB_BANNER_ID', quoted('ca-app-pub-3940256099942544/9214589741')
+            buildConfigField 'String', 'APP_AUDIENCE', quoted(audience == 'unconfigured' ? 'general' : audience)
+        }
+        release {
+            buildConfigField 'boolean', 'ADS_ENABLED', realAds.toString()
+            buildConfigField 'String', 'ADMOB_BANNER_ID', quoted(bannerId)
+            buildConfigField 'String', 'APP_AUDIENCE', quoted(audience)
+            if (value('UPLOAD_KEYSTORE_PATH', '')) signingConfig signingConfigs.release
+        }
+    }
+}
+
+// Android's public development key is not an upload/release key.
+def localDebugKey = rootProject.file('../.android-local/debug.keystore')
+tasks.register('createLocalDebugKeystore', Exec) {
+    onlyIf { !localDebugKey.exists() }
+    doFirst { localDebugKey.parentFile.mkdirs() }
+    commandLine new File(System.getProperty('java.home'), 'bin/keytool').absolutePath,
+        '-genkeypair', '-keystore', localDebugKey.absolutePath, '-storepass', 'android',
+        '-alias', 'androiddebugkey', '-keypass', 'android', '-keyalg', 'RSA', '-keysize', '2048',
+        '-validity', '10000', '-dname', 'CN=Android Debug,O=Android,C=US', '-noprompt'
+}
+tasks.configureEach { if (name == 'validateSigningDebug') dependsOn 'createLocalDebugKeystore' }

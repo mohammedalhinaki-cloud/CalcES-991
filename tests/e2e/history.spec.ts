@@ -1,0 +1,80 @@
+import { expect, test } from './fixtures'
+import type { MathfieldElement } from 'mathlive'
+import type { Page } from '@playwright/test'
+async function formula(page:Page,latex:string){await page.locator('math-field').evaluate((el,value)=>{const field=el as MathfieldElement;field.value=value;field.dispatchEvent(new InputEvent('input',{bubbles:true}))},latex)}
+async function mode(page:Page,name:string){await page.locator('[data-key="mode"]').click();await page.getByRole('dialog',{name:/MODE/}).getByRole('button',{name:new RegExp(name)}).click()}
+async function openHistory(page:Page){await page.getByRole('button',{name:/^السجل/}).click();return page.getByRole('dialog',{name:'سجل الحسابات'})}
+test('history recalls the original Ans context and keeps the same MathLive instance',async({page})=>{
+ await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
+ await formula(page,'7');await page.locator('[data-key="equals"]').click()
+ await formula(page,'\\mathrm{Ans}+1');await page.locator('[data-key="equals"]').click()
+ await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('8')
+ await page.locator('[data-key="equals"]').click()
+ await expect(page.getByRole('button',{name:'السجل (2)',exact:true})).toBeVisible()
+ await formula(page,'100');await page.locator('[data-key="equals"]').click()
+ await page.locator('math-field').evaluate(el=>el.setAttribute('data-instance','original'))
+ const dialog=await openHistory(page)
+ await dialog.getByRole('button',{name:'استدعاء 8',exact:true}).click()
+ await expect(page.locator('math-field')).toHaveAttribute('data-instance','original')
+ await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('8')
+ // CALC evaluates the recalled formula, rather than reusing the committed result.
+ await page.locator('[data-key="calc"]').click()
+ await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('8')
+ await openHistory(page);await page.keyboard.press('Escape')
+ await expect(dialog).not.toBeVisible()
+ await expect(page.getByRole('button',{name:/^السجل/})).toBeFocused()
+})
+test('advanced history restores matrix data and does not add another entry on recall',async({page})=>{
+ await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
+ await mode(page,'MATRIX')
+ await page.getByRole('textbox',{name:'A11',exact:true}).fill('2')
+ await page.getByRole('button',{name:'احسب',exact:true}).click()
+ await expect(page.getByLabel('نتيجة الحساب المتقدم',{exact:true})).toContainText('det(A)2',{timeout:15000})
+ await page.getByRole('textbox',{name:'A11',exact:true}).fill('9')
+ await mode(page,'COMP')
+ const dialog=await openHistory(page)
+ await dialog.getByRole('button',{name:/استدعاء/}).click()
+ await expect(page.getByRole('textbox',{name:'A11',exact:true})).toHaveText('2')
+ await expect(page.getByLabel('نتيجة الحساب المتقدم',{exact:true})).toContainText('det(A)2')
+ await expect(page.getByRole('button',{name:'السجل (1)',exact:true})).toBeVisible()
+ await page.locator('[data-key="equals"]').click()
+ await expect(page.getByLabel('نتيجة الحساب المتقدم',{exact:true})).toContainText('det(A)2')
+ await openHistory(page);await page.getByRole('button',{name:'مسح السجل',exact:true}).click()
+ await expect(dialog).toContainText('السجل فارغ')
+})
+test('mobile and desktop layouts have no horizontal overflow and retain editor selection on resize',async({browser})=>{
+ const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}})
+ const page=await context.newPage();const errors:string[]=[]
+ page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))errors.push(m.text())})
+ await page.goto('http://127.0.0.1:5174/');await expect(page.locator('math-field')).toBeVisible()
+ await formula(page,'\\frac{12}{34}')
+ await page.locator('math-field').evaluate(el=>{const f=el as MathfieldElement;f.position=2;el.setAttribute('data-position',String(f.position))})
+ for(const width of [280,390,768,1024]){
+  await page.setViewportSize({width,height:900})
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+  expect(await page.locator('math-field').evaluate(el=>(el as MathfieldElement).position===Number(el.getAttribute('data-position')))).toBe(true)
+  await expect(page.locator('#workspace')).toBeHidden()
+  await expect(page.getByRole('button',{name:'مساحة العمل',exact:true})).toHaveAttribute('aria-expanded','false')
+ }
+ await page.setViewportSize({width:390,height:844})
+ const keys=await page.locator('[aria-label="لوحة مفاتيح الحاسبة"] button').evaluateAll(buttons=>buttons.map(button=>button.getBoundingClientRect().height))
+ expect(Math.min(...keys)).toBeGreaterThanOrEqual(44)
+ await page.getByRole('button',{name:/^السجل/}).tap()
+ await expect(page.getByRole('dialog',{name:'سجل الحسابات'})).toBeVisible()
+ await page.getByRole('button',{name:'إغلاق',exact:true}).tap()
+ expect(errors).toEqual([]);await context.close()
+})
+
+test('recalling within the same calculus tool restores bounds and keeps equals connected',async({page})=>{
+ await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
+ await formula(page,'x^2');await page.locator('[data-key="integral"]').click()
+ await page.getByRole('textbox',{name:'الحد الأعلى',exact:true}).fill('2')
+ await page.locator('[data-key="equals"]').click()
+ await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('2.6666666666667',{timeout:15000})
+ await page.getByRole('textbox',{name:'الحد الأعلى',exact:true}).fill('4')
+ const dialog=await openHistory(page);await dialog.getByRole('button',{name:/استدعاء/}).click()
+ await expect(page.getByRole('textbox',{name:'الحد الأعلى',exact:true})).toHaveText('2')
+ await page.getByRole('textbox',{name:'الحد الأعلى',exact:true}).fill('3')
+ await page.locator('[data-key="equals"]').click()
+ await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('9',{timeout:15000})
+})

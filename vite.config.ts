@@ -4,5 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  build: { outDir: 'site', emptyOutDir: true },
+  // Keep generated output away from the tracked GitHub Pages site.
+  build: { outDir: 'build/web', emptyOutDir: true },
 })

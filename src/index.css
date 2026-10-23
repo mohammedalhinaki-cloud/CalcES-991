@@ -7,11 +7,40 @@
 
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #111612; font-family: var(--font-sans); }
-button { font: inherit; }
-.lcd-no-scroll::-webkit-scrollbar { display: none; }
-.lcd-no-scroll { scrollbar-width: none; }
-.key-3d { transition: transform .07s ease, box-shadow .07s ease; }
-.key-3d:active { transform: translateY(3px); box-shadow: 0 0 #151a15, inset 0 1px #ffffff22 !important; }
+body { margin: 0; min-width: 280px; font-family: var(--font-sans); }
+
+/* Shell and inset LCD depth. */
+.calculator-shell {
+  border: 1px solid #ffffff12;
+  box-shadow: 0 24px 64px #0008, inset 0 1px 0 #ffffff12;
+}
+.calculator-lcd {
+  border: 5px solid #1e2126;
+  box-shadow: inset 0 3px 8px #0003, 0 1px 0 #ffffff0d;
+}
 .cursor-blink { animation: cursor-blink 1.05s steps(1) infinite; }
 @keyframes cursor-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .cursor-blink { animation: none; }
+}
+
+/* Physical key travel: the bottom shadow collapses as the cap moves down. */
+.calculator-key {
+  border: 1px solid #ffffff12;
+  box-shadow: 0 4px 0 #111, inset 0 1px 0 #ffffff26;
+  transition: transform 70ms ease, box-shadow 70ms ease, filter 100ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.calculator-key:hover { filter: brightness(1.08); }
+.calculator-key:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .calculator-key { transition: none; }
+}
+
+/* KaTeX keeps its own math fonts; the LCD controls color and scroll boundaries. */
+.lcd-math { scrollbar-width: thin; scrollbar-color: #596b50 #a3b69a; }
+.lcd-math .katex { font-size: 1.15em; color: inherit; }
+.lcd-math .katex-display { margin: 0; }

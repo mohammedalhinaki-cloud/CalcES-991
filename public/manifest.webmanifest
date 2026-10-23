@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "CalcES 991 - حاسبة علمية",
+  "short_name": "CalcES 991",
+  "description": "حاسبة علمية تفاعلية مع المعادلات والمصفوفات والتكامل وسجل الحسابات",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#15171c",
+  "theme_color": "#15171c",
+  "categories": ["utilities", "education"],
+  "icons": [
+    {"src": "/icons/calculator-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/calculator-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}
