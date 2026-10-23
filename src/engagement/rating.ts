@@ -1,8 +1,8 @@
 // Store engagement preferences only. Never persist expressions or results here.
 export const RATING_EVENT='calces:calculation'
 export const THREE_DAYS=3*24*60*60*1000
-// Destination explicitly supplied by the publisher; currently the website, not a Play rating page.
-export const STORE_URL='https://study-tools-calculator.pages.dev/'
+// Official Google Play listing shared by both rating actions.
+export const STORE_URL='https://play.google.com/store/apps/details?id=calces991.calculator'
 export interface Preferences {count:number;done:boolean;remindAt:number}
 export function readPreferences(storage:Storage):Preferences {
  try {

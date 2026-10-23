@@ -56,7 +56,7 @@ test('existing native shield opens the about dialog without adding toolbar contr
  expect(await page.locator('math-field').evaluate(el=>(el as MathfieldElement).position)).toBe(position)
  await page.evaluate(()=>{window.open=((url?:string|URL)=>{document.body.dataset.ratingDestination=String(url);return null}) as typeof window.open})
  await button.tap();await modal.getByRole('button',{name:'هل أعجبك التطبيق؟ ادعمنا بالتقييم ⭐️'}).tap()
- await expect.poll(()=>page.evaluate(()=>document.body.dataset.ratingDestination)).toBe('https://study-tools-calculator.pages.dev/')
+ await expect.poll(()=>page.evaluate(()=>document.body.dataset.ratingDestination)).toBe('https://play.google.com/store/apps/details?id=calces991.calculator')
  expect(await page.evaluate(()=>localStorage.getItem('rate_done'))).toBe('1')
  await page.keyboard.press('Escape');await expect(modal).not.toBeVisible()
 })

@@ -2,6 +2,7 @@ package calces991.calculator;
 
 import com.google.android.gms.ads.AdSize;
 import android.content.Intent;
+import android.content.ActivityNotFoundException;
 import android.net.Uri;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -32,10 +33,16 @@ public class AppConfigurationPlugin extends Plugin {
         // Fixed publisher-provided destination: never accept an arbitrary intent from web content.
         getActivity().runOnUiThread(() -> {
             try {
-                getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://study-tools-calculator.pages.dev/")));
+                try {
+                    Intent market = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=calces991.calculator"));
+                    market.setPackage("com.android.vending");
+                    getActivity().startActivity(market);
+                } catch (ActivityNotFoundException missingPlayStore) {
+                    getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=calces991.calculator")));
+                }
                 call.resolve();
             } catch (Exception failure) {
-                call.reject("Unable to open the publisher website", failure);
+                call.reject("Unable to open the Google Play listing", failure);
             }
         });
     }
