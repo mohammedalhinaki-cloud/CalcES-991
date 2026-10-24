@@ -1,6 +1,18 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
+    <script id="android-store-redirect">
+      (function () {
+        // Keep the bundled Capacitor app local; redirect Android website visitors only.
+        var nativeApp = Boolean(window.androidBridge) ||
+          (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+          window.location.hostname === 'localhost' ||
+          window.location.protocol === 'capacitor:' || window.location.protocol === 'file:';
+        if (!nativeApp && /Android/i.test(navigator.userAgent)) {
+          window.location.replace('https://play.google.com/store/apps/details?id=calces991.calculator');
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#15171c" />

@@ -28,7 +28,7 @@ test('share uses the native sheet and cancelling it does not copy the link',asyn
  })
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await page.getByRole('button',{name:'مشاركة الحاسبة'}).click()
- await expect(page.locator('html')).toHaveAttribute('data-shared-url','http://127.0.0.1:5174/')
+ await expect(page.locator('html')).toHaveAttribute('data-shared-url','https://study-tools-calculator.pages.dev/')
  await expect(page.locator('html')).not.toHaveAttribute('data-copied','yes')
 })
 test('share falls back to copying the actual app link',async({page})=>{
@@ -37,7 +37,7 @@ test('share falls back to copying the actual app link',async({page})=>{
   Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async(text:string)=>{document.documentElement.dataset.copied=text}}})
  })
  await page.goto('/');await page.getByRole('button',{name:'مشاركة الحاسبة'}).click()
- await expect(page.locator('html')).toHaveAttribute('data-copied','http://127.0.0.1:5174/')
+ await expect(page.locator('html')).toHaveAttribute('data-copied','https://study-tools-calculator.pages.dev/')
  await expect(page.getByRole('status').filter({hasText:'تم نسخ رابط الحاسبة'})).toBeVisible()
 })
 test('manual share and install guidance remain available when browser APIs are missing',async({page})=>{
@@ -49,7 +49,7 @@ test('manual share and install guidance remain available when browser APIs are m
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await page.getByRole('button',{name:'مشاركة الحاسبة'}).click()
  const share=page.getByRole('dialog',{name:'مشاركة الحاسبة',exact:true})
- await expect(share.getByRole('link')).toHaveAttribute('href','http://127.0.0.1:5174/')
+ await expect(share.getByRole('link')).toHaveAttribute('href','https://study-tools-calculator.pages.dev/')
  await share.getByRole('button',{name:'إغلاق',exact:true}).click()
  await page.getByRole('button',{name:'تثبيت التطبيق'}).click()
  const install=page.getByRole('dialog',{name:'تثبيت الحاسبة',exact:true})

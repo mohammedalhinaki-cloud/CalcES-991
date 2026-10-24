@@ -1,6 +1,7 @@
 import {translate} from '../i18n/locale'
 import { useEffect, useRef, useState } from 'react'
 import { isAndroidApp, PUBLIC_APP_URL } from '../native/platform'
+import { STORE_URL } from '../engagement/rating'
 interface InstallPrompt extends Event {
  prompt:()=>Promise<void>
  userChoice:Promise<{outcome:'accepted'|'dismissed'}>
@@ -10,7 +11,9 @@ export function useAppActions(){
  const [installed,setInstalled]=useState(false)
  const [notice,setNotice]=useState('')
  const [help,setHelp]=useState<'install'|'share'|null>(null)
- const url=isAndroidApp()?PUBLIC_APP_URL:new URL(import.meta.env.BASE_URL,window.location.origin).href
+ const isAndroidDevice=()=>isAndroidApp()||/Android/i.test(navigator.userAgent)
+ const sharingUrl=()=>isAndroidDevice()?STORE_URL:PUBLIC_APP_URL
+ const url=sharingUrl()
  useEffect(()=>{
   const media=window.matchMedia('(display-mode: standalone)')
   const update=()=>setInstalled(isAndroidApp()||media.matches||Boolean((navigator as Navigator&{standalone?:boolean}).standalone))
@@ -24,6 +27,7 @@ export function useAppActions(){
  },[])
  async function share(){
   setNotice('')
+  const url=sharingUrl()
   if(isAndroidApp()){
    try{const {Share}=await import('@capacitor/share');await Share.share({title:translate('CalcES 991 - حاسبة علمية'),text:translate('حاسبة علمية تفاعلية'),url});return}catch(error){if(error instanceof Error&&/cancel/i.test(error.message))return}
   }
@@ -36,6 +40,7 @@ export function useAppActions(){
  }
  async function install(){
   setNotice('')
+  if(isAndroidDevice()){window.location.assign(STORE_URL);return}
   if(installed){setNotice('الحاسبة مثبتة بالفعل');return}
   const deferred=prompt.current
   if(deferred){
