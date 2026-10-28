@@ -11,8 +11,8 @@ export default function LanguageGate({children}:{children:ReactNode}){
  if(!selected)return <main className="language-onboarding" dir="ltr">
   <section className="language-card" role="dialog" aria-modal="true" aria-labelledby="language-title">
    <p className="language-brand">CalcES 991</p>
-   <h1 id="language-title"><span lang="ar" dir="rtl">اختر لغة التطبيق</span><br/><span lang="en">Choose your language</span></h1>
-   <p className="language-hint"><span lang="ar" dir="rtl">سيتم حفظ اختيارك على هذا الجهاز</span><br/><span lang="en">Your choice will be saved on this device</span></p>
+   <h1 id="language-title" lang="en">Choose your language</h1>
+   <p className="language-hint" lang="en">Your choice will be saved on this device</p>
    <div className="engagement-actions"><button type="button" lang="ar" dir="rtl" onClick={()=>choose('ar')}>العربية</button><button type="button" lang="en" onClick={()=>choose('en')}>English</button></div>
   </section>
  </main>

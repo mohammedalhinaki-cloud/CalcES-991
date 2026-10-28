@@ -9,6 +9,10 @@ async function noArabic(page:import('@playwright/test').Page){
 test('language chooser appears once; English selection persists through offline restart',async({page,context})=>{
  await page.goto('/')
  await expect(page.getByRole('dialog',{name:/Choose your language/})).toBeVisible()
+ await expect(page.getByRole('heading',{name:'Choose your language',exact:true})).toHaveCount(1)
+ await expect(page.getByText('اختر لغة التطبيق',{exact:true})).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'العربية',exact:true})).toBeVisible()
+ await expect(page.getByRole('button',{name:'Arabic',exact:true})).toHaveCount(0)
  await page.getByRole('button',{name:'English',exact:true}).tap()
  await expect(page.locator('math-field')).toBeVisible();await expect(page.locator('html')).toHaveAttribute('lang','en')
  await expect(page.locator('main.app-shell')).toHaveCSS('direction','ltr')
