@@ -11,7 +11,7 @@ export function selectLanguage(value:Language){
  language=value
  document.documentElement.lang=value
  document.documentElement.dir=getDirection()
- document.title=value==='en'?'CalcES 991 - Scientific Calculator':'CalcES 991 - حاسبة علمية'
+ document.title=value==='en'?'CalcES 991 | Scientific Calculator Online':'CalcES 991 | حاسبة علمية أون لاين بالعربية والإنجليزية'
  try{window.localStorage.setItem(LANGUAGE_KEY,value)}catch{/* Continue in the chosen language for this session. */}
 }
 const messages:Record<string,string>=english

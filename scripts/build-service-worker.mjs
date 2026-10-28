@@ -5,7 +5,7 @@ const root=path.resolve('build/web')
 async function files(directory){
  const entries=await readdir(directory,{withFileTypes:true})
  const groups=await Promise.all(entries.map(entry=>entry.isDirectory()?files(path.join(directory,entry.name)):[path.join(directory,entry.name)]))
- return groups.flat().filter(file=>!['sw.js','_headers'].includes(path.basename(file)))
+ return groups.flat().filter(file=>!['sw.js','_headers','_redirects'].includes(path.basename(file)))
 }
 const paths=(await files(root)).sort(),hash=createHash('sha256')
 for(const file of paths){hash.update(path.relative(root,file));hash.update(await readFile(file))}
@@ -23,7 +23,11 @@ self.addEventListener('fetch',event=>{
  const request=event.request,url=new URL(request.url);
  if(request.method!=='GET'||url.origin!==self.location.origin)return;
  if(request.mode==='navigate'){
-  event.respondWith((async()=>{try{return await fetch(request)}catch{return (await caches.open(CACHE)).match('/') .then(response=>response||Response.error())}})());
+  event.respondWith((async()=>{try{return await fetch(request)}catch{
+   const cache=await caches.open(CACHE);
+   const page=url.pathname.endsWith('/')?url.pathname+'index.html':url.pathname;
+   return (await cache.match(page))||(await cache.match(page+'.html'))||(await cache.match('/'))||Response.error();
+  }})());
  }else if(FILES.includes(url.pathname)){
   event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match(url.pathname))||fetch(request)));
  }

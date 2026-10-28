@@ -3,6 +3,7 @@ import {startAndroidAds} from '../native/androidAds'
 import type {ReactNode} from 'react'
 import {getDirection,readStoredLanguage,selectLanguage} from './locale'
 import type {Language} from './locale'
+import {isAndroidApp} from '../native/platform'
 export default function LanguageGate({children}:{children:ReactNode}){
  const [selected,setSelected]=useState(readStoredLanguage)
  useEffect(()=>{if(selected){selectLanguage(selected);void startAndroidAds()}},[selected])
@@ -14,6 +15,7 @@ export default function LanguageGate({children}:{children:ReactNode}){
    <h1 id="language-title" lang="en">Choose your language</h1>
    <p className="language-hint" lang="en">Your choice will be saved on this device</p>
    <div className="engagement-actions"><button type="button" lang="ar" dir="rtl" onClick={()=>choose('ar')}>العربية</button><button type="button" lang="en" onClick={()=>choose('en')}>English</button></div>
+   {!isAndroidApp()&&<nav className="guide-links" aria-label="Calculator guides"><a href="/ar/" lang="ar" dir="rtl">دليل الاستخدام</a><span aria-hidden="true"> · </span><a href="/en/" lang="en">User guide</a></nav>}
   </section>
  </main>
  return <div className="language-root" lang={selected} dir={getDirection()}>{children}</div>

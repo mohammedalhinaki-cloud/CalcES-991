@@ -1,3 +1,5 @@
+import {isAndroidApp} from '../native/platform'
+import {getLanguage} from '../i18n/locale'
 import { localize } from '../i18n/locale'
 import RatingPrompt from './RatingPrompt'
 import { useState } from 'react'
@@ -14,7 +16,7 @@ export default function CalculatorShell() {
  const [historyOpen,setHistoryOpen]=useState(false)
  return <div className="calculator-layout">
   <article id="calculator" className="calculator-body" aria-labelledby="calculator-title">
-   <header className="ad-reservation" aria-label={localize("مساحة محجوزة لإعلان مستقبلي")}><h1 id="calculator-title" className="sr-only">fx-991ES PLUS · Web</h1></header>
+   <header className="ad-reservation" aria-label={localize("مساحة محجوزة لإعلان مستقبلي")}><h1 id="calculator-title" className="sr-only">{getLanguage()==='en'?'CalcES 991 — Scientific Calculator':'CalcES 991 — حاسبة علمية'}</h1></header>
    <CalculatorDisplay/>
    <AppToolbar onHistory={()=>setHistoryOpen(true)}/>
    {/* Keep data fields mounted: hiding the panel must not reset their values. */}
@@ -22,6 +24,7 @@ export default function CalculatorShell() {
     <header className="flex items-center justify-between gap-2"><h2 id="workspace-title" className="font-semibold">{localize("مساحة العمل · ")}{localize(state.mode)}</h2><button type="button" className="utility-button" aria-label={localize("إغلاق مساحة العمل")} onClick={()=>setWorkspaceOpen(false)}>{localize("إخفاء ×")}</button></header>
     <p className="mt-2 text-xs leading-6 text-gray-300">{localize("أدخل البيانات ثم اضغط «احسب» أو =. يمكنك إخفاء الأدوات للوصول إلى الأزرار؛ تبقى البيانات محفوظة.")}</p>
     <AdvancedWorkspaces/>
+    {!isAndroidApp()&&<a className="utility-button mt-3" href={getLanguage()==='en'?'/en/':'/ar/'}>{getLanguage()==='en'?'Calculator user guide':'دليل استخدام الحاسبة'}</a>}
    </aside>
    <Keypad/>
   </article>

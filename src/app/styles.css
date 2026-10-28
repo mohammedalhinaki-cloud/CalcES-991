@@ -164,3 +164,6 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 .history-results { display:block; margin-top:6px; }
 .history-result-line { display:flex; align-items:center; gap:8px; min-width:0; font-size:14px; }
 .history-result-line > .history-math { flex:1; }
+
+.guide-links { margin-top:16px; font-size:13px; line-height:1.8; color:#c4b5fd; }
+.guide-links a { text-decoration:underline; text-underline-offset:3px; }

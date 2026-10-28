@@ -1,14 +1,16 @@
 import {test,expect} from './fixtures'
 const store='https://play.google.com/store/apps/details?id=calces991.calculator'
 const website='https://study-tools-calculator.pages.dev/'
-test('Android browser redirects during the initial HTML head execution',async({page})=>{
- await page.addInitScript(()=>Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 (Linux; Android 14)'}))
- await page.route('https://play.google.com/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Google Play destination</h1>'}))
- await page.goto('/');await expect(page).toHaveURL(store)
-})
+for(const userAgent of ['Mozilla/5.0 (Linux; Android 14)','Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)']){
+ test(`Android website remains accessible without forced redirects: ${userAgent.includes('Googlebot')?'crawler':'visitor'}`,async({page})=>{
+  await page.addInitScript(userAgent=>Object.defineProperty(navigator,'userAgent',{configurable:true,value:userAgent}),userAgent)
+  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
+  await expect(page).toHaveURL('http://127.0.0.1:5174/')
+ })
+}
 test('Android install button navigates directly to Google Play',async({page})=>{
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
- // Change only the UA after boot so the separate install handler can be exercised.
+ // The website stays open until the visitor explicitly chooses the install button.
  await page.evaluate(()=>Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 (Linux; Android 14)'}))
  await page.route('https://play.google.com/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Google Play destination</h1>'}))
  await page.getByRole('button',{name:'تثبيت التطبيق'}).click()

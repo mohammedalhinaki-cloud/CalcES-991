@@ -6,7 +6,7 @@ import App from '../app/App'
 vi.mock('../components/display/MathEditor', () => ({ default: () => <div aria-label="محرر المعادلة" /> }))
 it('renders the display and separate result with the original keypad groups', () => {
   render(<App />)
-  expect(screen.getByRole('heading', { name: 'fx-991ES PLUS · Web' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'CalcES 991 — حاسبة علمية' })).toBeInTheDocument()
   expect(screen.getByLabelText('الشاشة التفاعلية')).toBeInTheDocument()
   expect(screen.getByLabelText('النتيجة')).toHaveTextContent('—')
   expect(screen.getByLabelText('لوحة مفاتيح الحاسبة')).toBeInTheDocument()

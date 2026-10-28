@@ -1,18 +1,17 @@
 import {readFileSync} from 'node:fs'
-import {runInNewContext} from 'node:vm'
-import {describe,expect,it,vi} from 'vitest'
+import {describe,expect,it} from 'vitest'
 const html=readFileSync('index.html','utf8')
-const script=/<script id="android-store-redirect">([\s\S]*?)<\/script>/.exec(html)![1]!
-function boot(userAgent:string,options:{hostname?:string;bridge?:boolean;capacitor?:boolean;protocol?:string}={}){
- const replace=vi.fn()
- runInNewContext(script,{navigator:{userAgent},window:{androidBridge:options.bridge?{}:undefined,Capacitor:options.capacitor?{isNativePlatform:()=>true}:undefined,location:{replace,hostname:options.hostname??'study-tools-calculator.pages.dev',protocol:options.protocol??'https:'}}})
- return replace
-}
-describe('early HTML platform redirect',()=>{
- it('runs before app modules and immediately redirects Android web visitors',()=>{
-  expect(html.indexOf('id="android-store-redirect"')).toBeLessThan(html.indexOf('<meta'))
-  expect(boot('Mozilla/5.0 (Linux; Android 14)')).toHaveBeenCalledWith('https://play.google.com/store/apps/details?id=calces991.calculator')
+describe('crawlable calculator entry page',()=>{
+ it('keeps Android visitors and smartphone crawlers on the website',()=>{
+  const page=new DOMParser().parseFromString(html,'text/html')
+  expect(page.querySelector('script#android-store-redirect')).toBeNull()
+  expect([...page.querySelectorAll('script:not([type="application/ld+json"])')].every(script=>script.hasAttribute('src'))).toBe(true)
+  expect(page.querySelector('meta[http-equiv="refresh"]')).toBeNull()
  })
- it.each(['Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)','Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X)','Mozilla/5.0 (Windows NT 10.0; Win64; x64)','Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)'])('keeps iOS and desktop on the calculator: %s',ua=>expect(boot(ua)).not.toHaveBeenCalled())
- it.each([{bridge:true},{capacitor:true},{hostname:'localhost'},{protocol:'capacitor:'},{protocol:'file:'}])('never redirects the packaged app: %j',options=>expect(boot('Android',options)).not.toHaveBeenCalled())
+ it('declares the canonical page and factual structured application data',()=>{
+  const page=new DOMParser().parseFromString(html,'text/html')
+  expect(page.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe('https://study-tools-calculator.pages.dev/')
+  const schema=JSON.parse(page.querySelector('script[type="application/ld+json"]')!.textContent!)
+  expect(schema['@graph'].find((node:{'@type':string})=>node['@type']==='WebApplication')).toMatchObject({name:'CalcES 991',isAccessibleForFree:true})
+ })
 })
