@@ -72,7 +72,11 @@ function useCalculatorController(){
       return {status:'empty',text:'أدخل البيانات ثم اضغط = أو احسب'}
     }
     if(!state.latex)return {status:'empty',text:'—'}
-    return state.committedValue!==null?{status:'success',text:formatScientific(math.bignumber(state.committedValue),options)}:previewCalculation(state.latex,options)
+    if(state.committedValue!==null)return {status:'success',text:formatScientific(math.bignumber(state.committedValue),options)}
+    const preview=previewCalculation(state.latex,options)
+    // An unfinished formula is normal while editing. Explicit calculation still
+    // uses evaluateScientific and reports the original diagnostic via NOTICE.
+    return preview.status==='incomplete'?{...preview,text:''}:preview
   },[state.latex,state.mode,state.committedValue,options,tool,advanced.state])
   const beginEdit=useCallback(()=>{dataTarget.current=null;dispatch({type:'EDITOR_INTENT'})},[])
   const setMode=(mode:CalculatorMode)=>{advanced.cancel();dataTarget.current=null;setTool(null);setWorkspaceOpen(mode!=='COMP');dispatch({type:'SET_MODE',mode})}

@@ -117,3 +117,39 @@ test('keypad fraction template keeps touch editing available and fits mobile wid
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
   }
 })
+
+for(const language of ['ar','en'] as const){
+ test(`unfinished expressions stay quiet until equals in ${language}`,async({page})=>{
+  await page.addInitScript(language=>localStorage.setItem('calces_language',language),language)
+  await page.goto('/')
+  const field=page.locator('math-field')
+  await expect(field).toBeVisible()
+  const message=language==='ar'?'أكمل التعبير الرياضي':'Complete the mathematical expression'
+  const output=page.getByLabel(language==='ar'?'النتيجة':'Result',{exact:true})
+  const formula=async(value:string)=>field.evaluate((el,value)=>{const f=el as MathfieldElement;f.value=value;f.dispatchEvent(new InputEvent('input',{bubbles:true}))},value)
+  for(const incomplete of ['2+','\\frac{1}{}','\\sqrt{}']){
+   await formula(incomplete)
+   await expect(output).toHaveAttribute('data-status','incomplete')
+   await expect(output).toBeEmpty()
+   await expect(page.getByText(message,{exact:true})).toHaveCount(0)
+   await page.locator('[data-key="equals"]').click()
+   const notice=page.locator('.calculator-display > [role="status"]')
+   await expect(notice).not.toBeEmpty()
+   if(incomplete==='2+')await expect(notice).toHaveText(message)
+   expect(await page.evaluate(()=>localStorage.getItem('calc_count'))).toBeNull()
+   await formula('2+3')
+   await expect(output).toHaveText('5')
+   await expect(page.getByText(message,{exact:true})).toHaveCount(0)
+  }
+  await page.locator('[data-key="equals"]').click()
+  await expect(output).toHaveText('5')
+  expect(await page.evaluate(()=>localStorage.getItem('calc_count'))).toBe('1')
+  // Keep genuine mathematical errors visible: only the unfinished-input hint is suppressed.
+  await formula('1/0')
+  await expect(output).toHaveAttribute('data-status','error')
+  await expect(output).not.toBeEmpty()
+  await page.locator('[data-key="clear"]').click()
+  await expect(output).toHaveText('—')
+  await expect(page.getByText(message,{exact:true})).toHaveCount(0)
+ })
+}
