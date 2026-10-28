@@ -13,8 +13,8 @@ describe('local-only rating preferences',()=>{
   expect(shouldPrompt(readPreferences(localStorage),1000+THREE_DAYS-1)).toBe(false)
   expect(shouldPrompt(readPreferences(localStorage),1000+THREE_DAYS)).toBe(true)
  })
- it.each(['rate','dismiss'] as const)('permanently stops prompting after %s',choice=>{
-  localStorage.setItem('calc_count','5');saveChoice(localStorage,choice)
+ it('permanently stops prompting after choosing to rate',()=>{
+  localStorage.setItem('calc_count','5');saveChoice(localStorage,'rate')
   expect(shouldPrompt(readPreferences(localStorage),Date.now()+THREE_DAYS*100)).toBe(false)
  })
  it('sanitizes corrupt persisted counts and dates',()=>{

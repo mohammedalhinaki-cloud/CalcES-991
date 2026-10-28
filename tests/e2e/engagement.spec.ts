@@ -6,7 +6,7 @@ async function calculate(page:import('@playwright/test').Page,value:number){
  await page.getByRole('button',{name:String(value),exact:true}).click()
  await page.getByRole('button',{name:'=',exact:true}).click()
 }
-test('counts committed results only and permanently dismisses the fifth-operation prompt',async({page})=>{
+test('counts committed results only and offers exactly two rating actions',async({page})=>{
  await page.goto('/');await page.evaluate(()=>localStorage.clear())
  for(let i=1;i<=4;i++)await calculate(page,i)
  await expect(page.getByRole('dialog',{name:'رأيك يصنع الفارق! ⭐️'})).not.toBeVisible()
@@ -14,7 +14,10 @@ test('counts committed results only and permanently dismisses the fifth-operatio
  const prompt=page.getByRole('dialog',{name:'رأيك يصنع الفارق! ⭐️'})
  await expect(prompt).toBeVisible()
  await expect.poll(()=>page.evaluate(()=>localStorage.getItem('calc_count'))).toBe('5')
- await prompt.getByRole('button',{name:'إغلاق ✖️'}).click()
+ await expect(prompt.getByRole('button')).toHaveCount(2)
+ await page.evaluate(()=>{window.open=((url?:string|URL)=>{document.body.dataset.ratingDestination=String(url);return null}) as typeof window.open})
+ await prompt.getByRole('button',{name:'تقييم التطبيق الآن ⭐️'}).click()
+ await expect.poll(()=>page.evaluate(()=>document.body.dataset.ratingDestination)).toBe('https://play.google.com/store/apps/details?id=calces991.calculator')
  await calculate(page,6)
  await expect(prompt).not.toBeVisible()
  expect(await page.evaluate(()=>localStorage.getItem('rate_done'))).toBe('1')
@@ -74,3 +77,22 @@ test('preview, invalid expressions, repeated equals, and history recall do not i
  await page.getByRole('button',{name:'السجل (1)',exact:true}).click();await page.getByRole('button',{name:'استدعاء 5',exact:true}).click()
  expect(await page.evaluate(()=>localStorage.getItem('calc_count'))).toBe('1')
 })
+
+for(const action of ['escape','backdrop'] as const){
+ test(`closing rating via ${action} postpones without permanently dismissing`,async({page})=>{
+  await page.goto('/')
+  await page.evaluate(()=>{localStorage.removeItem('rate_done');localStorage.setItem('calc_count','5');window.dispatchEvent(new Event('calces:calculation'))})
+  const prompt=page.getByRole('dialog',{name:'رأيك يصنع الفارق! ⭐️'})
+  await expect(prompt).toBeVisible()
+  if(action==='escape')await page.keyboard.press('Escape')
+  else await page.touchscreen.tap(2,2)
+  await expect(prompt).not.toBeVisible()
+  expect(await page.evaluate(()=>localStorage.getItem('rate_done'))).toBeNull()
+  const remaining=await page.evaluate(()=>Number(localStorage.getItem('rate_remind_at'))-Date.now())
+  expect(remaining).toBeGreaterThan(3*86400000-10000)
+  expect(remaining).toBeLessThanOrEqual(3*86400000)
+  await page.reload()
+  await expect(page.locator('math-field')).toBeVisible()
+  await expect(prompt).not.toBeVisible()
+ })
+}

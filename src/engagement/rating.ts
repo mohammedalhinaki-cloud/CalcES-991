@@ -16,7 +16,7 @@ export function incrementCount(storage:Storage){
  const prefs=readPreferences(storage)
  try{storage.setItem('calc_count',String(Math.min(prefs.count+1,Number.MAX_SAFE_INTEGER)))}catch{/* Private/blocked storage must never interrupt calculations. */}
 }
-export function saveChoice(storage:Storage,choice:'rate'|'dismiss'|'later',now=Date.now()){
+export function saveChoice(storage:Storage,choice:'rate'|'later',now=Date.now()){
  try{storage.setItem(choice==='later'?'rate_remind_at':'rate_done',choice==='later'?String(now+THREE_DAYS):'1')}catch{/* Session state still closes the dialog if persistence is unavailable. */}
 }
 export function recordSuccessfulCalculation(){

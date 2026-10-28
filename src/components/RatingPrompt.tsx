@@ -24,16 +24,16 @@ export default function RatingPrompt(){
   check()
   return ()=>{clearTimeout(timer);observer.disconnect();window.removeEventListener(RATING_EVENT,check);window.removeEventListener('storage',check);document.removeEventListener('visibilitychange',check)}
  },[])
- const choose=useCallback((choice:'rate'|'later'|'dismiss')=>{
+ const choose=useCallback((choice:'rate'|'later')=>{
   closedUntil.current=choice==='later'?Date.now()+THREE_DAYS:Infinity
   try{saveChoice(window.localStorage,choice)}catch{/* Keep the close action functional. */}
   setOpen(false)
   window.dispatchEvent(new Event(RATING_EVENT))
   if(choice==='rate')void openStore()
  },[])
- return <EngagementDialog open={open} onClose={()=>choose('dismiss')} titleId="rating-title">
+ return <EngagementDialog open={open} onClose={()=>choose('later')} titleId="rating-title">
   <h2 id="rating-title">{localize("رأيك يصنع الفارق! ⭐️")}</h2>
   <p>{localize("أهلاً بك! 👋 نحن فريق عمل صغير (Maaoun Studio) نسعى لتقديم أدوات تعليمية مجانية عالية الجودة. إذا كان التطبيق يعجبك ويساعدك، فإن تقييمك بـ 5 نجوم على متجر قوقل بلاي يدعمنا كثيراً ويصنع فارقاً حقيقياً في استمرارنا وتحديث الأداة باستمرار. شكرًا لدعمك وثقتك!")}</p>
-  <div className="engagement-actions"><button type="button" className="utility-button rating-primary" onClick={()=>choose('rate')}>{localize("تقييم التطبيق الآن ⭐️")}</button><button type="button" className="utility-button" onClick={()=>choose('later')}>{localize("ذكرني لاحقاً ⏰")}</button><button type="button" className="utility-button" onClick={()=>choose('dismiss')}>{localize("إغلاق ✖️")}</button></div>
+  <div className="engagement-actions"><button type="button" className="utility-button rating-primary" onClick={()=>choose('rate')}>{localize("تقييم التطبيق الآن ⭐️")}</button><button type="button" className="utility-button" onClick={()=>choose('later')}>{localize("ذكرني لاحقاً ⏰")}</button></div>
  </EngagementDialog>
 }
