@@ -157,3 +157,10 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
  .language-card .language-hint { margin:8px 0; }
  .language-card .engagement-actions { grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:10px; }
 }
+
+/* History uses non-editable mathematical markup; wide expressions scroll
+   inside each entry rather than widening the dialog on small phones. */
+.history-math { display:block; min-width:0; max-width:100%; overflow-x:auto; overflow-y:hidden; padding:8px 2px; font-size:18px; text-align:start; }
+.history-results { display:block; margin-top:6px; }
+.history-result-line { display:flex; align-items:center; gap:8px; min-width:0; font-size:14px; }
+.history-result-line > .history-math { flex:1; }
