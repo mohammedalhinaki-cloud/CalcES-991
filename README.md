@@ -1,6 +1,6 @@
 # CalcES 991 - حاسبة علمية
 
-الإصدار الحالي **1.0.1 — البناء 5**: [تحميل AAB الموقّع](https://github.com/mohammedalhinaki-cloud/Study-tools/raw/refs/heads/main/releases/android/CalcES-991-1.0.1-build5-signed.aab) · [ملف Google Play للنسخ واللصق](docs/play/console-ready/Google-Play-Console-Copy-Paste.ar.txt)
+الإصدار الحالي **1.0.2 — البناء 6**: [تحميل AAB الموقّع](https://github.com/mohammedalhinaki-cloud/CalcES-991/raw/refs/heads/main/releases/android/CalcES-991-1.0.2-build6-signed.aab) · [تفاصيل الإصدار والتحقق](releases/android/build6-verification.ar.md)
 
 النسخة الحالية: **واجهة مستوحاة من الصورة المرجعية، مع المشاركة والتثبيت وإخفاء الأدوات**. نُشرت على [Cloudflare Pages](https://study-tools-calculator.pages.dev/) وتعمل بالكامل داخل المتصفح. نتائج المراجعات في [تقرير القبول](docs/acceptance.md).
 

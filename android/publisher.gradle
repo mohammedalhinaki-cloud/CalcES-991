@@ -19,8 +19,8 @@ if (realAds && (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}') || appId.contai
 android {
     buildFeatures { buildConfig true }
     defaultConfig {
-        versionCode value('APP_VERSION_CODE', '5').toInteger()
-        versionName value('APP_VERSION_NAME', '1.0.1')
+        versionCode value('APP_VERSION_CODE', '6').toInteger()
+        versionName value('APP_VERSION_NAME', '1.0.2')
         manifestPlaceholders = [admobAppId: appId, mobileAdsEnabled: realAds.toString()]
         buildConfigField 'String', 'PRIVACY_POLICY_URL', quoted(value('PRIVACY_POLICY_URL', 'https://study-tools-calculator.pages.dev/privacy.html'))
         buildConfigField 'String', 'SUPPORT_EMAIL', quoted(value('SUPPORT_EMAIL', 'jy906675@gmail.com'))

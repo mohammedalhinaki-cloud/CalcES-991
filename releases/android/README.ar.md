@@ -38,3 +38,11 @@
 ## البناء 5 — الإصدار 1.0.1
 
 [تحميل AAB الموقّع](https://github.com/mohammedalhinaki-cloud/Study-tools/raw/refs/heads/main/releases/android/CalcES-991-1.0.1-build5-signed.aab). تم تعديل versionCode إلى 5 وversionName إلى 1.0.1 كما طلب المالك، مع الاحتفاظ بمعرّف الحزمة ومفتاح الرفع واللغات والمنطق وإعدادات الإعلانات كما كانت. تحقق البناء والتوقيع وقيم manifest داخل الحزمة. لم يُعد بناء APK ولم يُرفع شيء إلى Play Console.
+
+## البناء 6 — الإصدار 1.0.2 (الأحدث)
+
+[تحميل AAB الموقّع](https://github.com/mohammedalhinaki-cloud/CalcES-991/raw/refs/heads/main/releases/android/CalcES-991-1.0.2-build6-signed.aab).
+
+يشمل التعديلات الخمسة المعتمدة: عنوان اختيار اللغة بالإنجليزية مرة واحدة مع بقاء «العربية»، الأيقونة الأصلية `CalcES_991_Icon_512x512_040606.png`، خيارا التقييم والتذكير فقط، سجل بمعادلات منسّقة، وإظهار تنبيه التعبير غير المكتمل عند الحساب الصريح بدلاً من أثناء الكتابة. يحتفظ بمعرّف `calces991.calculator` ومفتاح الرفع السابق. الإعلانات الفعلية معطّلة كما كانت؛ مساحة الإعلان محفوظة.
+
+[تقرير التحقق](build6-verification.ar.md). هذه حزمة AAB لرفعها في Google Play Console، وليست APK للتثبيت المباشر. لم تُرفع إلى Play Console ولم يُعد بناء APK في هذا الإصدار.

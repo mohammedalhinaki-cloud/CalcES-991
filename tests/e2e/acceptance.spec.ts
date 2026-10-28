@@ -33,7 +33,7 @@ test('production loads local fonts and the worker and survives a fresh page relo
  await page.locator('[data-key="equals"]').click()
  await expect(output(page)).toHaveText('3.5')
  await page.evaluate(()=>document.fonts.ready)
- const fonts=await page.evaluate(()=>performance.getEntriesByType('resource').map(entry=>entry.name).filter(url=>url.includes('/fonts/')&&url.endsWith('.woff2')))
+ const fonts=await page.evaluate(()=>performance.getEntriesByType('resource').map(entry=>entry.name).filter(url=>url.endsWith('.woff2')))
  expect(fonts.length).toBeGreaterThan(0)
  expect(fonts.every(url=>url.startsWith('http://127.0.0.1:5174/'))).toBe(true)
  await formula(page,'x^2');await page.locator('[data-key="integral"]').click()

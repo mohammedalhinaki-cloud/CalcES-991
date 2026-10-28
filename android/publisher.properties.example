@@ -1,7 +1,7 @@
 # Copy to android/publisher.properties (ignored). These are settings, not a request to publish.
 # Confirm capacitor.config.ts and android/app/build.gradle applicationId before first upload.
-APP_VERSION_CODE=5
-APP_VERSION_NAME=1.0.1
+APP_VERSION_CODE=6
+APP_VERSION_NAME=1.0.2
 # Live advertising stays off until configured. Debug always uses Google's test IDs.
 ADS_ENABLED=false
 ADMOB_APP_ID=
