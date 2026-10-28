@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="512" android:viewportHeight="512">
-<group android:scaleX="0.7" android:scaleY="0.7" android:translateX="76.8" android:translateY="76.8"><path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="M152,66H360Q400,66 400,106V406Q400,446 360,446H152Q112,446 112,406V106Q112,66 152,66Z M140,98H372V200H140Z M140,260H200V320H140Z M226,260H286V320H226Z M312,260H372V320H312Z M140,344H200V404H140Z M226,344H286V404H226Z M312,344H372V404H312Z" /></group></vector>
