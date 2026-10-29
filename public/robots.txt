@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://study-tools-calculator.pages.dev/sitemap.xml
