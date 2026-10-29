@@ -79,7 +79,7 @@ test('mouse hits denominator and radical; drag selects content', async ({ page }
 
 test('touch can focus and edit fraction branches without warnings', async ({ browser }) => {
   const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}})
-  await context.addInitScript(()=>{localStorage.setItem('calces_language','ar');localStorage.setItem('calces_interface','workspace')})
+  await context.addInitScript(()=>localStorage.setItem('calces_language','ar'))
  const page=await context.newPage()
   const diagnostics:string[]=[]
   page.on('pageerror', error=>diagnostics.push(error.message))
@@ -93,7 +93,8 @@ test('touch can focus and edit fraction branches without warnings', async ({ bro
   const point=await hitPoint(digit)
   await page.touchscreen.tap(point.x,point.y)
   await expect(field.locator('[part="keyboard-sink"]')).toBeFocused()
-  await page.locator('[data-key="9"]').tap()
+  await field.locator('[part="virtual-keyboard-toggle"]').tap()
+  await page.locator('.MLK__layer.is-visible .MLK__keycap').filter({hasText:/^9/}).first().tap()
   expect(await field.evaluate(el=>(el as MathfieldElement).getValue())).toMatch(/\\frac\{12\}\{[349]+\}/)
   await page.waitForLoadState('networkidle')
   expect(diagnostics).toEqual([])

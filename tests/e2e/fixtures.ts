@@ -1,12 +1,11 @@
 import { test as base, expect } from '@playwright/test'
 
 // Every default page is checked, including errors emitted before the first click.
-export const test=base.extend<{runtimeChecks:void;languageOnboarding:boolean;calculatorInterface:'device'|'workspace'}>({
+export const test=base.extend<{runtimeChecks:void;languageOnboarding:boolean}>({
  languageOnboarding:[false,{option:true}],
- calculatorInterface:['device',{option:true}],
- runtimeChecks:[async({page,languageOnboarding,calculatorInterface},use,testInfo)=>{
+ runtimeChecks:[async({page,languageOnboarding},use,testInfo)=>{
   // Keep unrelated calculator acceptance flows independent of the engagement prompt.
-  await page.addInitScript(({onboarding,variant})=>{localStorage.setItem('calces_interface',variant);localStorage.setItem('rate_done','1');if(!onboarding){Object.defineProperty(navigator,'languages',{configurable:true,value:['ar-SA']});if(!localStorage.getItem('calces_language'))localStorage.setItem('calces_language','ar')}},{onboarding:languageOnboarding,variant:calculatorInterface})
+  await page.addInitScript(onboarding=>{localStorage.setItem('rate_done','1');if(!onboarding){Object.defineProperty(navigator,'languages',{configurable:true,value:['ar-SA']});if(!localStorage.getItem('calces_language'))localStorage.setItem('calces_language','ar')}},languageOnboarding)
   const failures:string[]=[]
   const pageError=(error:Error)=>failures.push(`Runtime: ${error.message}`)
   const consoleMessage=(message:import('@playwright/test').ConsoleMessage)=>{

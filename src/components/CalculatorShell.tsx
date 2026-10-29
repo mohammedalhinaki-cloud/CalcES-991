@@ -1,39 +1,38 @@
-import { getLanguage, localize } from '../i18n/locale'
-import { useCalculator } from '../state/CalculatorProvider'
+import {isAndroidApp} from '../native/platform'
+import {getLanguage} from '../i18n/locale'
+import { localize } from '../i18n/locale'
+import RatingPrompt from './RatingPrompt'
+import {useLanguage} from '../i18n/LanguageGate'
+import { useState } from 'react'
+import AdvancedWorkspaces from './workspaces/AdvancedWorkspaces'
 import Keypad from './keypad/Keypad'
-import MathEditor from './display/MathEditor'
-import Indicators from './display/Indicators'
-import ResultDisplay from './display/ResultDisplay'
-import { useDeviceController } from './device/useDeviceController'
+import ModeMenu from './ModeMenu'
+import HistoryPanel from './HistoryPanel'
+import AppToolbar from './toolbar/AppToolbar'
+import CalculatorDisplay from './display/CalculatorDisplay'
+import { useCalculator } from '../state/CalculatorProvider'
 
-/** The silver alternative uses exactly the same integrated input system. */
 export default function CalculatorShell() {
-  const { state, result, edit, registerEditor, beginEdit, advanced } = useCalculator()
-  const device = useDeviceController()
-  const displayResult = state.committedValue !== null || advanced.state.status === 'success'
-    ? result
-    : {status:'empty' as const,text:state.latex?'':'0'}
-  return <div className="calculator-layout integrated-silver">
-    <article id="calculator" className="calculator-body" aria-labelledby="calculator-title" data-layer={state.layer} data-interface="silver">
-      <header className="calculator-brand" dir="ltr">
-        <h1 id="calculator-title" className="sr-only">{getLanguage() === 'en' ? 'CalcES 991 — Scientific Calculator' : 'CalcES 991 — حاسبة علمية'}</h1>
-        <div><div className="brand-wordmark">CalcES <strong>991</strong></div><span className="brand-tagline">NATURAL SCIENTIFIC</span></div>
-        <div className="brand-edition"><span>ES</span><small>CLASSIC</small></div>
-      </header>
-      <section className={`calculator-display lcd-panel ${state.off?'lcd-off':''}`} aria-label={localize('الشاشة التفاعلية')}>
-        <div className="lcd-content">
-          <Indicators />
-          <div className="device-main-editor" hidden={device.screen!==null}>
-            <div className="lcd-expression"><MathEditor onChange={edit} onReady={registerEditor} off={state.off} onEditIntent={beginEdit}/></div>
-            <ResultDisplay result={displayResult}/>
-          </div>
-          {device.screen!==null&&<div className="device-lcd-screen">{device.screen}</div>}
-          {advanced.state.status==='running'&&<div className="device-busy" role="status">{getLanguage()==='ar'?'جارٍ الحساب':'Calculating'}</div>}
-          {state.notice&&<div className="device-notice" role="status" dir="auto">{localize(state.notice)}</div>}
-        </div>
-      </section>
-      <Keypad onPress={device.press}/>
-      <footer className="calculator-footnote" dir="ltr">CalcES · INDEPENDENT SCIENTIFIC CALCULATOR</footer>
-    </article>
-  </div>
+ const {language,changeLanguage}=useLanguage()
+ const {state,workspaceOpen,setWorkspaceOpen}=useCalculator()
+ const [historyOpen,setHistoryOpen]=useState(false)
+ return <div className="calculator-layout">
+  <article id="calculator" className="calculator-body" aria-labelledby="calculator-title">
+   <header className="ad-reservation" aria-label={localize("مساحة محجوزة لإعلان مستقبلي")}><h1 id="calculator-title" className="sr-only">{getLanguage()==='en'?'CalcES 991 — Scientific Calculator':'CalcES 991 — حاسبة علمية'}</h1></header>
+   <CalculatorDisplay/>
+   <AppToolbar onHistory={()=>setHistoryOpen(true)}/>
+   {/* Keep data fields mounted: hiding the panel must not reset their values. */}
+   <aside id="workspace" hidden={!workspaceOpen||state.off} className="workspace-panel" aria-labelledby="workspace-title">
+    <header className="flex items-center justify-between gap-2"><h2 id="workspace-title" className="font-semibold">{localize("مساحة العمل · ")}{localize(state.mode)}</h2><button type="button" className="utility-button" aria-label={localize("إغلاق مساحة العمل")} onClick={()=>setWorkspaceOpen(false)}>{localize("إخفاء ×")}</button></header>
+    <p className="mt-2 text-xs leading-6 text-gray-300">{localize("أدخل البيانات ثم اضغط «احسب» أو =. يمكنك إخفاء الأدوات للوصول إلى الأزرار؛ تبقى البيانات محفوظة.")}</p>
+    <fieldset className="mt-3 mb-3"><legend className="mb-2 text-sm">{language==='ar'?'لغة التطبيق':'App language'}</legend><div className="flex gap-2"><button type="button" className="utility-button" lang="ar" dir="rtl" aria-pressed={language==='ar'} onClick={()=>changeLanguage('ar')}>العربية</button><button type="button" className="utility-button" lang="en" aria-pressed={language==='en'} onClick={()=>changeLanguage('en')}>English</button></div></fieldset>
+    <AdvancedWorkspaces/>
+    {!isAndroidApp()&&<a className="utility-button mt-3" href={getLanguage()==='en'?'/en/':'/ar/'}>{getLanguage()==='en'?'Calculator user guide':'دليل استخدام الحاسبة'}</a>}
+   </aside>
+   <Keypad/>
+  </article>
+  <RatingPrompt/>
+  <ModeMenu/>
+  <HistoryPanel open={historyOpen} onClose={()=>setHistoryOpen(false)}/>
+ </div>
 }

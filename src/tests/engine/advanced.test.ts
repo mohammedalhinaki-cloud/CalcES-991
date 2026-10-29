@@ -6,8 +6,6 @@ import { statistics } from '../../engine/statistics'
 import { baseOperation, parseBase } from '../../engine/baseN'
 import { evaluateComplex, fromPolar } from '../../engine/complex'
 import { calculateAdvanced } from '../../engine/advancedDispatcher'
-import { finiteSum } from '../../engine/summation'
-import { emptyVariables } from '../../engine/evaluate'
 const near=(value:string|undefined,expected:number,tolerance=1e-9)=>expect(Math.abs(Number(value)-expected)).toBeLessThan(tolerance)
 
 describe('calculus',()=>{
@@ -25,24 +23,6 @@ describe('calculus',()=>{
   near(derivative('\\sin(x)','0','RAD').scalar,1)
   near(derivative('\\sin(x)','0','DEG').scalar,Math.PI/180)
   expect(derivative('x^2','','RAD').lines[0]!.value).toContain('x')
- })
-})
-describe('finite summation',()=>{
- it('uses inclusive integer bounds, 64-digit BigNumber arithmetic, calculator variables, and x/X iteration symbols',()=>{
-  expect(finiteSum('x^2','1','3').scalar).toBe('14')
-  expect(finiteSum('X^2','1','3').scalar).toBe('14')
-  expect(finiteSum('A','1','3','DEG',{...emptyVariables,A:'0.1'}).scalar).toBe('0.3')
- })
- it('honors the selected angle unit and propagates a failing term instead of returning a partial total',()=>{
-  expect(finiteSum('\\sin(x)','90','90','DEG').scalar).toBe('1')
-  expect(finiteSum('\\sin(x)','100','100','GRA').scalar).toBe('1')
-  expect(()=>finiteSum('1/(x-2)','1','3')).toThrow()
- })
- it('rejects fractional, reversed, invalid, and over-limit bounds',()=>{
-  expect(()=>finiteSum('x','1.5','3')).toThrow('أعدادًا صحيحة')
-  expect(()=>finiteSum('x','3','1')).toThrow('معكوسة')
-  expect(()=>finiteSum('x','nope','3')).toThrow()
-  expect(()=>finiteSum('x','1','10001')).toThrow('10000')
  })
 })
 describe('equations',()=>{
@@ -111,7 +91,6 @@ describe('complex and signed 32-bit arithmetic',()=>{
  })
  it('dispatches typed jobs and rejects unsafe math input',()=>{
   expect(calculateAdvanced({kind:'base',operation:'NOT',a:'0',b:'',base:10}).lines[0]!.value).toBe('-1')
-  expect(calculateAdvanced({kind:'sum',latex:'x',lower:'1',upper:'3',angle:'DEG'}).scalar).toBe('6')
   expect(()=>derivative('a=2','0')).toThrow()
   expect(()=>evaluateComplex('\\operatorname{import}(1)','RAD')).toThrow()
  })

@@ -26,16 +26,14 @@ test('SHIFT/ALPHA change button labels, highlight and consume after insertion',a
   const shift=page.locator('[data-key="shift"]')
   await shift.click()
   await expect(shift).toHaveAttribute('aria-pressed','true')
-  await expect(page.locator('[data-key="sqrt"]')).toHaveAttribute('aria-label','∛')
-  await expect(page.locator('[data-key="sqrt"]')).toHaveText('√')
+  await expect(page.locator('[data-key="sqrt"]')).toHaveText('∛')
   await expect(page.locator('[data-key="sqrt"]')).toHaveAttribute('data-secondary-active','true')
   await page.locator('[data-key="sqrt"]').click()
   expect(await page.locator('math-field').evaluate(el=>(el as MathfieldElement).getValue())).toContain('\\sqrt[3]')
   await expect(shift).toHaveAttribute('aria-pressed','false')
   await page.locator('[data-key="clear"]').click()
   await page.locator('[data-key="alpha"]').click()
-  await expect(page.locator('[data-key="sin"]')).toHaveAttribute('aria-label','D')
-  await expect(page.locator('[data-key="sin"]')).toHaveText('sin')
+  await expect(page.locator('[data-key="sin"]')).toHaveText('D')
   await page.locator('[data-key="sin"]').click()
   expect(await page.locator('math-field').evaluate(el=>(el as MathfieldElement).getValue())).toBe('D')
   await expect(page.locator('[data-key="alpha"]')).toHaveAttribute('aria-pressed','false')
@@ -75,7 +73,7 @@ test('mode menus preserve the field, switch key functions and gate base digits',
 
 test('setup, AC, power and touch keypad preserve normal interaction',async({browser})=>{
   const context=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}})
-  await context.addInitScript(()=>{localStorage.setItem('calces_language','ar');localStorage.setItem('calces_interface','workspace')})
+  await context.addInitScript(()=>localStorage.setItem('calces_language','ar'))
  const page=await context.newPage()
   const errors:string[]=[]
   page.on('pageerror',e=>errors.push(e.message))

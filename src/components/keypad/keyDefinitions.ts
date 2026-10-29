@@ -35,7 +35,7 @@ export const FUNCTION_KEYS: Array<KeyDefinition | null> = [
   key('integral', {label:'∫',command:{kind:'advanced',tool:'integrate'}},{label:'d/dx',command:{kind:'advanced',tool:'derivative'}}),
   null, null,
   key('inverse', insert('x⁻¹','^{ -1}'), insert('x!','!')),
-  key('logbase', insert('logₐ','\\log_{#?}\\left(#?\\right)'), {label:'Σ',command:{kind:'advanced',tool:'sum'}}),
+  key('logbase', insert('logₐ','\\log_{#?}\\left(#?\\right)'), insert('Σ','\\sum_{x=#?}^{#?}#?')),
   key('fraction', insert('▰/▱','\\frac{#?}{#?}'), insert('a b/c','{#?}+\\frac{#?}{#?}')),
   key('sqrt', insert('√','\\sqrt{#?}'), insert('∛','\\sqrt[3]{#?}')),
   key('square', insert('x²','^{2}'), insert('x³','^{3}')),
@@ -82,8 +82,6 @@ export function resolveKey(definition: KeyDefinition, mode: CalculatorMode, laye
     const name=definition.id+'h'
     return insert(name+(layer==='SHIFT'?'⁻¹':''),`\\operatorname{${name}}${layer==='SHIFT'?'^{-1}':''}\\left(#?\\right)`)
   }
-  // Sigma belongs to COMP's calculus workspace; retain every other mode's logbase override.
-  if (layer==='SHIFT'&&definition.id==='logbase'&&mode!=='COMP') return definition.modes?.[mode] ?? definition.normal
   if (layer === 'SHIFT' && definition.shift) return definition.shift
   return definition.modes?.[mode] ?? definition.normal
 }

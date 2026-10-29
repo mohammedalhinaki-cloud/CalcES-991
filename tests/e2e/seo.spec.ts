@@ -29,13 +29,12 @@ for(const language of ['ar','en'] as const){
   }finally{await context.close()}
  })
 }
-test('both calculator skins contain only the integrated screen and original keypad',async({page})=>{
+test('guides remain discoverable in the workspace without a launch chooser',async({page})=>{
  await page.goto('/')
  await expect(page.locator('math-field')).toBeVisible()
- await expect(page.locator('#workspace,.workspace-panel,.app-toolbar')).toHaveCount(0)
- await page.getByTestId('calculator-switch').click()
- await expect(page.locator('math-field')).toBeVisible()
- await expect(page.locator('#workspace,.workspace-panel,.app-toolbar')).toHaveCount(0)
+ await page.getByRole('button',{name:'مساحة العمل',exact:true}).click()
+ await expect(page.getByRole('link',{name:'دليل استخدام الحاسبة',exact:true})).toHaveAttribute('href','/ar/')
+ await expect(page.locator('.app-toolbar > button')).toHaveCount(5)
 })
 test('cached guide navigation preserves its language when offline',async({page,context},testInfo)=>{
  test.skip(!testInfo.config.metadata.production,'Production service worker only')
