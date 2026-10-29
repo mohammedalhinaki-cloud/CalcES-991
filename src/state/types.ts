@@ -3,5 +3,6 @@ export type CalculatorMode = 'COMP' | 'CMPLX' | 'STAT' | 'MATRIX' | 'EQUATION' |
 export type KeyLayer = 'NORMAL' | 'SHIFT' | 'ALPHA'
 export type AngleUnit = 'DEG' | 'RAD' | 'GRA'
 export type NumericBase = 2 | 8 | 10 | 16
+export type Notation = 'norm' | 'fix' | 'sci'
+export type DisplayMode = 'natural' | 'linear'
 export type CalculationStatus = 'idle' | 'computing' | 'success' | 'error'
-

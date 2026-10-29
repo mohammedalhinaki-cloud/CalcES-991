@@ -31,6 +31,14 @@ describe('calculator state transitions',()=>{
     expect(reduce({...initialState,menu:'setup'},{type:'SET_ANGLE',angle:'RAD'})).toMatchObject({angle:'RAD',menu:null})
     expect(reduce(initialState,{type:'SET_BASE',base:2}).base).toBe(2)
   })
+  it('stores display setup and defaults missing fields while loading legacy history snapshots',()=>{
+    let state=reduce({...initialState,menu:'setup'},{type:'SET_NOTATION',notation:'sci',digits:6})
+    state=reduce(state,{type:'SET_DISPLAY_MODE',displayMode:'linear'})
+    expect(state).toMatchObject({notation:'sci',digits:6,displayMode:'linear'})
+    const {notation,digits,displayMode,...legacy}=initialState
+    expect(reduce(initialState,{type:'LOAD',snapshot:legacy})).toMatchObject({notation:'norm',digits:10,displayMode:'natural'})
+    expect(reduce(initialState,{type:'SET_DIGITS',digits:99}).digits).toBe(14)
+  })
 })
 describe('key definitions',()=>{
   const get=(id:string)=>FUNCTION_KEYS.find(k=>k?.id===id)!
@@ -45,6 +53,10 @@ describe('key definitions',()=>{
     expect(resolveKey(get('logbase'),'CMPLX','NORMAL').label).toBe('i')
     expect(resolveKey(get('calc'),'EQUATION','NORMAL').label).toBe('f(x)=0')
     expect(resolveKey(get('integral'),'STAT','NORMAL').label).toBe('x̄')
+  })
+  it('routes COMP SHIFT Sigma to its advanced workspace without replacing other mode bindings',()=>{
+    expect(resolveKey(get('logbase'),'COMP','SHIFT').command).toEqual({kind:'advanced',tool:'sum'})
+    expect(resolveKey(get('logbase'),'CMPLX','SHIFT').label).toBe('i')
   })
   it('has complete six-column function rows and five-column numeric rows',()=>{
     expect(FUNCTION_KEYS.length%6).toBe(0)

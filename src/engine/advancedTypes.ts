@@ -1,8 +1,10 @@
 import type { AngleUnit } from '../state/types'
+import type { Variables } from './evaluate'
 export type AdvancedRequest=
  | {kind:'integrate';latex:string;lower:string;upper:string;angle:AngleUnit}
  | {kind:'derivative';latex:string;point:string;angle:AngleUnit}
  | {kind:'root';latex:string;lower:string;upper:string;angle:AngleUnit}
+ | {kind:'sum';latex:string;lower:string;upper:string;angle:AngleUnit;variables?:Variables;answer?:string|null}
  | {kind:'polynomial';coefficients:string[]}
  | {kind:'linear';a:string[][];b:string[]}
  | {kind:'matrix';operation:'det'|'inverse'|'multiply';a:string[][];b:string[][]}

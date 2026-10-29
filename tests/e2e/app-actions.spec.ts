@@ -4,8 +4,8 @@ import type { MathfieldElement } from 'mathlive'
 test('workspace is hidden initially, opens on demand, and preserves fields after hiding',async({page})=>{
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await expect(page.locator('#workspace')).toBeHidden()
- const ad=await page.getByLabel('مساحة محجوزة لإعلان مستقبلي').boundingBox()
- expect(ad!.height).toBeGreaterThanOrEqual(40)
+ const brand=await page.locator('.calculator-brand').boundingBox()
+ expect(brand!.height).toBeGreaterThanOrEqual(30)
  const field=page.locator('math-field');await field.evaluate(el=>el.setAttribute('data-identity','same'))
  await page.getByRole('button',{name:'مساحة العمل',exact:true}).click()
  await expect(page.locator('#workspace')).toBeVisible()

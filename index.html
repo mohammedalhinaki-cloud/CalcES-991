@@ -9,7 +9,9 @@
         var nativeApp = Boolean(window.androidBridge) ||
           (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
           window.location.hostname === 'localhost' || /^(capacitor:|file:)$/.test(window.location.protocol);
-        if (!nativeApp && /Android/i.test(navigator.userAgent)) {
+        // The website must remain usable on Android. The store handoff is explicit.
+        var openAppRequested = /(?:^|[?&])openApp=1(?:&|$)/.test(window.location.search || '');
+        if (openAppRequested && !nativeApp && /Android/i.test(navigator.userAgent)) {
           document.documentElement.dataset.storeRedirect = 'true';
           window.location.replace(storeUrl);
         }

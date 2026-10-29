@@ -1,12 +1,12 @@
 import {test,expect} from './fixtures'
 const store='https://play.google.com/store/apps/details?id=calces991.calculator'
 const website='https://study-tools-calculator.pages.dev/'
-test('Android smart link redirects before the calculator bundles load',async({page})=>{
+test('explicit Android app link redirects before the calculator bundles load',async({page})=>{
  const loaded:string[]=[]
  page.on('request',request=>loaded.push(request.url()))
  await page.addInitScript(()=>Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 (Linux; Android 14)'}))
  await page.route('https://play.google.com/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Google Play destination</h1>'}))
- await page.goto('/');await expect(page).toHaveURL(store+'&pcampaignid=web_share')
+ await page.goto('/?openApp=1');await expect(page).toHaveURL(store+'&pcampaignid=web_share')
  expect(loaded.some(url=>/mathlive|calculation\.worker/.test(url))).toBe(false)
 })
 test('Android install button navigates directly to Google Play',async({page})=>{

@@ -18,7 +18,8 @@ test('device language is detected without a chooser and survives offline restart
  const keys=await page.locator('.calculator-keypad button').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {bottom:r.bottom,height:r.height}}))
  expect(keys).toHaveLength(50)
  expect(Math.min(...keys.map(key=>key.height))).toBeGreaterThanOrEqual(44)
- expect(Math.max(...keys.map(key=>key.bottom))).toBeGreaterThan(824)
+ expect(Math.max(...keys.map(key=>key.bottom))).toBeGreaterThan(800)
+ expect(Math.max(...keys.map(key=>key.bottom))).toBeLessThanOrEqual(844)
  await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise<void>(resolve=>navigator.serviceWorker.addEventListener('controllerchange',()=>resolve(),{once:true}))})
  await context.setOffline(true)
  try{await page.reload();await expect(page.locator('math-field')).toBeVisible();await expect(page.getByRole('dialog',{name:/Choose your language/})).not.toBeVisible();await expect(page.getByRole('button',{name:'Workspace',exact:true})).toBeVisible()}finally{await context.setOffline(false)}
@@ -47,12 +48,12 @@ test('English covers all mode panels, worker results, history, setup, and errors
   }
  }
  await page.locator('[data-key="mode"]').tap();await page.getByRole('dialog').getByRole('button',{name:/COMP/}).tap()
- await formula(page,'1/0');await page.locator('[data-key="equals"]').tap();await noArabic(page)
- await page.getByRole('button',{name:/History \(/}).tap();await noArabic(page)
- await page.getByRole('dialog',{name:'Calculation history'}).getByRole('button',{name:'Close',exact:true}).tap()
- await page.locator('[data-key="shift"]').tap();await page.locator('[data-key="mode"]').tap();await expect(page.getByRole('dialog')).toContainText('SETUP · Angle unit');await noArabic(page)
-})
-test('English native privacy and rate reminder retain contact details and correct store URL',async({page})=>{
+  await formula(page,'1/0');await page.locator('[data-key="equals"]').tap();await noArabic(page)
+  await page.getByRole('button',{name:/History \(/}).tap();await noArabic(page)
+  await page.getByRole('dialog',{name:'Calculation history'}).getByRole('button',{name:'Close',exact:true}).tap()
+  await page.locator('[data-key="shift"]').tap();await page.locator('[data-key="mode"]').tap();await expect(page.getByRole('dialog')).toContainText('SETUP · Display and calculation');await noArabic(page)
+  })
+  test('English native privacy and rate reminder retain contact details and correct store URL',async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(window,'androidBridge',{value:{},configurable:true}))
  await page.addInitScript(()=>localStorage.setItem('calces_language','en'))
  await page.goto('/')
