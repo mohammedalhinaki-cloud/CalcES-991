@@ -1,6 +1,7 @@
 import type { AngleUnit } from '../state/types'
 import type { Variables } from './evaluate'
 export type AdvancedRequest=
+ | {kind:'scientific';latex:string;angle:AngleUnit;variables?:Variables;answer?:string|null}
  | {kind:'integrate';latex:string;lower:string;upper:string;angle:AngleUnit}
  | {kind:'derivative';latex:string;point:string;angle:AngleUnit}
  | {kind:'root';latex:string;lower:string;upper:string;angle:AngleUnit}

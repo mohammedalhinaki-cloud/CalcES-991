@@ -1,6 +1,6 @@
 import {useLanguage} from '../../i18n/LanguageGate'
 import { localize } from '../../i18n/locale'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { MathfieldElement } from 'mathlive'
 import { loadMathLive } from '../../editor/mathliveAdapter'
 import type { EditorHandle } from '../../state/CalculatorProvider'
@@ -8,6 +8,7 @@ import type { EditorHandle } from '../../state/CalculatorProvider'
 interface Props { onChange: (latex: string) => void; onReady: (handle: EditorHandle | null) => void; off: boolean; onEditIntent: () => void }
 export default function MathEditor({ onChange, onReady, off, onEditIntent }: Props) {
   const {language}=useLanguage()
+  const helpId=useId()
   useEffect(()=>{
     let active=true
     void loadMathLive().then(Mathfield=>{if(active){Mathfield.locale=language;editor.current?.setAttribute('aria-label',localize('محرر المعادلة'))}}).catch(()=>{})
@@ -73,8 +74,8 @@ export default function MathEditor({ onChange, onReady, off, onEditIntent }: Pro
   // Uncontrolled custom element: React never writes its value/selection on input.
   return (
     <div>
-      <p id="editor-help" className="sr-only">{localize("المس أي موضع للتحرير، أو اسحب لتحديد جزء من المعادلة.")}</p>
-      <div ref={host} className="math-editor-host" aria-describedby="editor-help" />
+      <p id={helpId} className="sr-only">{localize("المس أي موضع للتحرير، أو اسحب لتحديد جزء من المعادلة.")}</p>
+      <div ref={host} className="math-editor-host" aria-describedby={helpId} />
       {localize(error && <p role="alert">{localize(error)}</p>)}
     </div>
   )

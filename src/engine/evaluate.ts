@@ -1,6 +1,7 @@
-import type { BigNumber } from 'mathjs'
+import type { BigNumber, MathNode } from 'mathjs'
 import type { AngleUnit } from '../state/types'
 import { LatexConversionError, latexToExpression } from '../editor/latexToExpression'
+import { INLINE_CALCULUS_ANGLE_SCOPE_KEY, InlineCalculusError, INLINE_CALCULUS_FUNCTIONS } from './inlineCalculus'
 import { math } from './mathInstance'
 
 export type VariableName='A'|'B'|'C'|'D'|'E'|'F'|'X'|'Y'|'M'
@@ -17,16 +18,62 @@ function finiteBigNumber(value:string):BigNumber {
   return numeric
 }
 
+/**
+ * Enforce the calculator's expression allowlist structurally. In particular,
+ * lowercase x is only legal in the AST body of a bounded inline-calculus
+ * function; it can never escape into the surrounding saved-variable scope.
+ */
+function validateExpressionNode(node: MathNode, allowedSymbols: Set<string>, boundX=false): void {
+  if(math.isFunctionNode(node)){
+    const name=node.fn.name
+    if(INLINE_CALCULUS_FUNCTIONS.has(name)){
+      if(name==='inlineIntegral'||name==='inlineSum'){
+        if(node.args.length!==3)throw new CalculationError('بنية عملية حساب التفاضل والتكامل غير صالحة')
+        validateExpressionNode(node.args[0]!,allowedSymbols,false)
+        validateExpressionNode(node.args[1]!,allowedSymbols,false)
+        validateExpressionNode(node.args[2]!,allowedSymbols,true)
+        return
+      }
+      if(node.args.length!==2)throw new CalculationError('بنية المشتقة غير صالحة')
+      validateExpressionNode(node.args[0]!,allowedSymbols,true)
+      validateExpressionNode(node.args[1]!,allowedSymbols,false)
+      return
+    }
+    if(!FUNCTIONS.has(name))throw new CalculationError('دالة غير مسموحة')
+    node.args.forEach(argument=>validateExpressionNode(argument,allowedSymbols,boundX))
+    return
+  }
+  if(math.isOperatorNode(node)){
+    if(!OPERATORS.has(node.op))throw new CalculationError('عامل غير مسموح')
+    node.args.forEach(argument=>validateExpressionNode(argument,allowedSymbols,boundX))
+    return
+  }
+  if(math.isSymbolNode(node)){
+    if(node.name==='x'){
+      if(boundX)return
+      // Existing advanced workspaces deliberately inject x as a temporary
+      // variable. It remains safe because only internal callers construct
+      // temporaryVariables; ordinary LCD evaluation does not expose it.
+      if(allowedSymbols.has('x'))return
+      throw new CalculationError('استخدم x داخل التكامل أو المجموع أو المشتقة فقط')
+    }
+    if(!allowedSymbols.has(node.name))throw new CalculationError('متغير غير معرّف')
+    return
+  }
+  if(math.isConstantNode(node))return
+  if(math.isParenthesisNode(node)){
+    validateExpressionNode(node.content,allowedSymbols,boundX)
+    return
+  }
+  throw new CalculationError('تعبير غير مسموح')
+}
+
 export function evaluateScientific(latex:string,options:EvaluationOptions={}):BigNumber {
   try{
     const temporaryVariables=options.temporaryVariables??{}
     const node=math.parse(latexToExpression(latex,{symbols:Object.keys(temporaryVariables)}))
-    node.traverse(child=>{
-      if(!['OperatorNode','ConstantNode','ParenthesisNode','SymbolNode','FunctionNode'].includes(child.type))throw new CalculationError('تعبير غير مسموح')
-      if(math.isOperatorNode(child)&&!OPERATORS.has(child.op))throw new CalculationError('عامل غير مسموح')
-      if(math.isFunctionNode(child)&&!FUNCTIONS.has(child.fn.name))throw new CalculationError('دالة غير مسموحة')
-      if(math.isSymbolNode(child)&&!FUNCTIONS.has(child.name)&&!['pi','e','Ans',...Object.keys(emptyVariables),...Object.keys(temporaryVariables)].includes(child.name))throw new CalculationError('متغير غير معرّف')
-    })
+    const allowedSymbols=new Set(['pi','e','Ans',...Object.keys(emptyVariables),...Object.keys(temporaryVariables)])
+    validateExpressionNode(node,allowedSymbols)
     const angle=options.angle??'DEG'
     const scale=angle==='RAD'?math.bignumber(1):math.divide(math.bignumber(math.pi),math.bignumber(angle==='GRA'?200:180)) as BigNumber
     const scope:Record<string,unknown>={Ans:finiteBigNumber(options.answer??'0')}
@@ -56,11 +103,15 @@ export function evaluateScientific(latex:string,options:EvaluationOptions={}):Bi
       return math.factorial(x)
     }
     scope.degrees=(x:BigNumber)=>math.divide(math.multiply(x,math.divide(math.pi,180)),scale)
+    // Instance-registered raw calculus callbacks read this non-user-visible
+    // marker from MathJS's scoped map to apply symbolic angle chain rules.
+    scope[INLINE_CALCULUS_ANGLE_SCOPE_KEY]=angle
     const result=node.evaluate(scope)
     if(!math.isBigNumber(result)||!result.isFinite()||result.abs().gt('1e10000'))throw new CalculationError('خطأ رياضي: النتيجة خارج المجال الحقيقي أو المسموح')
     return result
   }catch(error){
     if(error instanceof CalculationError||error instanceof LatexConversionError)throw error
+    if(error instanceof InlineCalculusError)throw new CalculationError(error.message)
     throw new CalculationError('خطأ رياضي: تحقق من مجال الدالة وبنية التعبير')
   }
 }
