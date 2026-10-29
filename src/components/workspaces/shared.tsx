@@ -2,8 +2,8 @@ import { localize } from '../../i18n/locale'
 import { useEffect, useRef } from 'react'
 import { useCalculator } from '../../state/CalculatorProvider'
 export function useWorkspaceSubmit(active:boolean,submit:()=>void){
- const {registerSubmit}=useCalculator();const latest=useRef(submit);latest.current=submit
- useEffect(()=>{if(active)return registerSubmit(()=>latest.current())},[active,registerSubmit])
+ const {registerSubmit,linearScreen}=useCalculator();const latest=useRef(submit);latest.current=submit
+ useEffect(()=>{if(active&&!linearScreen)return registerSubmit(()=>latest.current())},[active,registerSubmit,linearScreen])
 }
 export function Choices({value,choices,onChange}:{value:string;choices:Array<[string,string]>;onChange:(value:string)=>void}){
  return <div className="mb-3 flex flex-wrap gap-2">{localize(choices.map(([id,label])=><button key={id} type="button" aria-pressed={value===id} onClick={()=>onChange(id)} className="min-h-11 rounded border border-white/25 px-3 py-2 text-xs aria-pressed:border-amber-300 aria-pressed:bg-amber-400/10">{localize(label)}</button>))}</div>

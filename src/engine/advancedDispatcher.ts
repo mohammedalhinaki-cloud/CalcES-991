@@ -1,5 +1,5 @@
 import type { AdvancedRequest, AdvancedResult } from './advancedTypes'
-import { integrate, derivative } from './calculus'
+import { integrate, derivative, calculateLinearCalculus } from './calculus'
 import { solveRoot, solveLinear, solvePolynomial } from './equations'
 import { matrixOperation } from './matrices'
 import { statistics } from './statistics'
@@ -7,6 +7,7 @@ import { baseOperation } from './baseN'
 import { evaluateComplex, fromPolar } from './complex'
 export function calculateAdvanced(request:AdvancedRequest):AdvancedResult {
  switch(request.kind){
+  case 'linear-calculus':return calculateLinearCalculus(request.latex,request.angle)
   case 'integrate':return integrate(request.latex,request.lower,request.upper,request.angle)
   case 'derivative':return derivative(request.latex,request.point,request.angle)
   case 'root':return solveRoot(request.latex,request.lower,request.upper,request.angle)

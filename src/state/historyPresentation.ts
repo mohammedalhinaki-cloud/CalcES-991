@@ -14,7 +14,7 @@ export function historyExpression(entry: HistoryEntry): string | undefined {
  switch (request.kind) {
   case 'integrate': return `\\int_{${request.lower}}^{${request.upper}}\\left(${request.latex}\\right)\\,dx`
   case 'derivative': return `\\frac{d}{dx}\\left(${request.latex}\\right)`
-  case 'root': case 'complex': return request.latex
+  case 'root': case 'complex': case 'linear-calculus': return request.latex
   default: return undefined
  }
 }

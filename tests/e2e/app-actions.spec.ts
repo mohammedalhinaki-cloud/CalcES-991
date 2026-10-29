@@ -89,8 +89,8 @@ test('production precaches the calculator and worker for an offline installed la
  await context.setOffline(true)
  try{
   await page.reload();await expect(page.locator('math-field')).toBeVisible()
-  await page.locator('math-field').evaluate(el=>{const field=el as MathfieldElement;field.value='x^2';field.dispatchEvent(new InputEvent('input',{bubbles:true}))})
-  await page.locator('[data-key="integral"]').click();await page.locator('[data-key="equals"]').click()
+  await page.locator('math-field').evaluate(el=>{const field=el as MathfieldElement;field.value='\\int(x^2,0,1)';field.dispatchEvent(new InputEvent('input',{bubbles:true}))})
+  await page.locator('[data-key="equals"]').click()
   await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('0.33333333333333',{timeout:15000})
  }finally{await context.setOffline(false)}
 })

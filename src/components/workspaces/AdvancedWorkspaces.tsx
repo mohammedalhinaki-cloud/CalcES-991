@@ -7,8 +7,8 @@ import EquationWorkspace from './EquationWorkspace'
 import ComplexWorkspace from './ComplexWorkspace'
 import BaseNWorkspace from './BaseNWorkspace'
 export default function AdvancedWorkspaces(){
- const {advanced,state}=useCalculator()
- return <div hidden={state.off}>
+ const {advanced,state,linearScreen}=useCalculator()
+ return <div hidden={state.off||linearScreen}>
   <CalculusWorkspace/><MatrixWorkspace/><StatisticsWorkspace/><EquationWorkspace/><ComplexWorkspace/><BaseNWorkspace/>
   <div aria-live="polite" aria-atomic="true" className="mt-3 break-words text-sm [overflow-wrap:anywhere]">
    {localize(advanced.state.status==='running'&&<p role="status">{localize("جارٍ الحساب خارج مسار الواجهة…")}</p>)}

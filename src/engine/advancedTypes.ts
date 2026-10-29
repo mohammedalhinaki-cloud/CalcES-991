@@ -1,5 +1,6 @@
 import type { AngleUnit } from '../state/types'
 export type AdvancedRequest=
+ | {kind:'linear-calculus';latex:string;angle:AngleUnit}
  | {kind:'integrate';latex:string;lower:string;upper:string;angle:AngleUnit}
  | {kind:'derivative';latex:string;point:string;angle:AngleUnit}
  | {kind:'root';latex:string;lower:string;upper:string;angle:AngleUnit}

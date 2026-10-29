@@ -2,8 +2,14 @@ import type { BigNumber } from 'mathjs'
 import type { AngleUnit } from '../state/types'
 import type { AdvancedResult } from './advancedTypes'
 import { math } from './mathInstance'
-import { bn, decimal, functionNode, real, realFunction, show } from './advancedMath'
-export function integrate(latex:string,lower:string,upper:string,angle:AngleUnit='RAD'):AdvancedResult {
+import { parseLinearCalculus, normalizeLinearFunction, LinearSyntaxError } from '../editor/linearCalculus'
+import { latexToExpression } from '../editor/latexToExpression'
+import { evaluateScientific } from './evaluate'
+import { solveRoot } from './equations'
+import { bn, decimal, functionNode, real, realFunction, show, validateArithmetic } from './advancedMath'
+export function integrate(latex:string,lower?:string,upper?:string,angle:AngleUnit='RAD'):AdvancedResult {
+ if(lower===undefined&&upper===undefined)return calculateLinearCalculus(latex,angle,'integrate')
+ if(lower===undefined||upper===undefined)throw new LinearSyntaxError()
  let a=decimal(lower),b=decimal(upper),sign=bn(1)
  const f=realFunction(latex,angle)
  if(a.gt(b)){[a,b]=[b,a];sign=bn(-1)}
@@ -37,4 +43,31 @@ export function derivative(latex:string,point:string,angle:AngleUnit='RAD'):Adva
   scalar=value.toString();lines.push({label:'القيمة عند النقطة',value:show(value)})
  }
  return {title:'الاشتقاق الرمزي',lines,scalar,note:`وحدة الزوايا: ${angle}. تحويلات الزوايا داخلة في المشتقة.`}
+}
+
+// All numeric arguments use the same math.js engine and angle settings as COMP.
+// No eval, string execution, or Number coercion is used for the bounds/point.
+export function calculateLinearCalculus(latex:string,angle:AngleUnit='RAD',expectedKind?:'integrate'):AdvancedResult {
+ const parsed=parseLinearCalculus(latex)
+ if(expectedKind&&parsed.kind!==expectedKind)throw new LinearSyntaxError()
+ const func=normalizeLinearFunction(parsed.func)
+ let values:string[]
+ try{
+  // Validate the function before the numerical routine starts. SOLVE may have
+  // an equality; it is interpreted as left minus right by solveRoot.
+  const sides=parsed.kind==='root'?func.split('='):[func]
+  if(sides.length>2||sides.some(side=>!side.trim()))throw new LinearSyntaxError()
+  sides.forEach(side=>functionNode(side,angle))
+  values=parsed.args.map(argument=>{
+   const expression=normalizeLinearFunction(argument)
+   validateArithmetic(math.parse(latexToExpression(expression)),[],['factorial'])
+   return evaluateScientific(expression,{angle}).toString()
+  })
+  if(parsed.kind==='root'&&!bn(values[0]!).lt(bn(values[1]!)))throw new LinearSyntaxError()
+ }catch{throw new LinearSyntaxError()}
+ switch(parsed.kind){
+  case 'integrate':return integrate(func,values[0]!,values[1]!,angle)
+  case 'derivative':return derivative(func,values[0]??'',angle)
+  case 'root':return solveRoot(func,values[0]!,values[1]!,angle)
+ }
 }

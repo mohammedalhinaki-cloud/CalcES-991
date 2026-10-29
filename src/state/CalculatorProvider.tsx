@@ -13,6 +13,8 @@ import { evaluateScientific } from '../engine/evaluate'
 import type { VariableName } from '../engine/evaluate'
 import { formatScientific } from '../engine/formatResult'
 import { math } from '../engine/mathInstance'
+import {isLinearCalculus} from '../editor/linearCalculus'
+import type {LinearCalculusKind} from '../editor/linearCalculus'
 import type { CalculatorMode } from './types'
 import type { KeyBinding } from '../components/keypad/keyDefinitions'
 export interface EditorHandle {
@@ -33,6 +35,7 @@ function useCalculatorController(){
   const registerDataTarget=useCallback((handle:EditorHandle)=>{dataTarget.current=handle;return ()=>{if(dataTarget.current===handle)dataTarget.current=null}},[])
   const registerSubmit=useCallback((handler:()=>void)=>{submit.current=handler;return ()=>{if(submit.current===handler)submit.current=null}},[])
   const [state,dispatch]=useReducer(calculatorReducer,initialState)
+  const linearScreen=isLinearCalculus(state.latex)&&(state.mode==='COMP'||state.mode==='EQUATION'&&tool!=='linear'&&tool!=='polynomial')
   const [history,setHistory]=useState<HistoryEntry[]>([])
   const [recalled,setRecalled]=useState<HistoryEntry|null>(null)
   const sequence=useRef(0)
@@ -59,17 +62,17 @@ function useCalculatorController(){
   const editor=useRef<EditorHandle|null>(null)
   const [ready,setReady]=useState(false)
   const registerEditor=useCallback((handle:EditorHandle|null)=>{editor.current=handle;setReady(handle!==null)},[])
-  const edit=useCallback((latex:string)=>{advanced.cancel();dispatch({type:'EDIT',latex})},[advanced.cancel])
+  const edit=useCallback((latex:string)=>{advanced.cancel();if(isLinearCalculus(latex)){setWorkspaceOpen(false);updateTool(null)}dispatch({type:'EDIT',latex})},[advanced.cancel])
   const options=useMemo(()=>({angle:state.angle,variables:state.variables,answer:state.answer,format:state.format,engineeringOffset:state.engineeringOffset}),[state.angle,state.variables,state.answer,state.format,state.engineeringOffset])
   const result=useMemo<CalculationPreview>(()=>{
-    if(state.mode!=='COMP'||tool!==null){
+    if(linearScreen||state.mode!=='COMP'||tool!==null){
       if(advanced.state.status==='running')return {status:'incomplete',text:'جارٍ الحساب…'}
-      if(advanced.state.status==='error')return {status:'error',text:advanced.state.error}
+      if(advanced.state.status==='error')return {status:'error',text:linearScreen?(advanced.state.error==='Syntax ERROR'?'Syntax ERROR':'Math ERROR'):advanced.state.error}
       if(advanced.state.status==='success'){
         const value=advanced.state.result
         return {status:'success',text:value.scalar!==undefined?formatScientific(math.bignumber(value.scalar),options):`${value.lines[0]?.label??''}: ${value.lines[0]?.value??''}`}
       }
-      return {status:'empty',text:'أدخل البيانات ثم اضغط = أو احسب'}
+      return {status:'empty',text:linearScreen?'':'أدخل البيانات ثم اضغط = أو احسب'}
     }
     if(!state.latex)return {status:'empty',text:'—'}
     if(state.committedValue!==null)return {status:'success',text:formatScientific(math.bignumber(state.committedValue),options)}
@@ -77,7 +80,7 @@ function useCalculatorController(){
     // An unfinished formula is normal while editing. Explicit calculation still
     // uses evaluateScientific and reports the original diagnostic via NOTICE.
     return preview.status==='incomplete'?{...preview,text:''}:preview
-  },[state.latex,state.mode,state.committedValue,options,tool,advanced.state])
+  },[state.latex,state.mode,state.committedValue,options,tool,advanced.state,linearScreen])
   const beginEdit=useCallback(()=>{dataTarget.current=null;dispatch({type:'EDITOR_INTENT'})},[])
   const setMode=(mode:CalculatorMode)=>{advanced.cancel();dataTarget.current=null;setTool(null);setWorkspaceOpen(mode!=='COMP');dispatch({type:'SET_MODE',mode})}
   const currentValue=()=>{
@@ -95,6 +98,18 @@ function useCalculatorController(){
     }
     editor.current?.insert(latex)
   }
+  const startCalculus=(kind:LinearCalculusKind)=>{
+    advanced.cancel();dataTarget.current=null;updateTool(null);setWorkspaceOpen(false)
+    const func=state.latex.trim()&&!isLinearCalculus(state.latex)&&state.committedValue===null?state.latex:'#?'
+    const name=kind==='integrate'?'\\int':kind==='derivative'?'\\operatorname{d/dx}':'\\operatorname{SOLVE}'
+    editor.current?.clear()
+    editor.current?.insert(`${name}\\left(${func}${kind==='derivative'?'':',#?,#?'}\\right)`)
+    dispatch({type:'CONSUME_LAYER'})
+  }
+  const submitLinearCalculation=()=>{
+    if(advanced.state.status==='running')return
+    runAdvanced({kind:'linear-calculus',latex:state.latex,angle:state.angle})
+  }
   const commit=(value:string)=>{
     record({id:String(++sequence.current),snapshot:structuredClone(state),tool:null,title:formatScientific(math.bignumber(value),options),value})
     dispatch({type:'CALCULATE',value})
@@ -102,7 +117,7 @@ function useCalculatorController(){
   const recallHistory=(entry:HistoryEntry)=>{
     advanced.cancel();dataTarget.current=null
     setTool(entry.tool)
-    setWorkspaceOpen(entry.snapshot.mode!=='COMP'||entry.tool!==null)
+    setWorkspaceOpen(entry.request?.kind==='linear-calculus'?false:entry.snapshot.mode!=='COMP'||entry.tool!==null)
     editor.current?.replace?.(entry.snapshot.latex)
     dispatch({type:'RESTORE',snapshot:entry.snapshot,value:entry.value})
     setRecalled({...entry,id:`${entry.id}-${++sequence.current}`})
@@ -121,7 +136,9 @@ function useCalculatorController(){
         return
       }
       switch(command.kind){
-        case 'advanced':advanced.cancel();dataTarget.current=null;setTool(command.tool);dispatch({type:'CONSUME_LAYER'});return
+        case 'advanced':
+          if(['integrate','derivative','root'].includes(command.tool)){startCalculus(command.tool as LinearCalculusKind);return}
+          advanced.cancel();dataTarget.current=null;setTool(command.tool);dispatch({type:'CONSUME_LAYER'});return
         case 'layer':dispatch({type:'TOGGLE_LAYER',layer:command.layer});return
         case 'menu':dispatch({type:'OPEN_MENU',menu:command.menu});return
         case 'off':advanced.cancel();dispatch({type:'POWER',off:true});return
@@ -129,11 +146,13 @@ function useCalculatorController(){
         case 'hyp':dispatch({type:'TOGGLE_HYP'});return
         case 'unavailable':dispatch({type:'NOTICE',notice:command.message});return
         case 'equals':
+          if(linearScreen){if(advanced.state.status!=='success')submitLinearCalculation();return}
           if(state.mode!=='COMP'||tool!==null){submit.current?.();return}
           // Repeating = keeps the committed answer; do not record a new Ans context.
           if(state.committedValue!==null){dispatch({type:'CALCULATE',value:state.committedValue});return}
           commit(currentValue().toString());return
         case 'calculate':
+          if(linearScreen){submitLinearCalculation();return}
           if(state.mode!=='COMP'||tool!==null){submit.current?.();return}
           commit(evaluateScientific(state.latex,options).toString());return
         case 'store':case 'recall':dispatch({type:'PENDING',pending:command.kind});return
@@ -156,7 +175,7 @@ function useCalculatorController(){
       dispatch({type:'CONSUME_LAYER'})
     }catch(error){dispatch({type:'NOTICE',notice:error instanceof Error?error.message:'خطأ رياضي'})}
   }
-  return {workspaceOpen,setWorkspaceOpen,history,recalled,recallHistory,clearHistory,advanced,tool,setTool,runAdvanced,registerDataTarget,registerSubmit,state,result,beginEdit,dispatch,ready,registerEditor,edit,setMode,press}
+  return {linearScreen,startCalculus,submitLinearCalculation,workspaceOpen,setWorkspaceOpen,history,recalled,recallHistory,clearHistory,advanced,tool,setTool,runAdvanced,registerDataTarget,registerSubmit,state,result,beginEdit,dispatch,ready,registerEditor,edit,setMode,press}
 }
 const CalculatorContext=createContext<ReturnType<typeof useCalculatorController>|null>(null)
 export function CalculatorProvider({children}:{children:ReactNode}){
