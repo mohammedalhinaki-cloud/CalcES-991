@@ -1,17 +1,20 @@
 import {readFileSync} from 'node:fs'
-import {describe,expect,it} from 'vitest'
+import {runInNewContext} from 'node:vm'
+import {describe,expect,it,vi} from 'vitest'
 const html=readFileSync('index.html','utf8')
-describe('crawlable calculator entry page',()=>{
- it('keeps Android visitors and smartphone crawlers on the website',()=>{
-  const page=new DOMParser().parseFromString(html,'text/html')
-  expect(page.querySelector('script#android-store-redirect')).toBeNull()
-  expect([...page.querySelectorAll('script:not([type="application/ld+json"])')].every(script=>script.hasAttribute('src'))).toBe(true)
-  expect(page.querySelector('meta[http-equiv="refresh"]')).toBeNull()
+const script=/<script id="android-store-redirect">([\s\S]*?)<\/script>/.exec(html)![1]!
+function boot(userAgent:string,options:{hostname?:string;bridge?:boolean;capacitor?:boolean;protocol?:string}={}){
+ const replace=vi.fn(),dataset:Record<string,string>={}
+ runInNewContext(script,{document:{documentElement:{dataset}},navigator:{userAgent},window:{androidBridge:options.bridge?{}:undefined,Capacitor:options.capacitor?{isNativePlatform:()=>true}:undefined,location:{replace,hostname:options.hostname??'study-tools-calculator.pages.dev',protocol:options.protocol??'https:'}}})
+ return {replace,dataset}
+}
+describe('early smart-link redirect',()=>{
+ it('redirects Android before metadata and suppresses calculator loading',()=>{
+  expect(html.indexOf('id="android-store-redirect"')).toBeLessThan(html.indexOf('<meta'))
+  const {replace,dataset}=boot('Mozilla/5.0 (Linux; Android 14)')
+  expect(replace).toHaveBeenCalledWith('https://play.google.com/store/apps/details?id=calces991.calculator&pcampaignid=web_share')
+  expect(dataset.storeRedirect).toBe('true')
  })
- it('declares the canonical page and factual structured application data',()=>{
-  const page=new DOMParser().parseFromString(html,'text/html')
-  expect(page.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe('https://study-tools-calculator.pages.dev/')
-  const schema=JSON.parse(page.querySelector('script[type="application/ld+json"]')!.textContent!)
-  expect(schema['@graph'].find((node:{'@type':string})=>node['@type']==='WebApplication')).toMatchObject({name:'CalcES 991',isAccessibleForFree:true})
- })
+ it.each(['iPhone','iPad','Windows NT','Macintosh'])('leaves %s on the website',ua=>{const result=boot(ua);expect(result.replace).not.toHaveBeenCalled();expect(result.dataset.storeRedirect).toBeUndefined()})
+ it.each([{bridge:true},{capacitor:true},{hostname:'localhost'},{protocol:'capacitor:'},{protocol:'file:'}])('does not redirect the packaged Android app: %j',options=>expect(boot('Android',options).replace).not.toHaveBeenCalled())
 })

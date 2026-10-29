@@ -4,15 +4,18 @@ export const LANGUAGE_KEY='calces_language'
 export function readStoredLanguage():Language|null {
  try{const value=window.localStorage.getItem(LANGUAGE_KEY);return value==='ar'||value==='en'?value:null}catch{return null}
 }
-let language:Language=readStoredLanguage()??'ar'
+export function detectDeviceLanguage(languages:readonly string[]):Language {
+ return languages[0]?.toLowerCase().split(/[-_]/)[0]==='ar'?'ar':'en'
+}
+let language:Language=readStoredLanguage()??detectDeviceLanguage(typeof navigator==='undefined'?[]:navigator.languages?.length?navigator.languages:[navigator.language])
 export const getLanguage=()=>language
 export const getDirection=()=>language==='ar'?'rtl':'ltr'
-export function selectLanguage(value:Language){
+export function selectLanguage(value:Language,persist=true){
  language=value
  document.documentElement.lang=value
  document.documentElement.dir=getDirection()
  document.title=value==='en'?'CalcES 991 | Scientific Calculator Online':'CalcES 991 | حاسبة علمية أون لاين بالعربية والإنجليزية'
- try{window.localStorage.setItem(LANGUAGE_KEY,value)}catch{/* Continue in the chosen language for this session. */}
+ try{if(persist)window.localStorage.setItem(LANGUAGE_KEY,value)}catch{/* Continue in the chosen language for this session. */}
 }
 const messages:Record<string,string>=english
 // Longer messages win so dynamic labels such as "History (3)" remain translatable.

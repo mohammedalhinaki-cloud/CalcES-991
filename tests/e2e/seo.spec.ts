@@ -29,13 +29,11 @@ for(const language of ['ar','en'] as const){
   }finally{await context.close()}
  })
 }
-test('first-launch guides are discoverable without adding calculator toolbar buttons',async({page})=>{
- await page.addInitScript(()=>localStorage.removeItem('calces_language'))
+test('guides remain discoverable in the workspace without a launch chooser',async({page})=>{
  await page.goto('/')
- await expect(page.getByRole('link',{name:'دليل الاستخدام',exact:true})).toHaveAttribute('href','/ar/')
- await expect(page.getByRole('link',{name:'User guide',exact:true})).toHaveAttribute('href','/en/')
- await page.getByRole('button',{name:'العربية',exact:true}).click()
  await expect(page.locator('math-field')).toBeVisible()
+ await page.getByRole('button',{name:'مساحة العمل',exact:true}).click()
+ await expect(page.getByRole('link',{name:'دليل استخدام الحاسبة',exact:true})).toHaveAttribute('href','/ar/')
  await expect(page.locator('.app-toolbar > button')).toHaveCount(5)
 })
 test('cached guide navigation preserves its language when offline',async({page,context},testInfo)=>{

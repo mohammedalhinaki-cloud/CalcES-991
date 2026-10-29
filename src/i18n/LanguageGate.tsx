@@ -1,22 +1,16 @@
-import {useState,useEffect} from 'react'
+import {createContext,useContext,useState,useEffect} from 'react'
 import {startAndroidAds} from '../native/androidAds'
 import type {ReactNode} from 'react'
-import {getDirection,readStoredLanguage,selectLanguage} from './locale'
+import {getDirection,getLanguage,selectLanguage} from './locale'
 import type {Language} from './locale'
-import {isAndroidApp} from '../native/platform'
+const LanguageContext=createContext<{language:Language;changeLanguage:(value:Language)=>void}>({language:getLanguage(),changeLanguage:()=>{}})
+export const useLanguage=()=>useContext(LanguageContext)
 export default function LanguageGate({children}:{children:ReactNode}){
- const [selected,setSelected]=useState(readStoredLanguage)
- useEffect(()=>{if(selected){selectLanguage(selected);void startAndroidAds()}},[selected])
- const choose=(value:Language)=>{selectLanguage(value);setSelected(value)}
- // The calculator mounts after selection: its editor and all labels start in the chosen language.
- if(!selected)return <main className="language-onboarding" dir="ltr">
-  <section className="language-card" role="dialog" aria-modal="true" aria-labelledby="language-title">
-   <p className="language-brand">CalcES 991</p>
-   <h1 id="language-title" lang="en">Choose your language</h1>
-   <p className="language-hint" lang="en">Your choice will be saved on this device</p>
-   <div className="engagement-actions"><button type="button" lang="ar" dir="rtl" onClick={()=>choose('ar')}>العربية</button><button type="button" lang="en" onClick={()=>choose('en')}>English</button></div>
-   {!isAndroidApp()&&<nav className="guide-links" aria-label="Calculator guides"><a href="/ar/" lang="ar" dir="rtl">دليل الاستخدام</a><span aria-hidden="true"> · </span><a href="/en/" lang="en">User guide</a></nav>}
-  </section>
- </main>
- return <div className="language-root" lang={selected} dir={getDirection()}>{children}</div>
+ const [language,setLanguage]=useState(getLanguage)
+ useEffect(()=>{selectLanguage(language,false)},[language])
+ useEffect(()=>{void startAndroidAds()},[])
+ const changeLanguage=(value:Language)=>{selectLanguage(value);setLanguage(value)}
+ // Keep the calculator mounted when switching languages: expressions, history,
+ // workspace data and the MathLive selection must survive this preference change.
+ return <LanguageContext.Provider value={{language,changeLanguage}}><div className="language-root" lang={language} dir={getDirection()}>{children}</div></LanguageContext.Provider>
 }

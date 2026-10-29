@@ -1,3 +1,4 @@
+import {useLanguage} from '../../i18n/LanguageGate'
 import { localize } from '../../i18n/locale'
 import { useEffect, useRef, useState } from 'react'
 import type { MathfieldElement } from 'mathlive'
@@ -6,6 +7,12 @@ import type { EditorHandle } from '../../state/CalculatorProvider'
 
 interface Props { onChange: (latex: string) => void; onReady: (handle: EditorHandle | null) => void; off: boolean; onEditIntent: () => void }
 export default function MathEditor({ onChange, onReady, off, onEditIntent }: Props) {
+  const {language}=useLanguage()
+  useEffect(()=>{
+    let active=true
+    void loadMathLive().then(Mathfield=>{if(active){Mathfield.locale=language;editor.current?.setAttribute('aria-label',localize('محرر المعادلة'))}}).catch(()=>{})
+    return ()=>{active=false}
+  },[language])
   const intentRef=useRef(onEditIntent)
   intentRef.current=onEditIntent
   const host = useRef<HTMLDivElement>(null)

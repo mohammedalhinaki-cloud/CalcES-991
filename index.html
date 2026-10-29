@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
+    <script id="android-store-redirect">
+      (function () {
+        // Change this package name when publishing another application.
+        var packageName = 'calces991.calculator';
+        var storeUrl = 'https://play.google.com/store/apps/details?id=' + encodeURIComponent(packageName) + '&pcampaignid=web_share';
+        var nativeApp = Boolean(window.androidBridge) ||
+          (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+          window.location.hostname === 'localhost' || /^(capacitor:|file:)$/.test(window.location.protocol);
+        if (!nativeApp && /Android/i.test(navigator.userAgent)) {
+          document.documentElement.dataset.storeRedirect = 'true';
+          window.location.replace(storeUrl);
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="canonical" href="https://study-tools-calculator.pages.dev/" />
@@ -36,6 +50,6 @@
   <body>
     <div id="root"></div>
     <noscript><main lang="ar" dir="rtl"><h1>CalcES 991 — حاسبة علمية أون لاين</h1><p>حاسبة للكسور والجذور والدوال العلمية والمصفوفات والتكامل. شغّل JavaScript لاستخدام المحرر والحاسبة.</p><p><a href="/ar/">دليل الحاسبة بالعربية</a> · <a href="/en/" lang="en">Scientific calculator guide in English</a> · <a href="/privacy">سياسة الخصوصية</a></p></main></noscript>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/bootstrap.ts"></script>
   </body>
 </html>
