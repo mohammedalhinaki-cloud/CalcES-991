@@ -4,21 +4,28 @@ import { useEffect, useRef, useState } from 'react'
 import type { MathfieldElement } from 'mathlive'
 import { loadMathLive } from '../../editor/mathliveAdapter'
 import type { EditorHandle } from '../../state/CalculatorProvider'
-import {parseLinearCalculus,normalizeLinearFunction} from '../../editor/linearCalculus'
+import {parseLinearCalculus,normalizeLinearFunction,integralCalls} from '../../editor/linearCalculus'
 
 // Rendering adapter only. Calculator state, history and the worker continue to
 // receive the existing linear syntax; MathLive owns the editable 2D layout.
+let integralSequence=0
 function naturalIntegral(latex:string):string {
- if(!/^\s*(?:\\int|∫)\s*(?:\\left\s*)?\(/.test(latex))return latex
  const slot='CALCES_RENDER_SLOT'
  try{
-  const safe=latex.replace(/#\?|\\placeholder\{[^}]*\}/g,slot)
-  const parsed=parseLinearCalculus(safe)
-  if(parsed.kind!=='integrate')return latex
-  const restore=(value:string)=>value.replaceAll(slot,'\\placeholder{}')
-  const func=normalizeLinearFunction(restore(parsed.func))
-  const mark=(slot:string,value:string)=>`\\htmlData{calces-slot=${slot}}{${value}}`
-  return `\\int\\limits_{${mark('lower',restore(parsed.args[0]!))}}^{${mark('upper',restore(parsed.args[1]!))}}{${mark('function',func)}}\\,\\mathrm{d}x`
+  const calls=integralCalls(latex)
+  if(!calls.length)return latex
+  let result='',start=0
+  for(const call of calls){
+   const parsed=parseLinearCalculus(call.latex.replace(/#\?|\\placeholder\{[^}]*\}/g,slot))
+   const restore=(value:string)=>value.replaceAll(slot,'\\placeholder{}')
+   const id=String(++integralSequence)
+   const mark=(name:string,value:string)=>`\\htmlData{calces-slot=${name},calces-integral=${id}}{${value}}`
+   const func=normalizeLinearFunction(restore(parsed.func))
+   const display=`\\int\\limits_{${mark('lower',restore(parsed.args[0]!))}}^{${mark('upper',restore(parsed.args[1]!))}}{${mark('function',func)}}\\,\\mathrm{d}x`
+   result+=latex.slice(start,call.start)+`\\htmlData{calces-integral=${id}}{${display}}`
+   start=call.end
+  }
+  return result+latex.slice(start)
  }catch{return latex}
 }
 function texAtom(source:string,start:number):{value:string;end:number}|null {
@@ -39,7 +46,7 @@ function texAtom(source:string,start:number):{value:string;end:number}|null {
 // Invisible MathLive annotations identify editable regions, without adding UI
 // controls. Remove them before returning the existing linear expression.
 function removeSlotMarkup(latex:string):string {
- const marker=/\\htmlData\{calces-slot=(?:lower|upper|function)\}/g
+ const marker=/\\htmlData\{(?:calces-slot=(?:lower|upper|function)(?:,calces-integral=\d+)?|calces-integral=\d+)\}/g
  let match:RegExpExecArray|null
  while((match=marker.exec(latex))){
   const atom=texAtom(latex,marker.lastIndex)
@@ -50,16 +57,25 @@ function removeSlotMarkup(latex:string):string {
  return latex
 }
 type IntegralSlot='function'|'lower'|'upper'
-function integralSlots(field:MathfieldElement){
- const slots={} as Partial<Record<IntegralSlot,{start:number;end:number;placeholder?:number}>>
+type SlotRange={start:number;end:number;placeholder?:number}
+function integralGroups(field:MathfieldElement){
+ const groups=new Map<string,{start:number;end:number;slots:Partial<Record<IntegralSlot,SlotRange>>}>()
  for(let i=0;i<=field.lastOffset;i++){
   const info=field.getElementInfo(i),slot=info?.data?.['calces-slot'] as IntegralSlot|undefined
+  const id=info?.data?.['calces-integral']??(slot?'legacy':undefined)
+  if(!id)continue
+  const group=groups.get(id)??{start:i,end:i,slots:{}}
+  groups.set(id,group);group.end=i
   if(!slot||!['function','lower','upper'].includes(slot)||info?.latex?.startsWith('\\htmlData'))continue
-  const range=slots[slot]??={start:i,end:i}
+  const range=group.slots[slot]??={start:i,end:i}
   range.end=i
   if(info?.latex?.startsWith('\\placeholder'))range.placeholder=i
  }
- return slots
+ return groups
+}
+function integralSlots(field:MathfieldElement,id?:string){
+ const groups=integralGroups(field)
+ return (id?groups.get(id):groups.values().next().value)?.slots??{}
 }
 // Match cursor offsets to logical arguments before the one-time layout change.
 // Offsets inside each argument keep their relative position after reordering
@@ -83,50 +99,64 @@ function integralBookmark(field:MathfieldElement){
   return {slot:order[index],relative:index<0?offset:offset-argumentsAt.indexOf(index),end:offset===field.lastOffset}
  }
 }
-function selectIntegralSlot(field:MathfieldElement,slot:IntegralSlot,atEnd=false){
- const range=integralSlots(field)[slot]
+function selectIntegralSlot(field:MathfieldElement,slot:IntegralSlot,atEnd=false,id?:string){
+ const range=integralSlots(field,id)[slot]
  if(!range)return false
  if(range.placeholder!==undefined)field.selection={ranges:[[range.placeholder-1,range.placeholder]]}
  else field.position=atEnd?range.end:range.start
  return true
 }
 function moveIntegral(field:MathfieldElement,direction:'Left'|'Right'|'Up'|'Down'){
- if(!/^\\int\\limits/.test(field.getValue('latex')))return false
- const slots=integralSlots(field)
+ const id=field.getElementInfo(field.position)?.data?.['calces-integral']
+ const group=id?integralGroups(field).get(id):undefined
+ if(!group)return false
+ const slots=group.slots
  const slot=(Object.keys(slots) as IntegralSlot[]).find(key=>field.position>=slots[key]!.start&&field.position<=slots[key]!.end)
  if(!slot)return false
  const range=slots[slot]!,order:IntegralSlot[]=['function','lower','upper']
  if(direction==='Up'||direction==='Down'){
   const position=field.position
   field.executeCommand(direction==='Up'?'moveUp':'moveDown')
-  if(field.position===position||!field.getElementInfo(field.position)?.data?.['calces-slot']){
-   selectIntegralSlot(field,direction==='Up'?(slot==='upper'?'function':'upper'):(slot==='lower'?'function':'lower'))
+  const target=field.getElementInfo(field.position)?.data
+  if(field.position===position||target?.['calces-integral']!==id||!target?.['calces-slot']){
+   selectIntegralSlot(field,direction==='Up'?(slot==='upper'?'function':'upper'):(slot==='lower'?'function':'lower'),false,id)
   }
   return true
  }
- if(direction==='Right'&&field.position===range.end)return selectIntegralSlot(field,order[(order.indexOf(slot)+1)%3]!)
- if(direction==='Left'&&(field.position===range.start||range.placeholder===field.position))return selectIntegralSlot(field,order[(order.indexOf(slot)+2)%3]!,true)
+ if(direction==='Right'&&field.position===range.end){
+  if(slot==='upper'){field.position=group.end;return true}
+  return selectIntegralSlot(field,order[order.indexOf(slot)+1]!,false,id)
+ }
+ if(direction==='Left'&&(field.position===range.start||range.placeholder===field.position)){
+  if(slot==='function'){field.position=Math.max(0,group.start-1);return true}
+  return selectIntegralSlot(field,order[order.indexOf(slot)-1]!,true,id)
+ }
  return false
 }
 function linearIntegral(latex:string):string {
- const prefix=/^\s*\\int(?:\\(?:limits|nolimits))?/.exec(latex)
- if(!prefix)return latex
- let i=prefix[0].length,lower='\\placeholder{}',upper='\\placeholder{}'
- while(i<latex.length){
-  while(/\s/.test(latex[i]??'')&&i<latex.length)i++
-  const script=latex[i]
-  if(script!=='_'&&script!=='^')break
-  const atom=texAtom(latex,i+1)
-  if(!atom)return latex
-  if(script==='_')lower=removeSlotMarkup(atom.value)||'\\placeholder{}'
-  else upper=removeSlotMarkup(atom.value)||'\\placeholder{}'
-  i=atom.end
+ const source=removeSlotMarkup(latex),pattern=/\\int(?:\\(?:limits|nolimits))?/g
+ let result='',start=0,match:RegExpExecArray|null
+ while((match=pattern.exec(source))){
+  let i=pattern.lastIndex,lower='\\placeholder{}',upper='\\placeholder{}',hasScript=false
+  while(i<source.length){
+   while(/\s/.test(source[i]??'')&&i<source.length)i++
+   const script=source[i]
+   if(script!=='_'&&script!=='^')break
+   const atom=texAtom(source,i+1)
+   if(!atom)return latex
+   if(script==='_')lower=atom.value||'\\placeholder{}';else upper=atom.value||'\\placeholder{}'
+   i=atom.end;hasScript=true
+  }
+  if(!hasScript)continue
+  const func=texAtom(source,i)
+  if(!func)return latex
+  const differential=/^(?:\\[,!;]|\s)*(?:\\mathrm\{d\}|d)\s*x/.exec(source.slice(func.end))
+  if(!differential)return latex
+  const end=func.end+differential[0].length
+  result+=source.slice(start,match.index)+`\\int\\left(${func.value||'\\placeholder{}'},${lower},${upper}\\right)`
+  start=end;pattern.lastIndex=end
  }
- const body=latex.slice(i)
- const differential=/(?:\\[,!;]|\s)*(?:\\mathrm\{d\}|d)\s*x\s*$/.exec(body)
- if(!differential)return latex
- const func=removeSlotMarkup(body.slice(0,differential.index)).trim()||'\\placeholder{}'
- return `\\int\\left(${func},${lower},${upper}\\right)`
+ return result+source.slice(start)
 }
 
 interface Props { onChange: (latex: string) => void; onReady: (handle: EditorHandle | null) => void; off: boolean; onEditIntent: () => void }
@@ -157,7 +187,7 @@ export default function MathEditor({ onChange, onReady, off, onEditIntent }: Pro
       cancelAnimationFrame(frame)
       frame=requestAnimationFrame(()=>{
         if(!field)return
-        if(!/^\\int\\limits/.test(field.getValue('latex'))){field.style.removeProperty('font-size');return}
+        if(!/\\int\\limits/.test(field.getValue('latex'))){field.style.removeProperty('font-size');return}
         const pane=host.current?.parentElement?.parentElement
         const content=field.shadowRoot?.querySelector('.ML__latex')
         if(!pane||!content)return
@@ -221,12 +251,17 @@ export default function MathEditor({ onChange, onReady, off, onEditIntent }: Pro
       readyRef.current({
         insert: latex=>execute(()=>{
           const natural=naturalIntegral(latex),isIntegral=natural!==latex
+          if(isIntegral){
+            const id=field!.getElementInfo(field!.position)?.data?.['calces-integral']
+            const group=id?integralGroups(field!).get(id):undefined
+            if(group)field!.position=group.end
+          }
           field!.insert(natural,{selectionMode:/#\?|\\placeholder/.test(natural)?'placeholder':'after'})
           // Start at the integrand when all three slots are initially blank.
           // Bounds remain native superscript/subscript branches for Up/Down.
           if(isIntegral&&/^(?:\\int|∫).*?(?:#\?|\\placeholder)/.test(latex)&&
             /^(?:\\int|∫)(?:\\left)?\(\s*(?:#\?|\\placeholder)/.test(latex)){
-            selectIntegralSlot(field!,'function')
+            selectIntegralSlot(field!,'function',false,/\\htmlData\{calces-integral=(\d+)\}/.exec(natural)?.[1])
           }
         }),
         move: direction=>execute(()=>{if(!moveIntegral(field!,direction))field!.executeCommand(({Left:'moveToPreviousChar',Right:'moveToNextChar',Up:'moveUp',Down:'moveDown'} as const)[direction])}),

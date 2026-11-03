@@ -2,7 +2,7 @@ import type { BigNumber } from 'mathjs'
 import type { AngleUnit } from '../state/types'
 import type { AdvancedResult } from './advancedTypes'
 import { math } from './mathInstance'
-import { parseLinearCalculus, normalizeLinearFunction, LinearSyntaxError } from '../editor/linearCalculus'
+import { parseLinearCalculus, normalizeLinearFunction, LinearSyntaxError, integralCalls } from '../editor/linearCalculus'
 import { latexToExpression } from '../editor/latexToExpression'
 import { evaluateScientific } from './evaluate'
 import { solveRoot } from './equations'
@@ -48,6 +48,8 @@ export function derivative(latex:string,point:string,angle:AngleUnit='RAD'):Adva
 // All numeric arguments use the same math.js engine and angle settings as COMP.
 // No eval, string execution, or Number coercion is used for the bounds/point.
 export function calculateLinearCalculus(latex:string,angle:AngleUnit='RAD',expectedKind?:'integrate'):AdvancedResult {
+ const calls=integralCalls(latex)
+ if(calls.length&&(calls.length>1||calls[0]!.start!==0||calls[0]!.end!==latex.trimEnd().length))return calculateIntegralExpression(latex,angle)
  const parsed=parseLinearCalculus(latex)
  if(expectedKind&&parsed.kind!==expectedKind)throw new LinearSyntaxError()
  const func=normalizeLinearFunction(parsed.func)
@@ -70,4 +72,32 @@ export function calculateLinearCalculus(latex:string,angle:AngleUnit='RAD',expec
   case 'derivative':return derivative(func,values[0]??'',angle)
   case 'root':return solveRoot(func,values[0]!,values[1]!,angle)
  }
+}
+
+// Each definite integral is an independent BigNumber operand. math.js handles
+// arithmetic precedence and functions around those operands without rounding
+// the values to the LCD's display precision or using JavaScript arithmetic.
+function calculateIntegralExpression(latex:string,angle:AngleUnit):AdvancedResult {
+ if(latex.length>3000)throw new LinearSyntaxError()
+ const calls=integralCalls(latex)
+ const available='abcdefghijklmnopqrstuvwxyz'.split('').filter(c=>!['x','e'].includes(c)&&!latex.toLowerCase().includes(c))
+ if(!calls.length||calls.length>Math.min(16,available.length))throw new LinearSyntaxError()
+ let expression='',start=0
+ const scope:Record<string,BigNumber>={}
+ const symbols:string[]=[]
+ for(const [index,call] of calls.entries()){
+  const value=calculateLinearCalculus(call.latex,angle)
+  if(value.scalar===undefined)throw new LinearSyntaxError()
+  const name=available[index]!
+  symbols.push(name);scope[name]=bn(value.scalar)
+  expression+=latex.slice(start,call.start)+`(${name})`;start=call.end
+ }
+ expression+=latex.slice(start)
+ let node
+ try{
+  node=math.parse(latexToExpression(normalizeLinearFunction(expression),{symbols}))
+  node.traverse(child=>{if(math.isSymbolNode(child)&&['x','X','A','B','C','D','E','F','Y','M','Ans'].includes(child.name))throw new LinearSyntaxError()})
+ }catch{throw new LinearSyntaxError()}
+ const value=evaluateScientific(normalizeLinearFunction(expression),{angle,constants:scope})
+ return {title:'تعبير التكاملات',lines:[{label:'القيمة',value:show(value)}],scalar:value.toString()}
 }

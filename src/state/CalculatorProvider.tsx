@@ -100,9 +100,10 @@ function useCalculatorController(){
   }
   const startCalculus=(kind:LinearCalculusKind)=>{
     advanced.cancel();dataTarget.current=null;updateTool(null);setWorkspaceOpen(false)
-    const func=state.latex.trim()&&!isLinearCalculus(state.latex)&&state.committedValue===null?state.latex:'#?'
+    const append=kind==='integrate'&&(isLinearCalculus(state.latex)&&state.committedValue===null||/[+\-]\s*$|\\(?:times|div)\s*$/.test(state.latex))
+    const func=!append&&state.latex.trim()&&state.committedValue===null?state.latex:'#?'
     const name=kind==='integrate'?'\\int':kind==='derivative'?'\\operatorname{d/dx}':'\\operatorname{SOLVE}'
-    editor.current?.clear()
+    if(!append)editor.current?.clear()
     editor.current?.insert(`${name}\\left(${func}${kind==='derivative'?'':',#?,#?'}\\right)`)
     dispatch({type:'CONSUME_LAYER'})
   }

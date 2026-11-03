@@ -12,7 +12,7 @@ export function normalizeLinearCalculus(latex:string):string {
   .replace(/^\\int\b/,'∫')
 }
 export function isLinearCalculus(latex:string):boolean {
- return /^(?:∫|d\/dx|diff\b|SOLVE\b)/i.test(normalizeLinearCalculus(latex))
+ return /(?:\\int\b|∫)/.test(latex)||/^(?:d\/dx|diff\b|SOLVE\b)/i.test(normalizeLinearCalculus(latex))
 }
 export function parseLinearCalculus(latex:string):{kind:LinearCalculusKind;func:string;args:string[]} {
  if(latex.length>1500)throw new LinearSyntaxError()
@@ -38,4 +38,28 @@ export function parseLinearCalculus(latex:string):{kind:LinearCalculusKind;func:
 export function normalizeLinearFunction(latex:string):string {
  return latex.replace(/(?<![\\A-Za-z])(sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|ln|log|sqrt|abs|exp)\s*(?=\()/g,
   name=>({asin:'\\arcsin',acos:'\\arccos',atan:'\\arctan'}[name.trim()]??`\\${name.trim()}`))
+}
+
+export interface IntegralCall {start:number;end:number;latex:string}
+// Locate complete integral operands, without consuming adjacent operands or
+// confusing a comma inside a nested function with an integral argument.
+export function integralCalls(source:string):IntegralCall[]{
+ const calls:IntegralCall[]=[]
+ const pattern=/(?:\\int\b|∫)\s*(?:\\left\s*)?\(/g
+ let match:RegExpExecArray|null
+ while((match=pattern.exec(source))){
+  const stack=[')'];let end=-1
+  for(let i=pattern.lastIndex;i<source.length;i++){
+   const c=source[i]!
+   if('({['.includes(c))stack.push(c==='('?')':c==='{'?'}':']')
+   else if(')}]'.includes(c)){
+    if(stack.pop()!==c)throw new LinearSyntaxError()
+    if(!stack.length){end=i+1;break}
+   }
+  }
+  if(end<0)throw new LinearSyntaxError()
+  calls.push({start:match.index,end,latex:source.slice(match.index,end)})
+  pattern.lastIndex=end
+ }
+ return calls
 }

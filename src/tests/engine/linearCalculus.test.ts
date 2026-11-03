@@ -17,6 +17,7 @@ describe('linear calculus parser and math.js execution',()=>{
  it('honors the selected angular unit',()=>{
   expect(Number(calculateLinearCalculus('∫(cos(X),0,1)','DEG').scalar)).toBeCloseTo(Math.sin(Math.PI/180)/(Math.PI/180),10)
  })
+ it('supports arithmetic after a definite integral',()=>expect(Number(calculateLinearCalculus('∫(X,0,1)+1').scalar)).toBeCloseTo(1.5,12))
  it('supports reversed integral bounds',()=>expect(Number(calculateLinearCalculus('∫(X^2,1,0)').scalar)).toBeCloseTo(-1/3,12))
  it('differentiates symbolically or evaluates at an inline point',()=>{
   expect(calculateLinearCalculus('\\operatorname{d/dx}(X^3,2)').scalar).toBe('12')
@@ -26,7 +27,7 @@ describe('linear calculus parser and math.js execution',()=>{
   expect(Number(calculateLinearCalculus('\\operatorname{SOLVE}(X^2=2,0,2)').scalar)).toBeCloseTo(Math.SQRT2,10)
  })
  it('works through the existing worker dispatcher',()=>expect(calculateAdvanced({kind:'linear-calculus',latex:'∫(X,0,2)',angle:'RAD'}).scalar).toBe('2'))
- it.each(['∫(cos(X),0,1','∫(X,0)','∫(X,,1)','∫(X,0,1,2)','∫(X,0,1)+1','∫(X,0,1)]','∫(X,\\placeholder{},1)','∫(X,foo,1)','∫(X,X,1)','∫(X,1/0,2)','d/dx(X,1,2)','SOLVE(X,2,1)','∫(import("bad"),0,1)'])('reports Syntax ERROR for invalid input: %s',latex=>{
+ it.each(['∫(cos(X),0,1','∫(X,0)','∫(X,,1)','∫(X,0,1,2)','∫(X,0,1)]','∫(X,\\placeholder{},1)','∫(X,foo,1)','∫(X,X,1)','∫(X,1/0,2)','d/dx(X,1,2)','SOLVE(X,2,1)','∫(import("bad"),0,1)'])('reports Syntax ERROR for invalid input: %s',latex=>{
   expect(()=>calculateLinearCalculus(latex)).toThrow('Syntax ERROR')
  })
 })

@@ -72,7 +72,7 @@ test('inline calculus history restores the exact bounds without opening a worksp
  await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('2.6666666666667')
  await formula(page,'\\int(x^2,0,4)')
  const dialog=await openHistory(page);await dialog.getByRole('button',{name:/استدعاء/}).click()
- expect(await page.locator('math-field').evaluate(el=>(el as MathfieldElement).value)).toContain('0,2')
+ expect(await page.locator('math-field').evaluate(el=>{const f=el as MathfieldElement;return Array.from({length:f.lastOffset+1},(_,i)=>f.getElementInfo(i)).some(info=>info?.data?.['calces-slot']==='upper'&&info.latex==='2')})).toBe(true)
  await expect(page.locator('#workspace')).toBeHidden()
  await formula(page,'\\int(x^2,0,3)');await page.locator('[data-key="equals"]').click()
  await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('9')
