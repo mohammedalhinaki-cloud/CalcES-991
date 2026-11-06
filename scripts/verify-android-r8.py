@@ -97,6 +97,7 @@ def main():
     parser.add_argument('--baseline', type=Path, required=True)
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--mapping', type=Path, required=True)
+    parser.add_argument('--expected-web', type=Path, help='Verify updated public assets against this web build')
     args = parser.parse_args()
     mapping = {}
     for line in args.mapping.read_text().splitlines():
@@ -117,7 +118,20 @@ def main():
         assert bundle.read(embedded_mapping) == args.mapping.read_bytes(), 'Embedded R8 mapping mismatch'
         before_assets = {n: hashlib.sha256(baseline.read(n)).digest() for n in baseline.namelist() if n.startswith('base/assets/') and not n.endswith('/')}
         after_assets = {n: hashlib.sha256(bundle.read(n)).digest() for n in bundle.namelist() if n.startswith('base/assets/') and not n.endswith('/')}
-        assert before_assets == after_assets, 'Packaged web/Capacitor assets changed'
+        if args.expected_web:
+            assert args.expected_web.is_dir(), 'Expected web build directory is missing'
+            prefix = 'base/assets/public/'
+            assert {n: h for n, h in before_assets.items() if not n.startswith(prefix)} == {n: h for n, h in after_assets.items() if not n.startswith(prefix)}, 'Native Capacitor assets changed'
+            expected = {prefix + p.relative_to(args.expected_web).as_posix(): hashlib.sha256(p.read_bytes()).digest() for p in args.expected_web.rglob('*') if p.is_file()}
+            # Capacitor generates these two bridge shims during sync. They are
+            # not Vite outputs: require byte identity with the baseline instead.
+            generated = {prefix + 'cordova.js', prefix + 'cordova_plugins.js'}
+            for name in generated:
+                assert name in before_assets and after_assets.get(name) == before_assets[name], 'Generated Cordova bridge changed'
+            assert not generated.intersection(expected), 'Web build shadows a generated bridge'
+            assert expected == {n: h for n, h in after_assets.items() if n.startswith(prefix) and n not in generated}, 'Packaged web assets differ from expected build'
+        else:
+            assert before_assets == after_assets, 'Packaged web/Capacitor assets changed'
 
         bridge = {
             'com.getcapacitor.MessageHandler': ['postMessage'],
@@ -154,7 +168,8 @@ def main():
             'baseline_dex_files': len(before_dex), 'optimized_dex_files': len(dex_paths),
             'baseline_dex_bytes': before_bytes, 'optimized_dex_bytes': after_bytes,
             'dex_reduction_percent': round(100 * (1 - after_bytes / before_bytes), 2),
-            'unchanged_asset_files': len(after_assets), 'verified_bridge_methods': checks,
+            'unchanged_asset_files': sum(before_assets.get(n) == h for n, h in after_assets.items()),
+            'matched_expected_web_files': len(expected) if args.expected_web else None, 'verified_bridge_methods': checks,
             'reflective_plugins': [p['classpath'] for p in plugins], 'embedded_mapping_matches': True,
         }, indent=2))
 

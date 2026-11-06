@@ -30,7 +30,7 @@ export async function openBannerSession(config:AndroidConfiguration,sdk:BannerSd
   else await sdk.resumeBanner()
  }
  return {
-  setObscured:(value:boolean)=>serial(async()=>{obscured=value;await visibility()}),
+  setObscured:(value:boolean)=>serial(async()=>{if(disposed||obscured===value)return;obscured=value;await visibility()}),
   privacyOptions:()=>serial(async()=>{
    if(disposed)return
    privacyBusy=true;await visibility()

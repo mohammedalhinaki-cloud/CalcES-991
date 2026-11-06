@@ -55,3 +55,10 @@ describe('non-intrusive Android banners',()=>{
   await session.resize(50);expect(sdk.showBanner).toHaveBeenCalledTimes(count)
  })
 })
+it('does not repeat native hide/resume calls when dialog visibility is unchanged',async()=>{
+ const {sdk,bridge,events}=mocks();const session=(await openBannerSession(config,bridge,events))!
+ await session.setObscured(false);expect(sdk.resumeBanner).not.toHaveBeenCalled()
+ await session.setObscured(true);await session.setObscured(true);expect(sdk.hideBanner).toHaveBeenCalledOnce()
+ await session.setObscured(false);await session.setObscured(false);expect(sdk.resumeBanner).toHaveBeenCalledOnce()
+ await session.dispose();await session.setObscured(true);expect(sdk.hideBanner).toHaveBeenCalledOnce()
+})

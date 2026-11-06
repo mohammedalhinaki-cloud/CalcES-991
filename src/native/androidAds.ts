@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { AppConfiguration, isAndroidApp } from './platform'
 import type { AdMobPlugin } from '@capacitor-community/admob'
+import type {PluginListenerHandle} from '@capacitor/core'
 import type { AndroidConfiguration } from './platform'
 import { openBannerSession } from './bannerSession'
 import type { BannerSession } from './bannerSession'
@@ -28,16 +29,33 @@ export function startAndroidAds():Promise<void>{
   if(!configuration.adsEnabled)return
   const {AdMob,BannerAdPluginEvents}=await import('@capacitor-community/admob')
   sdk=AdMob
-  const size=await AdMob.addListener(BannerAdPluginEvents.SizeChanged,info=>reserveNativeBanner(info.height))
-  const failed=await AdMob.addListener(BannerAdPluginEvents.FailedToLoad,()=>update({message:'الإعلان غير متاح حاليًا؛ الحاسبة تعمل كالمعتاد.'}))
+  let size:PluginListenerHandle|undefined,failed:PluginListenerHandle|undefined
+  let observer:MutationObserver|undefined
+  const orientation=screen.orientation
+  const onOrientationChange=()=>{
+   void AppConfiguration.getConfiguration().then(config=>session?.resize(config.bannerHeight)).catch(()=>update({message:'تعذر تغيير مقاس الإعلان؛ أعد فتح التطبيق عند الحاجة.'}))
+  }
   try{
+   // Listener registration is asynchronous: the second registration can fail
+   // after the first one has already allocated a native callback.
+   size=await AdMob.addListener(BannerAdPluginEvents.SizeChanged,info=>reserveNativeBanner(info.height))
+   failed=await AdMob.addListener(BannerAdPluginEvents.FailedToLoad,()=>update({message:'الإعلان غير متاح حاليًا؛ الحاسبة تعمل كالمعتاد.'}))
    session=await openBannerSession(configuration,AdMob,{reserve:reserveNativeBanner,privacy:privacyRequired=>update({privacyRequired})})
-   const observer=new MutationObserver(updateOcclusion)
+   observer=new MutationObserver(updateOcclusion)
    observer.observe(document.body,{attributes:true,attributeFilter:['open'],subtree:true});updateOcclusion()
-   screen.orientation?.addEventListener('change',()=>{
-    void AppConfiguration.getConfiguration().then(config=>session?.resize(config.bannerHeight)).catch(()=>update({message:'تعذر تغيير مقاس الإعلان؛ أعد فتح التطبيق عند الحاجة.'}))
-   })
-  }catch(error){await size.remove();await failed.remove();throw error}
+   orientation?.addEventListener('change',onOrientationChange)
+  }catch(error){
+   observer?.disconnect()
+   orientation?.removeEventListener('change',onOrientationChange)
+   const failedSession=session;session=null
+   // Try every cleanup even if one native remove operation rejects.
+   await Promise.allSettled([
+    Promise.resolve().then(()=>size?.remove()),
+    Promise.resolve().then(()=>failed?.remove()),
+    Promise.resolve().then(()=>failedSession?.dispose()),
+   ])
+   throw error
+  }
  })().catch(()=>{update({message:'تعذر تجهيز الإعلان أو الموافقة عليه. يمكنك استخدام الحاسبة دون إعلان.'})})
 }
 export async function showAdPrivacyOptions(){

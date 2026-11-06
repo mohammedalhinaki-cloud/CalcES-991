@@ -58,8 +58,14 @@ function removeSlotMarkup(latex:string):string {
 }
 type IntegralSlot='function'|'lower'|'upper'
 type SlotRange={start:number;end:number;placeholder?:number}
+type IntegralGroup={start:number;end:number;slots:Partial<Record<IntegralSlot,SlotRange>>}
+// Store offsets only, never DOM nodes/rectangles. A WeakMap cannot retain a
+// removed editor; edits invalidate the cache while cursor-only moves reuse it.
+const integralGroupCache=new WeakMap<MathfieldElement,{latex:string;lastOffset:number;groups:Map<string,IntegralGroup>}>()
 function integralGroups(field:MathfieldElement){
- const groups=new Map<string,{start:number;end:number;slots:Partial<Record<IntegralSlot,SlotRange>>}>()
+ const latex=field.getValue('latex'),lastOffset=field.lastOffset,cached=integralGroupCache.get(field)
+ if(cached?.latex===latex&&cached.lastOffset===lastOffset)return cached.groups
+ const groups=new Map<string,IntegralGroup>()
  for(let i=0;i<=field.lastOffset;i++){
   const info=field.getElementInfo(i),slot=info?.data?.['calces-slot'] as IntegralSlot|undefined
   const id=info?.data?.['calces-integral']??(slot?'legacy':undefined)
@@ -71,6 +77,7 @@ function integralGroups(field:MathfieldElement){
   range.end=i
   if(info?.latex?.startsWith('\\placeholder'))range.placeholder=i
  }
+ integralGroupCache.set(field,{latex,lastOffset,groups})
  return groups
 }
 function integralSlots(field:MathfieldElement,id?:string){

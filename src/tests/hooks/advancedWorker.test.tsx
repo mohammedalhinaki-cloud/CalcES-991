@@ -59,3 +59,14 @@ it('recovers after a worker error by creating a fresh worker',()=>{
  act(()=>current.onmessage?.({data:{id:current.message!.id,ok:true,result:{title:'recovered',lines:[]}}}))
  expect(result.current.state).toMatchObject({status:'success',result:{title:'recovered'}})
 })
+it('reuses a successful idle worker instead of retaining extra worker instances',()=>{
+ vi.stubGlobal('Worker',FakeWorker)
+ const {result,unmount}=renderHook(useAdvancedCalculation)
+ act(()=>result.current.run(request))
+ const worker=FakeWorker.instances[0]!
+ act(()=>worker.onmessage?.({data:{id:worker.message!.id,ok:true,result:{title:'first',lines:[]}}}))
+ act(()=>result.current.run(request))
+ expect(FakeWorker.instances).toHaveLength(1)
+ expect(worker.terminated).toBe(false)
+ unmount();expect(worker.terminated).toBe(true)
+})
