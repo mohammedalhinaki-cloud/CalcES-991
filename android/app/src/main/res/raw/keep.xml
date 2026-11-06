@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cordova reads config.xml through Resources.getIdentifier("config", "xml", ...).
+     Preserve this dynamic lookup when release resource shrinking is enabled. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@xml/config" />
