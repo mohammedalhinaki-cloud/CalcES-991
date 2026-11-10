@@ -123,6 +123,14 @@ function useCalculatorController(){
     dispatch({type:'RESTORE',snapshot:entry.snapshot,value:entry.value})
     setRecalled({...entry,id:`${entry.id}-${++sequence.current}`})
   }
+  const loadEducationalValue=(value:string)=>{
+    advanced.cancel();dataTarget.current=null;updateTool(null);setWorkspaceOpen(false)
+    dispatch({type:'POWER',off:false})
+    dispatch({type:'SET_MODE',mode:'COMP'})
+    dispatch({type:'CLEAR'})
+    editor.current?.replace?.(value)
+    dispatch({type:'EDIT',latex:value})
+  }
   const clearHistory=()=>setHistory([])
   const press=(binding:KeyBinding)=>{
     const command=binding.command
@@ -176,7 +184,7 @@ function useCalculatorController(){
       dispatch({type:'CONSUME_LAYER'})
     }catch(error){dispatch({type:'NOTICE',notice:error instanceof Error?error.message:'خطأ رياضي'})}
   }
-  return {linearScreen,startCalculus,submitLinearCalculation,workspaceOpen,setWorkspaceOpen,history,recalled,recallHistory,clearHistory,advanced,tool,setTool,runAdvanced,registerDataTarget,registerSubmit,state,result,beginEdit,dispatch,ready,registerEditor,edit,setMode,press}
+  return {loadEducationalValue,linearScreen,startCalculus,submitLinearCalculation,workspaceOpen,setWorkspaceOpen,history,recalled,recallHistory,clearHistory,advanced,tool,setTool,runAdvanced,registerDataTarget,registerSubmit,state,result,beginEdit,dispatch,ready,registerEditor,edit,setMode,press}
 }
 const CalculatorContext=createContext<ReturnType<typeof useCalculatorController>|null>(null)
 export function CalculatorProvider({children}:{children:ReactNode}){

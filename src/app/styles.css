@@ -167,3 +167,41 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 
 .guide-links { margin-top:16px; font-size:13px; line-height:1.8; color:#c4b5fd; }
 .guide-links a { text-decoration:underline; text-underline-offset:3px; }
+
+/* Educational tools share the calculator viewport; only the tool page scrolls. */
+.education-app { height:100%; display:grid; grid-template-rows:minmax(0,1fr) 44px; gap:4px; }
+.education-nav { grid-row:2; grid-column:1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; max-width:720px; margin:auto; gap:4px; }
+.education-nav button { min-height:40px; border-radius:9px; border:1px solid #ffffff20; background:#252830; font-size:clamp(11px,3vw,14px); color:#d6d0df; touch-action:manipulation; }
+.education-nav button[aria-current] { background:#47375d; border-color:#b58af4; color:#fff; }
+.education-nav button:focus-visible { outline:2px solid #ffc629; outline-offset:-3px; }
+.calculator-page { grid-row:1; grid-column:1; min-height:0; height:100%; }
+.education-page { grid-row:1; grid-column:1; min-height:0; overflow:auto; overscroll-behavior:contain; padding:12px clamp(6px,2vw,20px) 24px; width:100%; max-width:900px; margin-inline:auto; }
+.education-app [hidden] { display:none!important; }
+.education-heading { margin-bottom:20px; }
+.education-heading>span { font-size:12px; color:#c9a6fa; }
+.education-heading h1 { font-size:clamp(23px,5vw,32px); font-weight:700; margin:8px 0; }
+.education-heading p,.education-hint { color:#bfc1ce; font-size:13px; line-height:1.7; }
+.education-card { padding:clamp(14px,3vw,24px); border:1px solid #ffffff25; border-radius:16px; background:#252830; min-width:0; }
+.education-card h2 { font-size:18px; font-weight:600; margin-block:10px; }
+.education-field { display:flex; flex-direction:column; gap:7px; margin-bottom:16px; min-width:0; font-size:14px; }
+.education-field input,.education-field select { width:100%; min-width:0; min-height:46px; border:1px solid #777585; border-radius:8px; background:#16191f; color:#f5f4f7; padding:10px; font-size:16px; }
+.education-field input:focus,.education-field select:focus { outline:2px solid #b58af4; outline-offset:2px; }
+.education-coefficients { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.education-formula { padding:15px; border-radius:10px; background:#15171c; text-align:center; font-size:20px; overflow-wrap:anywhere; }
+.education-solution ol { padding-inline-start:24px; }
+.education-solution li { margin-block:16px; line-height:1.7; overflow-wrap:anywhere; }
+.education-answer { display:block; background:#d5e4e5; color:#17272d; padding:16px; margin-block:16px; border-radius:10px; font-size:20px; overflow-wrap:anywhere; }
+.education-conversion { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.education-constants { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr)); }
+.constant-symbol { color:#c9a6fa; font-size:26px; font-weight:600; }
+.constant-value { user-select:text; font-size:18px; overflow-wrap:anywhere; }
+.constant-value small { font-size:13px; color:#bfc1ce; }
+.education-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+
+/* Keep every educational screen below the native top banner, including while scrolling. */
+.native-android .education-page { margin-top:var(--native-banner-slot,62px); }
+/* Trade a little LCD height for the new navigation while preserving key targets. */
+@media (orientation:portrait) and (min-height:760px) {
+ .education-app .calculator-body { grid-template-rows:clamp(30px,4.7dvh,50px) minmax(0,20fr) minmax(0,4fr) minmax(0,69fr); }
+ .native-android .education-app .calculator-body { grid-template-rows:var(--native-banner-slot,62px) minmax(0,20fr) minmax(0,4fr) minmax(0,69fr); }
+}

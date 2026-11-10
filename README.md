@@ -1,5 +1,8 @@
 # CalcES 991 - حاسبة علمية
 
+أضيفت أدوات تعليمية محلية: حل تربيعي بخطوات وجذور مركبة، نظام خطي 2×2، تحويل وحدات في 7 فئات، ومكتبة 12 ثابتاً. التنقل يدعم العربية والإنجليزية ويحفظ حالة الحاسبة. [تفاصيل الميزات والاختبارات ونص المتجر](docs/educational-tools.md). هذه التعديلات لم تُنشر بعد.
+
+
 الإصدار الحالي **1.0.4 — البناء 8**: [تحميل AAB الموقّع](https://github.com/mohammedalhinaki-cloud/CalcES-991/raw/refs/heads/main/releases/android/CalcES-991-1.0.4-build8-signed.aab) · [تفاصيل الإصدار والتحقق](releases/android/build8-verification.ar.md)
 
 النسخة الحالية: **واجهة مستوحاة من الصورة المرجعية، مع المشاركة والتثبيت وإخفاء الأدوات**. نُشرت على [Cloudflare Pages](https://study-tools-calculator.pages.dev/) وتعمل بالكامل داخل المتصفح. نتائج المراجعات في [تقرير القبول](docs/acceptance.md).
