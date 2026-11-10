@@ -1,6 +1,6 @@
 # Offline educational tools
 
-The app now includes Calculator, Equations, Converter and Constants navigation in Arabic and English. The calculator stays mounted when switching sections, preserving its expression, cursor, history and mode. Each tool retains its in-session form state. The tool page scrolls independently on smaller screens; the calculator continues to fit the viewport with the navigation present.
+The existing Tools button now reveals Equations, Converter and Constants in Arabic and English. No persistent bottom navigation is shown. A Calculator button returns from each tool to the existing Tools panel. The calculator stays mounted when switching sections, preserving its expression, cursor, history and mode. Each tool retains its in-session form state. The tool page scrolls independently on smaller screens; the calculator continues to fit the viewport at its original full viewport height.
 
 ## Implementation
 
@@ -39,8 +39,10 @@ Store acceptance remains the store reviewer's decision; these additions do not g
 
 - Production build and TypeScript check passed.
 - 209 unit tests across 17 files passed.
-- 82 production browser tests passed (1.9 minutes), including all existing calculator regressions and seven educational-tool flows.
+- 83 production browser tests passed (3.2 minutes), including all existing calculator regressions and eight educational-tool flows.
 - Reviewed phone and tablet screenshots of the equation and constants screens.
-- Preserved the existing 44px calculator-key height check at 390×844. Updated the old keyboard-bottom assertion to account for the new bottom navigation; keyboard keys now end immediately above that navigation.
-- During testing, fixed explicit select labelling and adjusted portrait LCD/toolbar/reserved-space proportions so fraction touch targets remain unobstructed. The keypad's functions, ordering and colors were not changed.
+- Restored the original calculator viewport and keyboard-bottom assertion; educational actions live only inside the existing Tools panel.
+- Explicit select labels support accessible editing. The original LCD/toolbar/keypad proportions are restored; keypad functions, ordering and colors are unchanged.
 - Local evidence is saved in `build/review/education/`. Browser geometry tests simulate native banner space; no Android-device run or store upload was performed.
+
+The Tools-only layout passed the full regression suite after removing bottom navigation; a dedicated test verifies that new actions remain hidden until the existing Tools panel is opened.

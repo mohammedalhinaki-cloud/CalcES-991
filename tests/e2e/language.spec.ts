@@ -18,10 +18,7 @@ test('device language is detected without a chooser and survives offline restart
  const keys=await page.locator('.calculator-keypad button').evaluateAll(els=>els.map(el=>{const r=el.getBoundingClientRect();return {bottom:r.bottom,height:r.height}}))
  expect(keys).toHaveLength(50)
  expect(Math.min(...keys.map(key=>key.height))).toBeGreaterThanOrEqual(44)
- // Navigation now occupies the bottom row; keys should end immediately above it.
- const navTop=await page.locator('.education-nav').evaluate(el=>el.getBoundingClientRect().top)
- expect(Math.max(...keys.map(key=>key.bottom))).toBeGreaterThan(navTop-8)
- expect(Math.max(...keys.map(key=>key.bottom))).toBeLessThanOrEqual(navTop)
+ expect(Math.max(...keys.map(key=>key.bottom))).toBeGreaterThan(824)
  await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise<void>(resolve=>navigator.serviceWorker.addEventListener('controllerchange',()=>resolve(),{once:true}))})
  await context.setOffline(true)
  try{await page.reload();await expect(page.locator('math-field')).toBeVisible();await expect(page.getByRole('dialog',{name:/Choose your language/})).not.toBeVisible();await expect(page.getByRole('button',{name:'Workspace',exact:true})).toBeVisible()}finally{await context.setOffline(false)}

@@ -8,7 +8,7 @@ import {solveLinear} from '../../engine/equations'
 
 type Section='calculator'|'equations'|'converter'|'constants'
 export default function EducationHub(){
- const {language}=useLanguage(),{loadEducationalValue}=useCalculator()
+ const {language}=useLanguage(),{loadEducationalValue,setWorkspaceOpen}=useCalculator()
  const [section,setSection]=useState<Section>('calculator')
  const t=useCallback((en:string,ar:string)=>language==='ar'?ar:en,[language])
  const send=(value:string)=>{
@@ -16,11 +16,13 @@ export default function EducationHub(){
   loadEducationalValue(latex);setSection('calculator')
  }
  return <div className="education-app" dir={language==='ar'?'rtl':'ltr'}>
-  <nav className="education-nav" aria-label={t('Learning tools','أدوات التعلم')}>
-   {([['calculator','Calculator','الحاسبة'],['equations','Equations','المعادلات'],['converter','Converter','المحول'],['constants','Constants','الثوابت']] as const).map(([id,en,ar])=><button key={id} type="button" aria-current={section===id?'page':undefined} onClick={()=>setSection(id)}>{t(en,ar)}</button>)}
-  </nav>
-  <div className="calculator-page" hidden={section!=='calculator'}><CalculatorShell/></div>
+  <div className="calculator-page" hidden={section!=='calculator'}><CalculatorShell tools={
+   <nav className="education-nav" aria-label={t('Learning tools','أدوات التعلم')}>
+    {([['equations','Equations','المعادلات'],['converter','Converter','المحول'],['constants','Constants','الثوابت']] as const).map(([id,en,ar])=><button key={id} type="button" onClick={()=>{setWorkspaceOpen(false);setSection(id)}}>{t(en,ar)}</button>)}
+   </nav>
+  }/></div>
   <div className="education-page" hidden={section==='calculator'}>
+   <button type="button" className="utility-button mb-4" onClick={()=>{setSection('calculator');setWorkspaceOpen(true)}}>{t('Calculator','الحاسبة')}</button>
    <header className="education-heading"><span>CalcES 991 · {t('Learning studio','استوديو التعلم')}</span><h1>{t(section==='equations'?'Equation solver':section==='converter'?'Unit converter':'Scientific constants',section==='equations'?'حل المعادلات':section==='converter'?'تحويل الوحدات':'الثوابت العلمية')}</h1><p>{t('Explore, understand, and calculate — entirely offline.','استكشف وافهم واحسب — بالكامل دون إنترنت.')}</p></header>
    <div hidden={section!=='equations'}><Equations t={t}/></div>
    <div hidden={section!=='converter'}><Converter t={t}/></div>

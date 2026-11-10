@@ -169,13 +169,13 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 .guide-links a { text-decoration:underline; text-underline-offset:3px; }
 
 /* Educational tools share the calculator viewport; only the tool page scrolls. */
-.education-app { height:100%; display:grid; grid-template-rows:minmax(0,1fr) 44px; gap:4px; }
-.education-nav { grid-row:2; grid-column:1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; max-width:720px; margin:auto; gap:4px; }
-.education-nav button { min-height:40px; border-radius:9px; border:1px solid #ffffff20; background:#252830; font-size:clamp(11px,3vw,14px); color:#d6d0df; touch-action:manipulation; }
+.education-app { height:100%; }
+.education-nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; max-width:720px; margin:auto; gap:4px; }
+.education-nav button { min-height:44px; border-radius:9px; border:1px solid #ffffff20; background:#252830; font-size:clamp(11px,3vw,14px); color:#d6d0df; touch-action:manipulation; }
 .education-nav button[aria-current] { background:#47375d; border-color:#b58af4; color:#fff; }
 .education-nav button:focus-visible { outline:2px solid #ffc629; outline-offset:-3px; }
 .calculator-page { grid-row:1; grid-column:1; min-height:0; height:100%; }
-.education-page { grid-row:1; grid-column:1; min-height:0; overflow:auto; overscroll-behavior:contain; padding:12px clamp(6px,2vw,20px) 24px; width:100%; max-width:900px; margin-inline:auto; }
+.education-page { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; padding:12px clamp(6px,2vw,20px) 24px; width:100%; max-width:900px; margin-inline:auto; }
 .education-app [hidden] { display:none!important; }
 .education-heading { margin-bottom:20px; }
 .education-heading>span { font-size:12px; color:#c9a6fa; }
@@ -199,9 +199,4 @@ math-field { padding:4px 0; font-size:clamp(18px,3dvh,26px); }
 .education-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
 
 /* Keep every educational screen below the native top banner, including while scrolling. */
-.native-android .education-page { margin-top:var(--native-banner-slot,62px); }
-/* Trade a little LCD height for the new navigation while preserving key targets. */
-@media (orientation:portrait) and (min-height:760px) {
- .education-app .calculator-body { grid-template-rows:clamp(30px,4.7dvh,50px) minmax(0,20fr) minmax(0,4fr) minmax(0,69fr); }
- .native-android .education-app .calculator-body { grid-template-rows:var(--native-banner-slot,62px) minmax(0,20fr) minmax(0,4fr) minmax(0,69fr); }
-}
+.native-android .education-page { margin-top:var(--native-banner-slot,62px); height:calc(100% - var(--native-banner-slot,62px)); }
