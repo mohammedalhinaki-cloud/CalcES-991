@@ -23,7 +23,9 @@
     "android:debug": "npm run android:sync && node scripts/android-gradle.mjs assembleDebug",
     "android:bundle": "npm run android:sync && node scripts/android-gradle.mjs bundleRelease",
     "android:check-release": "node scripts/check-android-release.mjs",
-    "android:release": "npm run android:check-release && npm run android:bundle"
+    "android:release": "npm run android:check-release && npm run android:bundle",
+    "android:appgallery:check": "node scripts/check-android-release.mjs --appgallery",
+    "android:appgallery": "npm run android:appgallery:check && npm run android:sync && node scripts/android-gradle.mjs bundleAppGallery --appgallery"
   },
   "dependencies": {
     "@capacitor-community/admob": "8.2.1",

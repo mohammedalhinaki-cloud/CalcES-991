@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-    <!-- This release is ad-free. Do not request unused advertising identifiers.
-         Review this overlay and Play declarations before enabling live ads later. -->
+    <!-- Standard release builds are ad-free by default. Do not request unused advertising identifiers.
+         Review store declarations before enabling live ads later. -->
     <!-- The calculator performs no foreground/background service work. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />

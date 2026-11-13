@@ -1,7 +1,7 @@
 // Store engagement preferences only. Never persist expressions or results here.
 export const RATING_EVENT='calces:calculation'
 export const THREE_DAYS=3*24*60*60*1000
-// Official Google Play listing shared by both rating actions.
+// Web-only Android store destination. Native Android uses the publisher-configured store listing URL.
 export const STORE_URL='https://play.google.com/store/apps/details?id=calces991.calculator'
 export interface Preferences {count:number;done:boolean;remindAt:number}
 export function readPreferences(storage:Storage):Preferences {

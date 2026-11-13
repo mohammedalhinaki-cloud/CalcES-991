@@ -4,7 +4,7 @@ import { useCalculator } from '../state/CalculatorProvider'
 import HistoryMath from './HistoryMath'
 import { historyExpression, matrixLatex, resultLatex } from '../state/historyPresentation'
 
-export default function HistoryPanel({open,onClose}:{open:boolean;onClose:()=>void}){
+export default function HistoryPanel({open,onClose,onRecall}:{open:boolean;onClose:()=>void;onRecall?:()=>void}){
  const {history,recallHistory,clearHistory}=useCalculator()
  const dialog=useRef<HTMLDialogElement>(null)
  useEffect(()=>{
@@ -18,7 +18,7 @@ export default function HistoryPanel({open,onClose}:{open:boolean;onClose:()=>vo
    const expression=historyExpression(entry)
    const scalar=resultLatex(entry.title)
    return <li key={entry.id}>
-   <button type="button" aria-label={localize(`استدعاء ${entry.title}`)} className="history-entry" onClick={()=>{recallHistory(entry);onClose()}}>
+   <button type="button" aria-label={localize(`استدعاء ${entry.title}`)} className="history-entry" onClick={()=>{recallHistory(entry);onRecall?.();onClose()}}>
     <span className="flex justify-between gap-2 text-xs text-[#c1d3b8]"><span>{localize(entry.snapshot.mode)}</span><span>{localize(entry.snapshot.angle)} · {localize(entry.snapshot.base===10?'DEC':`BASE ${entry.snapshot.base}`)}</span></span>
     <span className="mt-2 block text-sm">{entry.request&&localize(entry.title)}</span>
     {expression&&<HistoryMath latex={expression} />}

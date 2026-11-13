@@ -2,17 +2,21 @@ import {translate} from '../i18n/locale'
 import { useEffect, useRef, useState } from 'react'
 import { isAndroidApp, PUBLIC_APP_URL } from '../native/platform'
 import { STORE_URL } from '../engagement/rating'
+import { openStore } from '../engagement/openStore'
+import { useNativeAdsState } from '../native/androidAds'
 interface InstallPrompt extends Event {
  prompt:()=>Promise<void>
  userChoice:Promise<{outcome:'accepted'|'dismissed'}>
 }
 export function useAppActions(){
+ const {configuration}=useNativeAdsState()
  const prompt=useRef<InstallPrompt|null>(null)
  const [installed,setInstalled]=useState(false)
  const [notice,setNotice]=useState('')
  const [help,setHelp]=useState<'install'|'share'|null>(null)
  const isAndroidDevice=()=>isAndroidApp()||/Android/i.test(navigator.userAgent)
- const sharingUrl=()=>isAndroidDevice()?STORE_URL:PUBLIC_APP_URL
+ const androidListing=()=>isAndroidApp()?configuration?.storeListingUrl||PUBLIC_APP_URL:STORE_URL
+ const sharingUrl=()=>isAndroidDevice()?androidListing():PUBLIC_APP_URL
  const url=sharingUrl()
  useEffect(()=>{
   const media=window.matchMedia('(display-mode: standalone)')
@@ -40,7 +44,8 @@ export function useAppActions(){
  }
  async function install(){
   setNotice('')
-  if(isAndroidDevice()){window.location.assign(STORE_URL);return}
+  if(isAndroidApp()){void openStore();return}
+  if(/Android/i.test(navigator.userAgent)){window.location.assign(STORE_URL);return}
   if(installed){setNotice('الحاسبة مثبتة بالفعل');return}
   const deferred=prompt.current
   if(deferred){

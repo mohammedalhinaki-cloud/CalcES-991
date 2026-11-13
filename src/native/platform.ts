@@ -9,6 +9,7 @@ export interface AndroidConfiguration {
  audience:'general'|'children'|'unconfigured'
  privacyPolicyUrl:string
  supportEmail:string
+ storeListingUrl:string
  versionName:string
 }
 export const AppConfiguration=registerPlugin<{getConfiguration:()=>Promise<AndroidConfiguration>;openStore:()=>Promise<void>}>('AppConfiguration')

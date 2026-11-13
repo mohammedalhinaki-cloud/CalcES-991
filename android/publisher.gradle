@@ -12,6 +12,8 @@ def realAds = value('ADS_ENABLED', 'false').toBoolean()
 def appId = value('ADMOB_APP_ID', 'ca-app-pub-3940256099942544~3347511713')
 def bannerId = value('ADMOB_BANNER_ID', '')
 def audience = value('APP_AUDIENCE', 'unconfigured')
+def storeListingUrl = value('APP_STORE_URL', 'https://study-tools-calculator.pages.dev/')
+def playStoreUrl = 'https://play.google.com/store/apps/details?id=calces991.calculator'
 if (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}')) throw new GradleException('ADMOB_APP_ID has an invalid format; the Mobile Ads provider cannot start with a placeholder.')
 if (realAds && (!appId.matches('ca-app-pub-[0-9]{16}~[0-9]{10}') || appId.contains('3940256099942544') || !bannerId.matches('ca-app-pub-[0-9]{16}/[0-9]{10}') || bannerId.contains('3940256099942544') || !['general', 'children'].contains(audience))) {
     throw new GradleException('Live ads require your own AdMob App/Banner IDs and an explicit APP_AUDIENCE (general or children).')
@@ -24,6 +26,7 @@ android {
         manifestPlaceholders = [admobAppId: appId, mobileAdsEnabled: realAds.toString()]
         buildConfigField 'String', 'PRIVACY_POLICY_URL', quoted(value('PRIVACY_POLICY_URL', 'https://study-tools-calculator.pages.dev/privacy.html'))
         buildConfigField 'String', 'SUPPORT_EMAIL', quoted(value('SUPPORT_EMAIL', 'jy906675@gmail.com'))
+        buildConfigField 'String', 'STORE_LISTING_URL', quoted(playStoreUrl)
     }
     signingConfigs {
         debug { storeFile rootProject.file('../.android-local/debug.keystore') }
@@ -49,6 +52,16 @@ android {
             buildConfigField 'boolean', 'ADS_ENABLED', realAds.toString()
             buildConfigField 'String', 'ADMOB_BANNER_ID', quoted(bannerId)
             buildConfigField 'String', 'APP_AUDIENCE', quoted(audience)
+            if (value('UPLOAD_KEYSTORE_PATH', '')) signingConfig signingConfigs.release
+        }
+        appGallery {
+            initWith release
+            matchingFallbacks = ['release']
+            manifestPlaceholders = [admobAppId: appId, mobileAdsEnabled: 'false']
+            buildConfigField 'boolean', 'ADS_ENABLED', 'false'
+            buildConfigField 'String', 'ADMOB_BANNER_ID', quoted('')
+            buildConfigField 'String', 'APP_AUDIENCE', quoted(audience == 'unconfigured' ? 'general' : audience)
+            buildConfigField 'String', 'STORE_LISTING_URL', quoted(storeListingUrl)
             if (value('UPLOAD_KEYSTORE_PATH', '')) signingConfig signingConfigs.release
         }
     }

@@ -34,7 +34,8 @@ test('guides remain discoverable in the workspace without a launch chooser',asyn
  await expect(page.locator('math-field')).toBeVisible()
  await page.getByRole('button',{name:'مساحة العمل',exact:true}).click()
  await expect(page.getByRole('link',{name:'دليل استخدام الحاسبة',exact:true})).toHaveAttribute('href','/ar/')
- await expect(page.locator('.app-toolbar > button')).toHaveCount(5)
+ await expect(page.locator('.app-toolbar > button')).toHaveCount(4)
+ await expect(page.getByRole('button',{name:/^السجل/})).toBeVisible()
 })
 test('cached guide navigation preserves its language when offline',async({page,context},testInfo)=>{
  test.skip(!testInfo.config.metadata.production,'Production service worker only')

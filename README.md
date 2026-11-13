@@ -24,6 +24,17 @@ npm run android:release
 
 الاسم المعتمد هو **CalcES 991 - حاسبة علمية**. معرّف الحزمة ما زال للمراجعة قبل أول رفع، ولم تُملأ بيانات الناشر أو سياسة الخصوصية المنشورة أو معرّفات AdMob الحقيقية ؛ مفتاح الرفع أُنشئ لاحقاً وحُفظ خارج Git. توجد القوالب في `android/publisher.properties.example` و`docs/play/`؛ ملف الإعداد الفعلي والمفاتيح مستبعدة من Git. لم يُنشر تعديل على Cloudflare في مهمة تجهيز Android.
 
+## Huawei AppGallery
+
+أُضيف build type مستقل باسم `appGallery` لتجهيز AAB مخصص لـHuawei AppGallery: الإعلانات معطلة، ويُزال AdMob plugin وبيانات/أذونات Google Ads من هذا النوع فقط، ويستخدم رابط متجر يحدده الناشر. احتفظت نسختا `debug` و`release` العاديتان بإعداداتهما الحالية. راجع [دليل AppGallery](docs/appgallery-release.md).
+
+```sh
+npm run android:appgallery:check
+npm run android:appgallery
+```
+
+الناتج بعد إدخال رابط القائمة ومفتاح الناشر وتجهيز JDK 21 وAndroid SDK 36 هو `build/android/calces-991-appgallery.aab`. لا يوجد في هذا المستودع مفتاح توقيع أو رابط AppGallery منشور؛ لم يُنشأ AAB موقّع هنا ولم يُرفع شيء إلى AppGallery Connect. لا ترفع AAB غير موقعة.
+
 ## التثبيت والتشغيل
 
 Node.js 22.12+ أو 24، وnpm 10.9.2.

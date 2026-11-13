@@ -19,7 +19,8 @@ export function selectLanguage(value:Language,persist=true){
 }
 const messages:Record<string,string>=english
 // Longer messages win so dynamic labels such as "History (3)" remain translatable.
-const pattern=new RegExp(Object.keys(messages).sort((a,b)=>b.length-a.length).map(key=>key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g')
+// Keep very short tokens exact-only; standalone Arabic units and prepositions must not replace substrings in other words.
+const pattern=new RegExp(Object.keys(messages).filter(key=>key.length>3).sort((a,b)=>b.length-a.length).map(key=>key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g')
 export function translate(value:string):string {
  if(language!=='en')return value
  const normalized=value.trim().replace(/\s+/g,' ')

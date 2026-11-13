@@ -3,6 +3,7 @@ import { useCalculator } from '../../state/CalculatorProvider'
 import Indicators from './Indicators'
 import MathEditor from './MathEditor'
 import ResultDisplay from './ResultDisplay'
+import AdvancedLayerToggle from '../keypad/AdvancedLayerToggle'
 export default function CalculatorDisplay() {
   const {state,tool,result,edit,registerEditor,beginEdit}=useCalculator()
   return (
@@ -14,7 +15,8 @@ export default function CalculatorDisplay() {
         <ResultDisplay result={result} />
         </div>
       </div>
-      <p role="status" className="mt-1 break-words text-xs leading-5 [overflow-wrap:anywhere]" aria-live="polite">{localize(state.off?'اضغط ON للتشغيل':state.notice)}</p>
+      <p role="status" className="calculator-display-status break-words text-xs leading-5 [overflow-wrap:anywhere]" aria-live="polite">{localize(state.off?'اضغط ON للتشغيل':state.notice)}</p>
+      <AdvancedLayerToggle />
     </section>
   )
 }
