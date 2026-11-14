@@ -283,7 +283,6 @@
   "حجم المصفوفة يجب أن يكون بين 1 و3 وصفوفها متساوية": "Matrix size must be between 1 and 3 with equal row lengths",
   "حساب عام": "General calculation",
   "حساب محلي": "Local calculations",
-  "حسابات علمية على جهازك · مساحة تعلّم خاصة": "Scientific calculations on your device · Private study space",
   "حسابات محلية دون اتصال": "Local calculations, available offline",
   "حل f(x) = 0": "Solve f(x) = 0",
   "حل المعادلات": "Equation solver",
@@ -394,7 +393,6 @@
   "محدد المصفوفة A": "Determinant of matrix A",
   "محرر المعادلة": "Math editor",
   "محرك الحساب يعمل محليًا على جهازك": "The calculation engine runs locally on your device",
-  "محرك محلي": "Local engine",
   "محلل polynomialRoot في math.js بدقة الآلة (تقريبًا 15 رقمًا)؛ قد تدمج المكتبة الجذور المكررة.": "math.js polynomialRoot uses machine precision (about 15 digits); repeated roots may be merged.",
   "محول الوحدات": "Unit converter",
   "مرجع علمي في مساحة واحدة": "A scientific reference in one workspace",
@@ -408,8 +406,6 @@
   "مساحة المعادلات": "Equation workspace",
   "مساحة تعليمية خاصة": "Private study space",
   "مساحة تعلّم": "LEARNING SPACE",
-  "مساحة علمية للتعلّم": "Scientific learning workspace",
-  "مساحة محجوزة لإعلان مستقبلي": "Reserved advertising space",
   "مساحة مخصصة لفهم طريقة الحل، لا لعرض الناتج فقط. ستظهر خطوات مرتبة وواضحة مع كل مسألة.": "A dedicated space to understand the method, not just see the answer. Each problem will have clear, ordered steps.",
   "مسح السجل": "Clear history",
   "مشاركة": "Share",
@@ -518,5 +514,8 @@
   "عدد النتائج:": "Results:",
   "أهلاً بك! 👋 نحن فريق عمل صغير (Maaoun Studio) نسعى لتقديم أدوات تعليمية مجانية عالية الجودة. إذا كان التطبيق يعجبك ويساعدك، فإن تقييمك للتطبيق في متجر التطبيقات يدعمنا كثيراً ويصنع فارقاً حقيقياً في استمرارنا وتحديث الأداة باستمرار. شكرًا لدعمك وثقتك!": "Hello! 👋 We are a small team at Maaoun Studio creating free, high-quality educational tools. If this app helps you, a review in your app store makes a real difference and supports our continued work and updates. Thank you for your support and trust!",
   "نحفظ محلياً على جهازك اللغة المختارة وعدد العمليات وتفضيلات تذكير التقييم فقط. لا تُرسل هذه التفضيلات إلينا.": "We store only your selected language, calculation count, and rating-reminder preferences on your device. These preferences are not sent to us.",
-  "عند تفعيل إعلانات Google، يحتاج الإعلان إلى الإنترنت وقد تعالج خدمات Google بيانات الإعلان وفق سياسة الخصوصية وخيارات الموافقة المتاحة في منطقتك. لا توجد إعلانات كاملة الشاشة.": "When Google ads are enabled, ads require internet access and Google may process advertising data under its privacy policy and the consent options available in your region. There are no full-screen ads."
+  "عند تفعيل إعلانات Google، يحتاج الإعلان إلى الإنترنت وقد تعالج خدمات Google بيانات الإعلان وفق سياسة الخصوصية وخيارات الموافقة المتاحة في منطقتك. لا توجد إعلانات كاملة الشاشة.": "When Google ads are enabled, ads require internet access and Google may process advertising data under its privacy policy and the consent options available in your region. There are no full-screen ads.",
+  "قائمة الأدوات": "Tools menu",
+  "اختر أداة": "Choose a tool",
+  "إغلاق قائمة الأدوات": "Close tools menu"
 }
