@@ -8,8 +8,8 @@ import QuickAccessDrawer from './QuickAccessDrawer'
 import ToolLoadingSkeleton from './ToolLoadingSkeleton'
 import ThemeToggle from './ThemeToggle'
 import type { WorkspaceTheme } from './ThemeToggle'
-import WorkspaceNavigation from './WorkspaceNavigation'
-import type { WorkspaceToolId } from './WorkspaceNavigation'
+import WorkspaceTabs, { WorkspaceToolsButton } from './WorkspaceTabs'
+import type { WorkspaceToolId } from './WorkspaceTabs'
 import { useCalculator } from '../../state/CalculatorProvider'
 
 const EquationSolver = lazy(() => import('../../features/equation-solver/EquationSolver'))
@@ -62,6 +62,16 @@ export default function WorkspaceShell() {
   const [theme, setTheme] = useState<WorkspaceTheme>(readTheme)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [quickAccessOpen, setQuickAccessOpen] = useState(false)
+  const [toolsOpen, setToolsOpen] = useState(false)
+  const toolsButton = useRef<HTMLButtonElement>(null)
+  const closeTools = () => {
+    setToolsOpen(false)
+    // Return focus to the trigger only when it is the visible control (phones and tablets).
+    window.requestAnimationFrame(() => {
+      const trigger = toolsButton.current
+      if (trigger && trigger.offsetParent !== null && document.activeElement?.closest('.workspace-sidebar')) trigger.focus()
+    })
+  }
   const { insertFromWorkspace, history, state } = useCalculator()
   const lastTextInput = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const selectTool = (tool: WorkspaceToolId) => {
@@ -122,27 +132,23 @@ export default function WorkspaceShell() {
 
   return (
     <main className="app-shell" data-theme={theme} lang={language}>
-      <div className="ad-reservation" aria-label={localize('مساحة محجوزة لإعلان مستقبلي')}>
-        <span className="ad-slot-caption">{localize('حسابات علمية على جهازك · مساحة تعلّم خاصة')}</span>
-      </div>
+      {/* Empty slot: Android places its native adaptive banner here; it collapses to 0px on the web. */}
+      <div className="ad-reservation" aria-hidden="true" />
 
       <header className="workspace-header">
         <div className="workspace-brand">
           <span className="workspace-brand-mark" aria-hidden="true"><span>CE</span><small>991</small></span>
-          <span className="workspace-brand-copy">
-            <span className="workspace-brand-title"><strong>CalcES</strong><span>991</span></span>
-            <span className="workspace-brand-subtitle">{localize('مساحة علمية للتعلّم')}</span>
-          </span>
+          <span className="workspace-brand-title"><strong>CalcES</strong><span>991</span></span>
         </div>
         <div className="workspace-header-actions">
-          <span className="local-engine-badge"><span className="local-engine-dot" aria-hidden="true"/>{localize('محرك محلي')}</span>
+          <WorkspaceToolsButton ref={toolsButton} activeTool={activeTool} open={toolsOpen} onToggle={() => setToolsOpen(current => !current)} />
           <button type="button" className="header-quick-button" aria-label={localize('الثوابت السريعة')} title={localize('الثوابت السريعة')} onClick={() => setQuickAccessOpen(true)}>
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3Z"/><path d="M5 16.5a3 3 0 0 1 3-3h11M10 8h5m-5 3h4"/><path d="m15.5 6.5 1.5 1.5-1.5 1.5"/></svg>
             <span>{localize('الثوابت')}</span>
           </button>
           <button type="button" className="header-quick-button header-history-button" aria-label={localize(`السجل (${history.length})`)} title={localize('سجل الحسابات')} disabled={state.off} onClick={() => setHistoryOpen(true)}>
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.2-5.7L3 9"/><path d="M3 4v5h5m4-1v4l3 2"/></svg>
-            <span>{localize('السجل')}</span><b>{history.length}</b>
+            <span>{localize('السجل')}</span>{history.length > 0 && <b>{history.length}</b>}
           </button>
           <ThemeToggle theme={theme} onToggle={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')} />
         </div>
@@ -151,16 +157,23 @@ export default function WorkspaceShell() {
       <DeskLayout
         activeView={activeTool}
         aside={<CalculatorGuide />}
+        navigationOpen={toolsOpen}
+        onNavigationClose={closeTools}
         navigation={
-          <>
-            <WorkspaceNavigation activeTool={activeTool} onSelect={selectTool} />
-            <div className="workspace-sidebar-note">
-              <span className="sidebar-note-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-              </span>
-              <div><strong>{localize('خصوصيتك أولاً')}</strong><span>{localize('الحسابات لا تغادر جهازك')}</span></div>
-            </div>
-          </>
+          <WorkspaceTabs
+            activeTool={activeTool}
+            onSelect={selectTool}
+            open={toolsOpen}
+            onClose={closeTools}
+            footer={
+              <div className="workspace-sidebar-note">
+                <span className="sidebar-note-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+                </span>
+                <div><strong>{localize('خصوصيتك أولاً')}</strong><span>{localize('الحسابات لا تغادر جهازك')}</span></div>
+              </div>
+            }
+          />
         }
       >
         <section

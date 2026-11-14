@@ -69,3 +69,24 @@ it('persists the light theme and exposes Shift/Alpha from the Advanced toggle', 
   unmount()
   localStorage.removeItem('calces_theme')
 })
+
+it('switches workspaces from the single Tools button drawer instead of a tab row', () => {
+  render(<App />)
+  expect(screen.queryByText('حسابات علمية على جهازك · مساحة تعلّم خاصة')).not.toBeInTheDocument()
+  const trigger = screen.getByRole('button', { name: 'قائمة الأدوات' })
+  expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  expect(trigger).toHaveTextContent('الحاسبة')
+
+  fireEvent.click(trigger)
+  expect(trigger).toHaveAttribute('aria-expanded', 'true')
+  expect(document.getElementById('workspace-tools-menu')).toHaveAttribute('data-open', 'true')
+
+  fireEvent.click(screen.getByRole('tab', { name: /تحويل الوحدات/ }))
+  expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  expect(trigger).toHaveTextContent('تحويل الوحدات')
+  expect(screen.getByRole('tab', { name: /تحويل الوحدات/ })).toHaveAttribute('aria-selected', 'true')
+
+  fireEvent.click(trigger)
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(trigger).toHaveAttribute('aria-expanded', 'false')
+})

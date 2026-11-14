@@ -20,25 +20,54 @@ test('all five workspace tools stay available and formulas search and insert int
 test('the remaining Study Desk panels fit a narrow phone viewport', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 })
   await page.goto('/')
+  await page.getByRole('button', { name: 'قائمة الأدوات', exact: true }).click()
   await page.getByRole('tab', { name: /القوانين والصيغ/ }).click()
   await expect(page.locator('.formula-card').first()).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
-test('five workspace tabs are centered on a mobile-width layout', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 })
+test('mobile tools live behind a single header button that opens a drawer', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
   await page.goto('/')
   const navigation = page.getByRole('tablist', { name: 'أدوات CalcES' })
+  const trigger = page.getByRole('button', { name: 'قائمة الأدوات', exact: true })
+  // No tab row on phones: the tablist is hidden until the Tools button opens the drawer.
+  await expect(navigation).toBeHidden()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  await trigger.click()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
   const tabs = navigation.getByRole('tab')
   await expect(tabs).toHaveCount(5)
-  const navBox = await navigation.boundingBox()
-  const firstBox = await tabs.nth(0).boundingBox()
-  const lastBox = await tabs.nth(4).boundingBox()
-  expect(navBox).not.toBeNull()
-  expect(firstBox).not.toBeNull()
-  expect(lastBox).not.toBeNull()
-  const tabsCenter = (lastBox!.x + firstBox!.x + firstBox!.width) / 2
-  expect(Math.abs(tabsCenter - (navBox!.x + navBox!.width / 2))).toBeLessThan(1)
+  for (let index = 0; index < 5; index++) {
+    const box = await tabs.nth(index).boundingBox()
+    expect(box!.x).toBeGreaterThanOrEqual(0)
+    expect(box!.x + box!.width).toBeLessThanOrEqual(375)
+    expect(box!.y + box!.height).toBeLessThanOrEqual(667)
+    expect(box!.height).toBeGreaterThanOrEqual(44)
+  }
+  await page.keyboard.press('Escape')
+  await expect(navigation).toBeHidden()
+  await trigger.click()
+  await navigation.getByRole('tab', { name: /الرسم البياني/ }).click()
+  await expect(navigation).toBeHidden()
+  await expect(trigger).toContainText('الرسم البياني')
+  await expect(page.getByRole('tabpanel')).toBeVisible()
+})
+
+test('the header has no banner text and the calculator fills a 375px phone', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
+  await page.goto('/')
+  await expect(page.locator('math-field')).toBeVisible()
+  await expect(page.getByText('حسابات علمية على جهازك')).toHaveCount(0)
+  const geometry = await page.evaluate(() => {
+    const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect()
+    return { header: box('.workspace-header'), lcd: box('.lcd-panel'), keypad: box('.calculator-keypad'), scrollHeight: document.documentElement.scrollHeight }
+  })
+  expect(geometry.header.height).toBeLessThanOrEqual(50)
+  expect(geometry.lcd.height).toBeGreaterThanOrEqual(80)
+  expect(geometry.keypad.bottom).toBeLessThanOrEqual(667)
+  expect(geometry.keypad.height).toBeGreaterThanOrEqual(420)
+  expect(geometry.scrollHeight).toBeLessThanOrEqual(668)
 })
 
 test('header Quick Access searches scientific constants and inserts into the calculator', async ({ page }) => {
