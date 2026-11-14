@@ -11,6 +11,7 @@ it('persists language and translates static and dynamic labels without changing 
 it('translates the Phase 3 tools and dynamic search counts',()=>{
  selectLanguage('en')
  expect(translate('القوانين والصيغ')).toBe('Formulas')
+ expect(translate('جارٍ تحميل الأداة')).toBe('Loading tool')
  expect(translate('عدد النتائج: 6')).toBe('Results: 6')
  expect(translate('تصدير الرسم بصيغة SVG')).toBe('Export graph as SVG')
 })

@@ -14,7 +14,7 @@ it('renders the display and separate result with the original keypad groups', ()
   expect(screen.getByLabelText('الأرقام والعمليات')).toHaveClass('grid-cols-5')
 })
 
-it('shows all five workspace tabs and opens the functional graphing tool', () => {
+it('shows all five workspace tabs and opens the functional graphing tool', async () => {
   render(<App />)
   expect(screen.getAllByRole('tab')).toHaveLength(5)
   expect(screen.getByRole('tab', { name: /القوانين والصيغ/ })).toBeInTheDocument()
@@ -23,27 +23,27 @@ it('shows all five workspace tabs and opens the functional graphing tool', () =>
   fireEvent.click(screen.getByRole('tab', { name: /الرسم البياني/ }))
   expect(screen.getByRole('tab', { name: /الرسم البياني/ })).toHaveAttribute('aria-selected', 'true')
   const panel = screen.getByRole('tabpanel')
-  expect(within(panel).getByRole('heading', { name: 'الرسم البياني' })).toBeInTheDocument()
+  expect(await within(panel).findByRole('heading', { name: 'الرسم البياني' })).toBeInTheDocument()
   expect(within(panel).getByRole('heading', { name: 'الدوال' })).toBeInTheDocument()
   expect(within(panel).getByRole('img', { name: 'الرسم البياني للدوال' })).toBeInTheDocument()
   expect(within(panel).getByLabelText('الدالة 1')).toHaveValue('sin(x)')
 })
 
-it('solves a linear equation from the equation-solver workspace', () => {
+it('solves a linear equation from the equation-solver workspace', async () => {
   render(<App />)
   fireEvent.click(screen.getByRole('tab', { name: /حل المعادلات/ }))
   const panel = screen.getByRole('tabpanel')
-  fireEvent.click(within(panel).getByRole('button', { name: 'خطية' }))
+  fireEvent.click(await within(panel).findByRole('button', { name: 'خطية' }))
   fireEvent.click(within(panel).getByRole('button', { name: 'حل المعادلة' }))
   expect(panel.querySelector('.solution-roots strong')).toHaveTextContent('3')
   expect(within(panel).getByRole('list', { name: 'خطوات الحل' })).toBeInTheDocument()
 })
 
-it('converts units and exposes insertable scientific constants', () => {
+it('converts units and exposes insertable scientific constants', async () => {
   render(<App />)
   fireEvent.click(screen.getByRole('tab', { name: /تحويل الوحدات/ }))
   const panel = screen.getByRole('tabpanel')
-  expect(within(panel).getByLabelText('القيمة')).toHaveValue('1')
+  expect(await within(panel).findByLabelText('القيمة')).toHaveValue('1')
   expect(within(panel).getByText(/1000 m/)).toBeInTheDocument()
   expect(within(panel).getByRole('heading', { name: 'ثوابت علمية' })).toBeInTheDocument()
   expect(within(panel).getByRole('button', { name: 'إدراج ثابت سرعة الضوء في الفراغ' })).toBeInTheDocument()
