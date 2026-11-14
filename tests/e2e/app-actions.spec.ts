@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures'
+import { expect, test, openAppMenu } from './fixtures'
 import type { MathfieldElement } from 'mathlive'
 
 test('workspace is hidden initially, opens on demand, and preserves fields after hiding',async({page})=>{
@@ -27,7 +27,7 @@ test('share uses the native sheet and cancelling it does not copy the link',asyn
   Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{document.documentElement.dataset.copied='yes'}}})
  })
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
- await page.getByRole('button',{name:'مشاركة الحاسبة'}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'مشاركة الحاسبة'}).click()
  await expect(page.locator('html')).toHaveAttribute('data-shared-url','https://study-tools-calculator.pages.dev/')
  await expect(page.locator('html')).not.toHaveAttribute('data-copied','yes')
 })
@@ -36,7 +36,7 @@ test('share falls back to copying the actual app link',async({page})=>{
   Object.defineProperty(navigator,'share',{configurable:true,value:undefined})
   Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async(text:string)=>{document.documentElement.dataset.copied=text}}})
  })
- await page.goto('/');await page.getByRole('button',{name:'مشاركة الحاسبة'}).click()
+ await page.goto('/');await (await openAppMenu(page)).getByRole('button',{name:'مشاركة الحاسبة'}).click()
  await expect(page.locator('html')).toHaveAttribute('data-copied','https://study-tools-calculator.pages.dev/')
  await expect(page.getByRole('status').filter({hasText:'تم نسخ رابط الحاسبة'})).toBeVisible()
 })
@@ -47,16 +47,16 @@ test('manual share and install guidance remain available when browser APIs are m
   window.addEventListener('beforeinstallprompt',event=>{if(event.isTrusted){event.preventDefault();event.stopImmediatePropagation()}},true)
  })
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
- await page.getByRole('button',{name:'مشاركة الحاسبة'}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'مشاركة الحاسبة'}).click()
  const share=page.getByRole('dialog',{name:'مشاركة الحاسبة',exact:true})
  await expect(share.getByRole('link')).toHaveAttribute('href','https://study-tools-calculator.pages.dev/')
  await share.getByRole('button',{name:'إغلاق',exact:true}).click()
- await page.getByRole('button',{name:'تثبيت التطبيق'}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'تثبيت التطبيق'}).click()
  const install=page.getByRole('dialog',{name:'تثبيت الحاسبة',exact:true})
  await expect(install).toContainText('Safari')
  await expect(install).toContainText('إضافة إلى الشاشة الرئيسية')
  await page.keyboard.press('Escape');await expect(install).not.toBeVisible()
- await expect(page.getByRole('button',{name:'تثبيت التطبيق'})).toBeFocused()
+ await expect(page.getByRole('button',{name:'الإعدادات',exact:true})).toBeFocused()
 })
 test('install consumes the browser prompt and responds to installed state',async({page})=>{
  await page.addInitScript(()=>window.addEventListener('beforeinstallprompt',event=>{if(event.isTrusted){event.preventDefault();event.stopImmediatePropagation()}},true))
@@ -67,11 +67,12 @@ test('install consumes the browser prompt and responds to installed state',async
   window.dispatchEvent(event);return event.defaultPrevented
  })
  expect(intercepted).toBe(true)
- await page.getByRole('button',{name:'تثبيت التطبيق'}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'تثبيت التطبيق'}).click()
  await expect(page.locator('html')).toHaveAttribute('data-install-calls','1')
  await page.evaluate(()=>window.dispatchEvent(new Event('appinstalled')))
- await expect(page.getByRole('button',{name:'التطبيق مثبت'})).toBeVisible()
- await page.getByRole('button',{name:'التطبيق مثبت'}).click()
+ const menu=await openAppMenu(page)
+ await expect(menu.getByRole('button',{name:'التطبيق مثبت'})).toBeVisible()
+ await menu.getByRole('button',{name:'التطبيق مثبت'}).click()
  await expect(page.locator('html')).toHaveAttribute('data-install-calls','1')
 })
 test('production precaches the calculator and worker for an offline installed launch',async({page,context},testInfo)=>{

@@ -1,4 +1,4 @@
-import {test,expect} from './fixtures'
+import { test, expect, openAppMenu } from './fixtures'
 import type {MathfieldElement} from 'mathlive'
 import type {Page} from '@playwright/test'
 test.use({hasTouch:true,viewport:{width:390,height:844}})
@@ -49,7 +49,7 @@ test('recall restores both MathIO operands and repeats the exact result',async({
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await formula(page,'\\int(X^2,0,2)+\\int(X^3,0,2)');await key(page,'equals')
  await expect(output(page)).toHaveText('6.6666666666667')
- await key(page,'clear');await page.getByRole('button',{name:'السجل (1)',exact:true}).click()
+ await key(page,'clear');await (await openAppMenu(page)).getByRole('button',{name:'السجل (1)',exact:true}).click()
  await page.getByRole('dialog').getByRole('button',{name:/استدعاء/}).click()
  expect(await ids(page)).toHaveLength(2)
  await key(page,'calc');await expect(output(page)).toHaveText('6.6666666666667')

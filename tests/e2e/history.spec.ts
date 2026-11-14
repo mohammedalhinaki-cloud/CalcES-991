@@ -1,16 +1,16 @@
-import { expect, test } from './fixtures'
+import { expect, test, expectHistory, openAppMenu } from './fixtures'
 import type { MathfieldElement } from 'mathlive'
 import type { Page } from '@playwright/test'
 async function formula(page:Page,latex:string){await page.locator('math-field').evaluate((el,value)=>{const field=el as MathfieldElement;field.value=value;field.dispatchEvent(new InputEvent('input',{bubbles:true}))},latex)}
 async function mode(page:Page,name:string){await page.locator('[data-key="mode"]').click();await page.getByRole('dialog',{name:/MODE/}).getByRole('button',{name:new RegExp(name)}).click()}
-async function openHistory(page:Page){await page.getByRole('button',{name:/^السجل/}).click();return page.getByRole('dialog',{name:'سجل الحسابات'})}
+async function openHistory(page:Page){await (await openAppMenu(page)).getByRole('button',{name:/^السجل/}).click();return page.getByRole('dialog',{name:'سجل الحسابات'})}
 test('history recalls the original Ans context and keeps the same MathLive instance',async({page})=>{
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await formula(page,'7');await page.locator('[data-key="equals"]').click()
  await formula(page,'\\mathrm{Ans}+1');await page.locator('[data-key="equals"]').click()
  await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('8')
  await page.locator('[data-key="equals"]').click()
- await expect(page.getByRole('button',{name:'السجل (2)',exact:true})).toBeVisible()
+ await expectHistory(page,2)
  await formula(page,'100');await page.locator('[data-key="equals"]').click()
  await page.locator('math-field').evaluate(el=>el.setAttribute('data-instance','original'))
  const dialog=await openHistory(page)
@@ -22,7 +22,7 @@ test('history recalls the original Ans context and keeps the same MathLive insta
  await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('8')
  await openHistory(page);await page.keyboard.press('Escape')
  await expect(dialog).not.toBeVisible()
- await expect(page.getByRole('button',{name:/^السجل/})).toBeFocused()
+ await expect(page.getByRole('button',{name:'الإعدادات',exact:true})).toBeFocused()
 })
 test('advanced history restores matrix data and does not add another entry on recall',async({page})=>{
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
@@ -36,7 +36,7 @@ test('advanced history restores matrix data and does not add another entry on re
  await dialog.getByRole('button',{name:/استدعاء/}).click()
  await expect(page.getByRole('textbox',{name:'A11',exact:true})).toHaveText('2')
  await expect(page.getByLabel('نتيجة الحساب المتقدم',{exact:true})).toContainText('det(A)2')
- await expect(page.getByRole('button',{name:'السجل (1)',exact:true})).toBeVisible()
+ await expectHistory(page,1)
  await page.locator('[data-key="equals"]').click()
  await expect(page.getByLabel('نتيجة الحساب المتقدم',{exact:true})).toContainText('det(A)2')
  await openHistory(page);await page.getByRole('button',{name:'مسح السجل',exact:true}).click()
@@ -60,7 +60,8 @@ test('mobile and desktop layouts have no horizontal overflow and retain editor s
  await page.setViewportSize({width:390,height:844})
  const keys=await page.locator('[aria-label="لوحة مفاتيح الحاسبة"] button').evaluateAll(buttons=>buttons.map(button=>button.getBoundingClientRect().height))
  expect(Math.min(...keys)).toBeGreaterThanOrEqual(44)
- await page.getByRole('button',{name:/^السجل/}).tap()
+ await page.getByRole('button',{name:'الإعدادات',exact:true}).tap()
+ await page.locator('#app-menu').getByRole('button',{name:/^السجل/}).tap()
  await expect(page.getByRole('dialog',{name:'سجل الحسابات'})).toBeVisible()
  await page.getByRole('button',{name:'إغلاق',exact:true}).tap()
  expect(errors).toEqual([]);await context.close()
@@ -107,7 +108,7 @@ test('symbolic derivative history uses mathematical powers instead of program sy
  await page.locator('[data-key="integral"]').click()
  await formula(page,'\\operatorname{d/dx}(x^3,0)')
  await page.locator('[data-key="equals"]').click()
- await expect(page.getByRole('button',{name:'السجل (1)',exact:true})).toBeVisible()
+ await expectHistory(page,1)
  const dialog=await openHistory(page)
  const entry=dialog.locator('.history-entry').first()
  await expect(entry.locator('.history-math .ML__latex').first()).toBeVisible()
@@ -115,5 +116,5 @@ test('symbolic derivative history uses mathematical powers instead of program sy
  await expect(entry.locator('.history-results')).not.toContainText('^')
  await expect(entry.locator('.history-results')).not.toContainText('*')
  await entry.click()
- await expect(page.getByRole('button',{name:'السجل (1)',exact:true})).toBeVisible()
+ await expectHistory(page,1)
 })

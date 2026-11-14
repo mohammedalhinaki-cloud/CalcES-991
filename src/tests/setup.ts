@@ -9,3 +9,13 @@ Object.defineProperty(window,'matchMedia',{writable:true,value:vi.fn(query=>({ma
 
 // Existing calculator tests start after onboarding; first-launch behavior has dedicated tests.
 localStorage.setItem('calces_language','ar')
+
+// jsdom does not implement modal dialogs; mirror the open/close state so dialog content is queryable.
+if (typeof HTMLDialogElement !== 'undefined' && !HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) { this.setAttribute('open', '') }
+  HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+    if (!this.hasAttribute('open')) return
+    this.removeAttribute('open')
+    this.dispatchEvent(new Event('close'))
+  }
+}

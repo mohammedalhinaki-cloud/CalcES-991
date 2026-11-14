@@ -1,5 +1,5 @@
 import type { MathfieldElement } from 'mathlive'
-import { expect, test } from './fixtures'
+import { expect, test, openAppMenu } from './fixtures'
 
 test('all five workspace tools stay available and formulas search and insert into the calculator', async ({ page }) => {
   await page.goto('/')
@@ -72,7 +72,7 @@ test('the header has no banner text and the calculator fills a 375px phone', asy
 
 test('header Quick Access searches scientific constants and inserts into the calculator', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'الثوابت السريعة' }).click()
+  await (await openAppMenu(page)).getByRole('button', { name: 'الثوابت السريعة' }).click()
   const dialog = page.getByRole('dialog', { name: 'الثوابت العلمية' })
   await dialog.getByRole('searchbox', { name: 'بحث في الثوابت' }).fill('Avogadro')
   await expect(dialog.locator('.quick-access-item')).toHaveCount(1)
@@ -87,7 +87,7 @@ test('Quick Access inserts a constant at the remembered cursor in the active too
   await page.getByRole('tab', { name: /الرسم البياني/ }).click()
   const functionInput = page.getByRole('textbox', { name: 'الدالة 1' })
   await functionInput.fill('x+')
-  await page.getByRole('button', { name: 'الثوابت السريعة' }).click()
+  await (await openAppMenu(page)).getByRole('button', { name: 'الثوابت السريعة' }).click()
   const dialog = page.getByRole('dialog', { name: 'الثوابت العلمية' })
   await dialog.getByRole('searchbox', { name: 'بحث في الثوابت' }).fill('Avogadro')
   await dialog.getByRole('button', { name: 'إدراج ثابت ثابت أفوجادرو' }).click()

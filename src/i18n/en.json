@@ -517,5 +517,10 @@
   "عند تفعيل إعلانات Google، يحتاج الإعلان إلى الإنترنت وقد تعالج خدمات Google بيانات الإعلان وفق سياسة الخصوصية وخيارات الموافقة المتاحة في منطقتك. لا توجد إعلانات كاملة الشاشة.": "When Google ads are enabled, ads require internet access and Google may process advertising data under its privacy policy and the consent options available in your region. There are no full-screen ads.",
   "قائمة الأدوات": "Tools menu",
   "اختر أداة": "Choose a tool",
-  "إغلاق قائمة الأدوات": "Close tools menu"
+  "إغلاق قائمة الأدوات": "Close tools menu",
+  "الإعدادات": "Settings",
+  "إغلاق الإعدادات": "Close settings",
+  "المظهر": "Appearance",
+  "داكن": "Dark",
+  "فاتح": "Light"
 }

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { localize } from '../../i18n/locale'
 import { useLanguage } from '../../i18n/LanguageGate'
 import DeskLayout from '../../app/DeskLayout'
@@ -6,8 +6,9 @@ import CalculatorShell from '../CalculatorShell'
 import HistoryPanel from '../HistoryPanel'
 import QuickAccessDrawer from './QuickAccessDrawer'
 import ToolLoadingSkeleton from './ToolLoadingSkeleton'
-import ThemeToggle from './ThemeToggle'
-import type { WorkspaceTheme } from './ThemeToggle'
+import AppMenu, { AppMenuButton } from '../menu/AppMenu'
+import type { WorkspaceTheme } from '../menu/AppMenu'
+import AboutDialog from '../menu/AboutDialog'
 import WorkspaceTabs, { WorkspaceToolsButton } from './WorkspaceTabs'
 import type { WorkspaceToolId } from './WorkspaceTabs'
 import { useCalculator } from '../../state/CalculatorProvider'
@@ -60,20 +61,28 @@ export default function WorkspaceShell() {
   const [activeTool, setActiveTool] = useState<WorkspaceToolId>('calculator')
   const [loadedTools, setLoadedTools] = useState<Set<WorkspaceToolId>>(() => new Set(['calculator']))
   const [theme, setTheme] = useState<WorkspaceTheme>(readTheme)
+  const [toolsOpen, setToolsOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [quickAccessOpen, setQuickAccessOpen] = useState(false)
-  const [toolsOpen, setToolsOpen] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
+  const { insertFromWorkspace, history, state } = useCalculator()
+  const lastTextInput = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const toolsButton = useRef<HTMLButtonElement>(null)
+  const menuButton = useRef<HTMLButtonElement>(null)
+
+  /** Dialogs opened from the menu return focus to the visible corner icon, not the closed menu. */
+  const focusMenuButton = useCallback(() => window.requestAnimationFrame(() => {
+    const active = document.activeElement
+    if (!document.querySelector('dialog[open]') && (!active || active === document.body)) menuButton.current?.focus()
+  }), [])
   const closeTools = () => {
     setToolsOpen(false)
-    // Return focus to the trigger only when it is the visible control (phones and tablets).
     window.requestAnimationFrame(() => {
       const trigger = toolsButton.current
       if (trigger && trigger.offsetParent !== null && document.activeElement?.closest('.workspace-sidebar')) trigger.focus()
     })
   }
-  const { insertFromWorkspace, history, state } = useCalculator()
-  const lastTextInput = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const selectTool = (tool: WorkspaceToolId) => {
     setActiveTool(tool)
     setLoadedTools(current => {
@@ -132,49 +141,14 @@ export default function WorkspaceShell() {
 
   return (
     <main className="app-shell" data-theme={theme} lang={language}>
-      {/* Empty slot: Android places its native adaptive banner here; it collapses to 0px on the web. */}
-      <div className="ad-reservation" aria-hidden="true" />
-
-      <header className="workspace-header">
-        <div className="workspace-brand">
-          <span className="workspace-brand-mark" aria-hidden="true"><span>CE</span><small>991</small></span>
-          <span className="workspace-brand-title"><strong>CalcES</strong><span>991</span></span>
-        </div>
-        <div className="workspace-header-actions">
-          <WorkspaceToolsButton ref={toolsButton} activeTool={activeTool} open={toolsOpen} onToggle={() => setToolsOpen(current => !current)} />
-          <button type="button" className="header-quick-button" aria-label={localize('الثوابت السريعة')} title={localize('الثوابت السريعة')} onClick={() => setQuickAccessOpen(true)}>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3Z"/><path d="M5 16.5a3 3 0 0 1 3-3h11M10 8h5m-5 3h4"/><path d="m15.5 6.5 1.5 1.5-1.5 1.5"/></svg>
-            <span>{localize('الثوابت')}</span>
-          </button>
-          <button type="button" className="header-quick-button header-history-button" aria-label={localize(`السجل (${history.length})`)} title={localize('سجل الحسابات')} disabled={state.off} onClick={() => setHistoryOpen(true)}>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.2-5.7L3 9"/><path d="M3 4v5h5m4-1v4l3 2"/></svg>
-            <span>{localize('السجل')}</span>{history.length > 0 && <b>{history.length}</b>}
-          </button>
-          <ThemeToggle theme={theme} onToggle={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')} />
-        </div>
-      </header>
-
       <DeskLayout
         activeView={activeTool}
-        aside={<CalculatorGuide />}
+        toolsControl={<WorkspaceToolsButton ref={toolsButton} activeTool={activeTool} open={toolsOpen} onToggle={() => setToolsOpen(current => !current)} />}
+        cornerControl={<AppMenuButton ref={menuButton} open={menuOpen} onClick={() => setMenuOpen(true)} />}
+        navigation={<WorkspaceTabs activeTool={activeTool} onSelect={selectTool} open={toolsOpen} onClose={closeTools} />}
         navigationOpen={toolsOpen}
         onNavigationClose={closeTools}
-        navigation={
-          <WorkspaceTabs
-            activeTool={activeTool}
-            onSelect={selectTool}
-            open={toolsOpen}
-            onClose={closeTools}
-            footer={
-              <div className="workspace-sidebar-note">
-                <span className="sidebar-note-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-                </span>
-                <div><strong>{localize('خصوصيتك أولاً')}</strong><span>{localize('الحسابات لا تغادر جهازك')}</span></div>
-              </div>
-            }
-          />
-        }
+        aside={<CalculatorGuide />}
       >
         <section
           id="tool-panel-calculator"
@@ -262,8 +236,22 @@ export default function WorkspaceShell() {
           )}
         </section>
       </DeskLayout>
-      <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} onRecall={() => selectTool('calculator')} />
-      <QuickAccessDrawer open={quickAccessOpen} onClose={() => setQuickAccessOpen(false)} onInsert={insertQuickConstant} />
+
+      <AppMenu
+        open={menuOpen}
+        onClose={() => { setMenuOpen(false); focusMenuButton() }}
+        theme={theme}
+        onToggleTheme={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}
+        historyCount={history.length}
+        historyDisabled={state.off}
+        onOpenHistory={() => setHistoryOpen(true)}
+        onOpenConstants={() => setQuickAccessOpen(true)}
+        onOpenAbout={() => setAboutOpen(true)}
+        onReturnFocus={focusMenuButton}
+      />
+      <HistoryPanel open={historyOpen} onClose={() => { setHistoryOpen(false); focusMenuButton() }} onRecall={() => selectTool('calculator')} />
+      <QuickAccessDrawer open={quickAccessOpen} onClose={() => { setQuickAccessOpen(false); focusMenuButton() }} onInsert={insertQuickConstant} />
+      <AboutDialog open={aboutOpen} onClose={() => { setAboutOpen(false); focusMenuButton() }} />
     </main>
   )
 }

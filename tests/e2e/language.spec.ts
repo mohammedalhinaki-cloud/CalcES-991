@@ -1,4 +1,4 @@
-import {test,expect} from './fixtures'
+import { test, expect, expectHistory, openAppMenu } from './fixtures'
 import type {MathfieldElement} from 'mathlive'
 test.use({languageOnboarding:true,viewport:{width:390,height:844},hasTouch:true})
 async function formula(page:import('@playwright/test').Page,value:string){await page.locator('math-field').evaluate((el,value)=>{const field=el as MathfieldElement;field.value=value;field.dispatchEvent(new InputEvent('input',{bubbles:true}))},value)}
@@ -48,7 +48,7 @@ test('English covers all mode panels, worker results, history, setup, and errors
  }
  await page.locator('[data-key="mode"]').tap();await page.getByRole('dialog').getByRole('button',{name:/COMP/}).tap()
  await formula(page,'1/0');await page.locator('[data-key="equals"]').tap();await noArabic(page)
- await page.getByRole('button',{name:/History \(/}).tap();await noArabic(page)
+ await page.locator('.app-menu-button').tap();await page.locator('#app-menu').getByRole('button',{name:/History \(/}).tap();await noArabic(page)
  await page.getByRole('dialog',{name:'Calculation history'}).getByRole('button',{name:'Close',exact:true}).tap()
  await page.locator('[data-key="shift"]').tap();await page.locator('[data-key="mode"]').tap();await expect(page.getByRole('dialog')).toContainText('SETUP · Angle unit');await noArabic(page)
 })
@@ -56,7 +56,7 @@ test('English native privacy and rate reminder retain contact details and correc
  await page.addInitScript(()=>Object.defineProperty(window,'androidBridge',{value:{},configurable:true}))
  await page.addInitScript(()=>localStorage.setItem('calces_language','en'))
  await page.goto('/')
- await page.getByRole('button',{name:'Privacy and ads'}).tap()
+ await page.locator('.app-menu-button').tap();await page.locator('#app-menu').getByRole('button',{name:'Privacy and ads'}).tap()
  const modal=page.getByRole('dialog',{name:'About and privacy 🛡️'})
  await expect(modal).toContainText('Maaoun Studio');await expect(modal).toContainText('jy906675@gmail.com');await noArabic(page)
  await modal.getByRole('button',{name:'Close',exact:true}).tap()
@@ -70,13 +70,12 @@ test('manual language switching preserves the editor instance, expression, resul
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await formula(page,'12+3');await page.locator('[data-key="equals"]').click()
  await page.locator('math-field').evaluate(el=>el.setAttribute('data-instance','original'))
- await page.getByRole('button',{name:'Workspace',exact:true}).click()
- await page.getByRole('button',{name:'العربية',exact:true}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'العربية',exact:true}).click()
  await expect(page.locator('html')).toHaveAttribute('lang','ar')
  await expect(page.locator('math-field')).toHaveAttribute('data-instance','original')
  await expect(page.getByLabel('النتيجة',{exact:true})).toHaveText('15')
- await expect(page.getByRole('button',{name:'السجل (1)',exact:true})).toBeVisible()
- await page.getByRole('button',{name:'English',exact:true}).click()
+ await expectHistory(page,1)
+ await (await openAppMenu(page)).getByRole('button',{name:'English',exact:true}).click()
  await expect(page.locator('html')).toHaveAttribute('lang','en')
  await expect(page.locator('math-field')).toHaveAttribute('aria-label','Math editor')
  expect(await page.evaluate(()=>localStorage.getItem('calces_language'))).toBe('en')

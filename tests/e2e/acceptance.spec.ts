@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures'
+import { expect, test, expectHistory } from './fixtures'
 import type { MathfieldElement } from 'mathlive'
 import type { Page } from '@playwright/test'
 async function formula(page:Page,latex:string){
@@ -9,17 +9,17 @@ test('invalid scalar and advanced input recover without polluting history',async
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
  await formula(page,'1/0');await page.locator('[data-key="equals"]').click()
  await expect(output(page)).toHaveAttribute('data-status','error')
- await expect(page.getByRole('button',{name:'السجل (0)',exact:true})).toBeVisible()
+ await expectHistory(page,0)
  await formula(page,'0.1+0.2');await page.locator('[data-key="equals"]').click()
  await expect(output(page)).toHaveText('0.3')
  await formula(page,'\\int(1/x,-1,1)');await page.locator('[data-key="equals"]').click()
  await expect(output(page)).toHaveAttribute('data-status','error',{timeout:15000})
- await expect(page.getByRole('button',{name:'السجل (1)',exact:true})).toBeVisible()
+ await expectHistory(page,1)
  await formula(page,'\\int(1/x,1,2)')
  await page.locator('[data-key="equals"]').click()
  await expect(output(page)).toHaveAttribute('data-status','success',{timeout:15000})
  expect(Math.abs(Number(await output(page).textContent())-Math.log(2))).toBeLessThan(1e-10)
- await expect(page.getByRole('button',{name:'السجل (2)',exact:true})).toBeVisible()
+ await expectHistory(page,2)
 })
 test('production loads local fonts and the worker and survives a fresh page reload',async({page},testInfo)=>{
  test.skip(!testInfo.config.metadata.production,'Artifact-only acceptance check')
@@ -38,7 +38,7 @@ test('production loads local fonts and the worker and survives a fresh page relo
  await expect(output(page)).toHaveText('0.33333333333333',{timeout:15000})
  expect(workers.some(url=>/\/assets\/calculation\.worker-[^/]+\.js$/.test(url))).toBe(true)
  await page.reload();await expect(page.locator('math-field')).toBeVisible()
- await expect(page.getByRole('button',{name:'السجل (0)',exact:true})).toBeVisible()
+ await expectHistory(page,0)
  await formula(page,'\\sin(30)');await page.locator('[data-key="equals"]').click()
  await expect(output(page)).toHaveText('0.5')
 })
