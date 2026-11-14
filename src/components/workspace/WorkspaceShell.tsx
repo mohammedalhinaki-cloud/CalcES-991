@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { localize } from '../../i18n/locale'
 import { useLanguage } from '../../i18n/LanguageGate'
+import DeskLayout from '../../app/DeskLayout'
 import CalculatorShell from '../CalculatorShell'
 import HistoryPanel from '../HistoryPanel'
 import QuickAccessDrawer from './QuickAccessDrawer'
@@ -28,7 +29,7 @@ function readTheme(): WorkspaceTheme {
 
 function CalculatorGuide() {
   return (
-    <aside className="calculator-guide" aria-label={localize('دليل سريع للحاسبة')}>
+    <div className="calculator-guide">
       <div className="guide-card-heading">
         <span className="guide-card-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-2-5.8L4 11l6-2.2L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
@@ -50,7 +51,7 @@ function CalculatorGuide() {
         <span className="precision-mark" aria-hidden="true">64</span>
         <div><strong>{localize('دقة عشرية عالية')}</strong><span>{localize('محرك الحساب يعمل محليًا على جهازك')}</span></div>
       </div>
-    </aside>
+    </div>
   )
 }
 
@@ -147,107 +148,107 @@ export default function WorkspaceShell() {
         </div>
       </header>
 
-      <div className="workspace-frame">
-        <aside className="workspace-sidebar" aria-label={localize('التنقل بين الأدوات')}>
-          <WorkspaceNavigation activeTool={activeTool} onSelect={selectTool} />
-          <div className="workspace-sidebar-note">
-            <span className="sidebar-note-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-            </span>
-            <div><strong>{localize('خصوصيتك أولاً')}</strong><span>{localize('الحسابات لا تغادر جهازك')}</span></div>
-          </div>
-        </aside>
-
-        <section className="workspace-stage" aria-label={localize('مساحة الأدوات')}>
-          <section
-            id="tool-panel-calculator"
-            className="tool-panel tool-panel--calculator"
-            role="tabpanel"
-            aria-labelledby="tool-tab-calculator"
-            tabIndex={0}
-            hidden={activeTool !== 'calculator'}
-          >
-            <div className="calculator-view">
-              <header className="calculator-heading">
-                <div>
-                  <span className="calculator-heading-eyebrow">{localize('حاسبة علمية')}</span>
-                  <h2>{localize('فكّر بالأرقام، لا بالأزرار')}</h2>
-                  <p>{localize('اكتب تعبيرًا طبيعيًا واستخدم الأدوات العلمية في مساحة واحدة.')}</p>
-                </div>
-                <div className="calculator-heading-tags">
-                  <span><i aria-hidden="true"/> {localize('عرض رياضي طبيعي')}</span>
-                  <span>{localize('حساب محلي')}</span>
-                </div>
-              </header>
-              <div className="calculator-main-grid">
-                <CalculatorShell />
-                <CalculatorGuide />
-              </div>
+      <DeskLayout
+        activeView={activeTool}
+        aside={<CalculatorGuide />}
+        navigation={
+          <>
+            <WorkspaceNavigation activeTool={activeTool} onSelect={selectTool} />
+            <div className="workspace-sidebar-note">
+              <span className="sidebar-note-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+              </span>
+              <div><strong>{localize('خصوصيتك أولاً')}</strong><span>{localize('الحسابات لا تغادر جهازك')}</span></div>
             </div>
-          </section>
-
-          <section
-            id="tool-panel-equation-solver"
-            className="tool-panel"
-            role="tabpanel"
-            aria-labelledby="tool-tab-equation-solver"
-            tabIndex={0}
-            hidden={activeTool !== 'equation-solver'}
-          >
-            {loadedTools.has('equation-solver') && (
-              <Suspense fallback={<ToolLoadingSkeleton />}>
-                <EquationSolver onReturn={returnToCalculator} />
-              </Suspense>
-            )}
-          </section>
-
-          <section
-            id="tool-panel-graphing"
-            className="tool-panel"
-            role="tabpanel"
-            aria-labelledby="tool-tab-graphing"
-            tabIndex={0}
-            hidden={activeTool !== 'graphing'}
-          >
-            {loadedTools.has('graphing') && (
-              <Suspense fallback={<ToolLoadingSkeleton />}>
-                <GraphingTool onReturn={returnToCalculator} />
-              </Suspense>
-            )}
-          </section>
-
-          <section
-            id="tool-panel-unit-converter"
-            className="tool-panel"
-            role="tabpanel"
-            aria-labelledby="tool-tab-unit-converter"
-            tabIndex={0}
-            hidden={activeTool !== 'unit-converter'}
-          >
-            {loadedTools.has('unit-converter') && (
-              <Suspense fallback={<ToolLoadingSkeleton />}>
-                <UnitConverter onReturn={returnToCalculator} onInsertConstant={insertConstant} />
-              </Suspense>
-            )}
-          </section>
-
-          <section
-            id="tool-panel-formulas"
-            className="tool-panel"
-            role="tabpanel"
-            aria-labelledby="tool-tab-formulas"
-            tabIndex={0}
-            hidden={activeTool !== 'formulas'}
-          >
-            {loadedTools.has('formulas') && (
-              <Suspense fallback={<ToolLoadingSkeleton />}>
-                <FormulasTool onReturn={returnToCalculator} onInsert={insertConstant} />
-              </Suspense>
-            )}
-          </section>
-
+          </>
+        }
+      >
+        <section
+          id="tool-panel-calculator"
+          className="tool-panel tool-panel--calculator"
+          role="tabpanel"
+          aria-labelledby="tool-tab-calculator"
+          tabIndex={0}
+          hidden={activeTool !== 'calculator'}
+        >
+          <div className="calculator-view">
+            <header className="calculator-heading">
+              <div>
+                <span className="calculator-heading-eyebrow">{localize('حاسبة علمية')}</span>
+                <h2>{localize('فكّر بالأرقام، لا بالأزرار')}</h2>
+                <p>{localize('اكتب تعبيرًا طبيعيًا واستخدم الأدوات العلمية في مساحة واحدة.')}</p>
+              </div>
+              <div className="calculator-heading-tags">
+                <span><i aria-hidden="true"/> {localize('عرض رياضي طبيعي')}</span>
+                <span>{localize('حساب محلي')}</span>
+              </div>
+            </header>
+            <div className="calculator-main-grid">
+              <CalculatorShell />
+            </div>
+          </div>
         </section>
-      </div>
+
+        <section
+          id="tool-panel-equation-solver"
+          className="tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-equation-solver"
+          tabIndex={0}
+          hidden={activeTool !== 'equation-solver'}
+        >
+          {loadedTools.has('equation-solver') && (
+            <Suspense fallback={<ToolLoadingSkeleton />}>
+              <EquationSolver onReturn={returnToCalculator} />
+            </Suspense>
+          )}
+        </section>
+
+        <section
+          id="tool-panel-graphing"
+          className="tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-graphing"
+          tabIndex={0}
+          hidden={activeTool !== 'graphing'}
+        >
+          {loadedTools.has('graphing') && (
+            <Suspense fallback={<ToolLoadingSkeleton />}>
+              <GraphingTool onReturn={returnToCalculator} />
+            </Suspense>
+          )}
+        </section>
+
+        <section
+          id="tool-panel-unit-converter"
+          className="tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-unit-converter"
+          tabIndex={0}
+          hidden={activeTool !== 'unit-converter'}
+        >
+          {loadedTools.has('unit-converter') && (
+            <Suspense fallback={<ToolLoadingSkeleton />}>
+              <UnitConverter onReturn={returnToCalculator} onInsertConstant={insertConstant} />
+            </Suspense>
+          )}
+        </section>
+
+        <section
+          id="tool-panel-formulas"
+          className="tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-formulas"
+          tabIndex={0}
+          hidden={activeTool !== 'formulas'}
+        >
+          {loadedTools.has('formulas') && (
+            <Suspense fallback={<ToolLoadingSkeleton />}>
+              <FormulasTool onReturn={returnToCalculator} onInsert={insertConstant} />
+            </Suspense>
+          )}
+        </section>
+      </DeskLayout>
       <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} onRecall={() => selectTool('calculator')} />
       <QuickAccessDrawer open={quickAccessOpen} onClose={() => setQuickAccessOpen(false)} onInsert={insertQuickConstant} />
     </main>
