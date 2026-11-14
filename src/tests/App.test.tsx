@@ -49,22 +49,27 @@ it('converts units and exposes insertable scientific constants', async () => {
   expect(within(panel).getByRole('button', { name: 'إدراج ثابت سرعة الضوء في الفراغ' })).toBeInTheDocument()
 })
 
-it('persists the light theme and exposes Shift/Alpha from the Advanced toggle', () => {
+it('keeps the header to logo + Tools + one settings icon, with app settings in the corner menu', () => {
   localStorage.removeItem('calces_theme')
-  const { unmount } = render(<App />)
+  const { unmount, container } = render(<App />)
+  const header = container.querySelector('.workspace-header') as HTMLElement
+  const headerButtons = within(header).getAllByRole('button').map(button => button.getAttribute('aria-label'))
+  expect(headerButtons).toEqual(['قائمة الأدوات', 'الإعدادات'])
+  expect(screen.queryByRole('button', { name: 'الوظائف المتقدمة' })).not.toBeInTheDocument()
 
-  fireEvent.click(screen.getByRole('button', { name: 'التبديل إلى الوضع الفاتح' }))
+  fireEvent.click(screen.getByRole('button', { name: 'الإعدادات' }))
+  const menu = screen.getByRole('dialog', { name: 'الإعدادات' })
+  expect(within(menu).getByRole('button', { name: 'السجل (0)' })).toBeInTheDocument()
+  expect(within(menu).getByRole('button', { name: 'English' })).toBeInTheDocument()
+  expect(within(menu).getByRole('button', { name: 'عن التطبيق والخصوصية' })).toBeInTheDocument()
+  fireEvent.click(within(menu).getByRole('button', { name: 'التبديل إلى الوضع الفاتح' }))
   expect(document.documentElement).toHaveAttribute('data-theme', 'light')
   expect(localStorage.getItem('calces_theme')).toBe('light')
 
-  fireEvent.click(screen.getByRole('button', { name: 'الوظائف المتقدمة' }))
-  const choices = screen.getByRole('group', { name: 'اختيار وظائف SHIFT وALPHA' })
-  fireEvent.click(within(choices).getByRole('button', { name: /SHIFT/ }))
-  expect(screen.getByRole('button', { name: 'sin⁻¹' })).toBeInTheDocument()
-
-  fireEvent.click(screen.getByRole('button', { name: 'الوظائف المتقدمة' }))
-  fireEvent.click(within(screen.getByRole('group', { name: 'اختيار وظائف SHIFT وALPHA' })).getByRole('button', { name: /ALPHA/ }))
-  expect(screen.getByRole('button', { name: 'D' })).toBeInTheDocument()
+  // SHIFT/ALPHA remain on the keypad itself; no separate Advanced dropdown.
+  fireEvent.click(screen.getByRole('button', { name: 'إغلاق الإعدادات' }))
+  expect(screen.getByRole('button', { name: 'SHIFT' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'ALPHA' })).toBeInTheDocument()
 
   unmount()
   localStorage.removeItem('calces_theme')

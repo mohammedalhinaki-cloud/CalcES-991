@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useCalculator } from '../state/CalculatorProvider'
 import HistoryMath from './HistoryMath'
 import { historyExpression, matrixLatex, resultLatex } from '../state/historyPresentation'
+import { formatDisplayNumber } from '../engine/formatResult'
 
 export default function HistoryPanel({open,onClose,onRecall}:{open:boolean;onClose:()=>void;onRecall?:()=>void}){
  const {history,recallHistory,clearHistory}=useCalculator()
@@ -20,13 +21,13 @@ export default function HistoryPanel({open,onClose,onRecall}:{open:boolean;onClo
    return <li key={entry.id}>
    <button type="button" aria-label={localize(`استدعاء ${entry.title}`)} className="history-entry" onClick={()=>{recallHistory(entry);onRecall?.();onClose()}}>
     <span className="flex justify-between gap-2 text-xs text-[#c1d3b8]"><span>{localize(entry.snapshot.mode)}</span><span>{localize(entry.snapshot.angle)} · {localize(entry.snapshot.base===10?'DEC':`BASE ${entry.snapshot.base}`)}</span></span>
-    <span className="mt-2 block text-sm">{entry.request&&localize(entry.title)}</span>
+    <span className="mt-2 block text-sm">{entry.request&&localize(formatDisplayNumber(entry.title))}</span>
     {expression&&<HistoryMath latex={expression} />}
     {entry.result ? <span className="history-results">{entry.result.lines.map((line,index)=>{
      const latex=resultLatex(line.value)
-     return <span className="history-result-line" key={index}><span>{localize(line.label)}:</span>{latex ? <HistoryMath latex={latex}/> : <span dir="auto">{localize(line.value)}</span>}</span>
+     return <span className="history-result-line" key={index}><span>{localize(line.label)}:</span>{latex ? <HistoryMath latex={latex}/> : <span dir="auto">{localize(formatDisplayNumber(line.value))}</span>}</span>
     })}{entry.result.matrix&&<HistoryMath latex={matrixLatex(entry.result.matrix)}/>}</span>
-    : <span className="history-result-line" dir="ltr"><span>=</span>{scalar ? <HistoryMath latex={scalar}/> : <span>{entry.title}</span>}</span>}
+    : <span className="history-result-line" dir="ltr"><span>=</span>{scalar ? <HistoryMath latex={scalar}/> : <span>{formatDisplayNumber(entry.title)}</span>}</span>}
    </button>
   </li>}))}</ol><button type="button" className="utility-button mt-4 w-full text-red-200" onClick={clearHistory}>{localize("مسح السجل")}</button></>)}
  </dialog>

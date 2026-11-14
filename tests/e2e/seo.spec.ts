@@ -1,4 +1,4 @@
-import {test,expect} from './fixtures'
+import {test,expect,openAppMenu} from './fixtures'
 const origin='https://study-tools-calculator.pages.dev'
 test('verification, robots and sitemap are publicly accessible static resources',async({request})=>{
  const verification=await request.get('/googlee4b4a8558ff35d51.html')
@@ -29,13 +29,14 @@ for(const language of ['ar','en'] as const){
   }finally{await context.close()}
  })
 }
-test('guides remain discoverable in the workspace without a launch chooser',async({page})=>{
+test('guides remain discoverable in the settings menu without a launch chooser',async({page})=>{
  await page.goto('/')
  await expect(page.locator('math-field')).toBeVisible()
- await page.getByRole('button',{name:'مساحة العمل',exact:true}).click()
- await expect(page.getByRole('link',{name:'دليل استخدام الحاسبة',exact:true})).toHaveAttribute('href','/ar/')
- await expect(page.locator('.app-toolbar > button')).toHaveCount(4)
- await expect(page.getByRole('button',{name:/^السجل/})).toBeVisible()
+ // The header holds only the logo, the Tools switcher and one settings icon.
+ await expect(page.locator('.workspace-header button')).toHaveCount(2)
+ const menu=await openAppMenu(page)
+ await expect(menu.getByRole('link',{name:'دليل استخدام الحاسبة',exact:true})).toHaveAttribute('href','/ar/')
+ await expect(menu.getByRole('button',{name:/^السجل/})).toBeVisible()
 })
 test('cached guide navigation preserves its language when offline',async({page,context},testInfo)=>{
  test.skip(!testInfo.config.metadata.production,'Production service worker only')

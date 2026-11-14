@@ -32,3 +32,16 @@ export const test=base.extend<{runtimeChecks:void;languageOnboarding:boolean}>({
  },{auto:true}],
 })
 export { expect }
+
+type Page=import('@playwright/test').Page
+/** App settings (history, constants, language, share, install, about) live in the header corner menu. */
+export async function openAppMenu(page:Page){
+ const menu=page.locator('#app-menu')
+ if(!await menu.evaluate(el=>(el as HTMLDialogElement).open).catch(()=>false))await page.locator('.app-menu-button').click()
+ await expect(menu).toBeVisible()
+ return menu
+}
+/** The history count is exposed on the menu row's accessible name even while the menu is closed. */
+export async function expectHistory(page:Page,count:number,label='السجل'){
+ await expect(page.locator(`#app-menu button[aria-label^="${label} ("]`)).toHaveAttribute('aria-label',`${label} (${count})`)
+}

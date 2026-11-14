@@ -1,4 +1,4 @@
-import {test,expect} from './fixtures'
+import { test, expect, openAppMenu } from './fixtures'
 const store='https://play.google.com/store/apps/details?id=calces991.calculator'
 const website='https://study-tools-calculator.pages.dev/'
 test('Android smart link redirects before the calculator bundles load',async({page})=>{
@@ -14,7 +14,7 @@ test('Android install button navigates directly to Google Play',async({page})=>{
  // The website stays open until the visitor explicitly chooses the install button.
  await page.evaluate(()=>Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 (Linux; Android 14)'}))
  await page.route('https://play.google.com/**',route=>route.fulfill({contentType:'text/html',body:'<h1>Google Play destination</h1>'}))
- await page.getByRole('button',{name:'تثبيت التطبيق'}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'تثبيت التطبيق'}).click()
  await expect(page).toHaveURL(store)
 })
 test('Android share and clipboard use the official Play URL',async({page})=>{
@@ -23,12 +23,12 @@ test('Android share and clipboard use the official Play URL',async({page})=>{
   Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Android'})
   Object.defineProperty(navigator,'share',{configurable:true,value:async(data:ShareData)=>{document.body.dataset.shared=data.url}})
  })
- await page.getByRole('button',{name:'مشاركة الحاسبة'}).click();await expect(page.locator('body')).toHaveAttribute('data-shared',store)
+ await (await openAppMenu(page)).getByRole('button',{name:'مشاركة الحاسبة'}).click();await expect(page.locator('body')).toHaveAttribute('data-shared',store)
  await page.evaluate(()=>{
   Object.defineProperty(navigator,'share',{configurable:true,value:undefined})
   Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async(text:string)=>{document.body.dataset.copied=text}}})
  })
- await page.getByRole('button',{name:'مشاركة الحاسبة'}).click();await expect(page.locator('body')).toHaveAttribute('data-copied',store)
+ await (await openAppMenu(page)).getByRole('button',{name:'مشاركة الحاسبة'}).click();await expect(page.locator('body')).toHaveAttribute('data-copied',store)
 })
 test('iPhone keeps website sharing and its available PWA installation flow',async({page})=>{
  await page.goto('/');await expect(page.locator('math-field')).toBeVisible()
@@ -38,6 +38,6 @@ test('iPhone keeps website sharing and its available PWA installation flow',asyn
   const event=new Event('beforeinstallprompt',{cancelable:true})
   Object.assign(event,{prompt:async()=>{document.body.dataset.prompted='yes'},userChoice:Promise.resolve({outcome:'accepted'})});window.dispatchEvent(event)
  })
- await page.getByRole('button',{name:'مشاركة الحاسبة'}).click();await expect(page.locator('body')).toHaveAttribute('data-shared',website)
- await page.getByRole('button',{name:'تثبيت التطبيق'}).click();await expect(page.locator('body')).toHaveAttribute('data-prompted','yes')
+ await (await openAppMenu(page)).getByRole('button',{name:'مشاركة الحاسبة'}).click();await expect(page.locator('body')).toHaveAttribute('data-shared',website)
+ await (await openAppMenu(page)).getByRole('button',{name:'تثبيت التطبيق'}).click();await expect(page.locator('body')).toHaveAttribute('data-prompted','yes')
 })

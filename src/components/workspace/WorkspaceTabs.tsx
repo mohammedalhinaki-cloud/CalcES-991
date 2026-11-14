@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useRef } from 'react'
-import type { KeyboardEvent, ReactNode } from 'react'
+import type { KeyboardEvent } from 'react'
 import { getDirection, localize } from '../../i18n/locale'
 
 export type WorkspaceToolId = 'calculator' | 'equation-solver' | 'graphing' | 'unit-converter' | 'formulas'
@@ -73,13 +73,11 @@ export default function WorkspaceTabs({
   onSelect,
   open = false,
   onClose,
-  footer,
 }: {
   activeTool: WorkspaceToolId
   onSelect: (tool: WorkspaceToolId) => void
   open?: boolean
   onClose?: () => void
-  footer?: ReactNode
 }) {
   const buttons = useRef<Array<HTMLButtonElement | null>>([])
 
@@ -160,7 +158,6 @@ export default function WorkspaceTabs({
           )
         })}
       </nav>
-      {footer}
     </div>
   )
 }

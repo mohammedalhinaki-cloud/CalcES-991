@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { localize } from '../../i18n/locale'
 import ToolFrame from '../shared/ToolFrame'
+import { formatDisplayNumber } from '../../engine/formatResult'
 import { convertUnitValue, formatConvertedValue, SCIENTIFIC_CONSTANTS, UNIT_GROUPS } from './conversions'
 import type { UnitCategory } from './conversions'
 
@@ -82,7 +83,7 @@ export default function UnitConverter({
             {conversion.error ? (
               <p role="alert">{localize(conversion.error)}</p>
             ) : (
-              <strong dir="ltr">{value || '0'} {from.symbol} <span>=</span> {conversion.result} {to.symbol}</strong>
+              <strong dir="ltr">{value || '0'} {from.symbol} <span>=</span> {formatDisplayNumber(conversion.result)} {to.symbol}</strong>
             )}
           </div>
         </section>

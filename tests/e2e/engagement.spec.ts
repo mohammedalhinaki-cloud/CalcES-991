@@ -1,4 +1,4 @@
-import {test,expect} from './fixtures'
+import { test, expect, openAppMenu } from './fixtures'
 import type {MathfieldElement} from 'mathlive'
 test.use({hasTouch:true,viewport:{width:390,height:844}})
 async function calculate(page:import('@playwright/test').Page,value:number){
@@ -26,7 +26,7 @@ test('counts committed results only and offers exactly two rating actions',async
 test('defers the prompt while history is open and remembers later for three days',async({page})=>{
  await page.setViewportSize({width:360,height:640});await page.goto('/')
  await page.evaluate(()=>localStorage.clear())
- await page.getByRole('button',{name:/السجل \(/}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:/السجل \(/}).click()
  await page.evaluate(()=>{localStorage.setItem('calc_count','5');window.dispatchEvent(new Event('calces:calculation'))})
  const prompt=page.getByRole('dialog',{name:'رأيك يصنع الفارق! ⭐️'})
  await expect(prompt).not.toBeVisible()
@@ -38,16 +38,16 @@ test('defers the prompt while history is open and remembers later for three days
  expect(remaining).toBeGreaterThan(3*86400000-10000)
  await calculate(page,7);await expect(prompt).not.toBeVisible()
 })
-test('existing native shield opens the about dialog without adding toolbar controls',async({page})=>{
+test('settings menu opens the native about dialog without adding header controls',async({page})=>{
  await page.addInitScript(()=>{
   // Capacitor detects the native platform via androidBridge. No advertising SDK is loaded.
   Object.defineProperty(window,'androidBridge',{value:{},configurable:true})
  })
  await page.goto('/')
- const button=page.getByRole('button',{name:'الخصوصية والإعلانات'})
  await page.locator('math-field').evaluate(el=>{const field=el as MathfieldElement;field.value='123+4';field.position=2;field.dispatchEvent(new InputEvent('input',{bubbles:true}))})
  const position=await page.locator('math-field').evaluate(el=>(el as MathfieldElement).position)
- await button.tap()
+ const openAbout=async()=>{await page.getByRole('button',{name:'الإعدادات',exact:true}).tap();await page.locator('#app-menu').getByRole('button',{name:'الخصوصية والإعلانات'}).tap()}
+ await openAbout()
  const modal=page.getByRole('dialog',{name:'عن التطبيق والخصوصية 🛡️'})
  await expect(modal).toBeVisible();await expect(modal).toContainText('Maaoun Studio');await expect(modal.getByRole('link',{name:'jy906675@gmail.com'})).toHaveAttribute('href','mailto:jy906675@gmail.com')
  for(const viewport of [{width:320,height:568},{width:844,height:390}]){
@@ -58,7 +58,7 @@ test('existing native shield opens the about dialog without adding toolbar contr
  await page.touchscreen.tap(2,2);await expect(modal).not.toBeVisible()
  expect(await page.locator('math-field').evaluate(el=>(el as MathfieldElement).position)).toBe(position)
  await page.evaluate(()=>{window.open=((url?:string|URL)=>{document.body.dataset.ratingDestination=String(url);return null}) as typeof window.open})
- await button.tap();await modal.getByRole('button',{name:'هل أعجبك التطبيق؟ ادعمنا بالتقييم ⭐️'}).tap()
+ await openAbout();await modal.getByRole('button',{name:'هل أعجبك التطبيق؟ ادعمنا بالتقييم ⭐️'}).tap()
  await expect.poll(()=>page.evaluate(()=>document.body.dataset.ratingDestination)).toBe('https://study-tools-calculator.pages.dev/')
  expect(await page.evaluate(()=>localStorage.getItem('rate_done'))).toBe('1')
  await page.keyboard.press('Escape');await expect(modal).not.toBeVisible()
@@ -74,7 +74,7 @@ test('preview, invalid expressions, repeated equals, and history recall do not i
  expect(await page.evaluate(()=>localStorage.getItem('calc_count'))).toBeNull()
  await formula('2+3');await page.locator('[data-key="equals"]').click();await page.locator('[data-key="equals"]').click()
  expect(await page.evaluate(()=>localStorage.getItem('calc_count'))).toBe('1')
- await page.getByRole('button',{name:'السجل (1)',exact:true}).click();await page.getByRole('button',{name:'استدعاء 5',exact:true}).click()
+ await (await openAppMenu(page)).getByRole('button',{name:'السجل (1)',exact:true}).click();await page.getByRole('button',{name:'استدعاء 5',exact:true}).click()
  expect(await page.evaluate(()=>localStorage.getItem('calc_count'))).toBe('1')
 })
 

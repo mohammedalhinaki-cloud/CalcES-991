@@ -63,9 +63,9 @@ test('fraction and engineering formatting do not rewrite the editor',async({page
   await press('decimal')
   await expect(output).toHaveText('0.33333333333333')
   await press('clear','1','2','3','4','5','6','equals','eng')
-  await expect(output).toHaveText('123.456×10^3')
+  await expect(output).toHaveText('123.456 × 10³')
   await press('eng')
-  await expect(output).toHaveText('123456×10^0')
+  await expect(output).toHaveText('123456')
 })
 
 test('domain errors recover and angle changes leave committed Ans frozen',async({page})=>{

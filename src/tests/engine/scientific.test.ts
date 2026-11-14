@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { evaluateScientific, emptyVariables } from '../../engine/evaluate'
-import { formatScientific } from '../../engine/formatResult'
+import { formatDisplayNumber, formatScientific } from '../../engine/formatResult'
 import { math } from '../../engine/mathInstance'
 import { previewCalculation } from '../../editor/previewCalculation'
 
@@ -51,5 +51,26 @@ describe('display formats do not modify the numeric value',()=>{
     expect(formatScientific(math.bignumber('12.5'),{format:'dms'})).toBe('12°30′0″')
     expect(formatScientific(math.bignumber('12.999999999999999'),{format:'dms'})).toBe('13°0′0″')
     expect(formatScientific(evaluateScientific('\\pi/2'),{format:'dms',angle:'RAD'})).toBe('90°0′0″')
+  })
+})
+
+describe('display formatting of scientific results',()=>{
+  it.each([
+    ['-392×10^0','-392'],
+    ['123.456×10^3','123.456 × 10³'],
+    ['-3.92×10^2','-3.92 × 10²'],
+    ['1.2e+13','1.2 × 10¹³'],
+    ['5e-10','5 × 10⁻¹⁰'],
+    ['2.5×10^-6','2.5 × 10⁻⁶'],
+    ['42','42'],
+    ['3 + 2i','3 + 2i'],
+  ])('%s → %s',(engine,display)=>{
+    expect(formatDisplayNumber(engine)).toBe(display)
+  })
+  it('never shows a caret, an ASCII x, or a zero exponent',()=>{
+    for(const value of [-392,1e13,-0.000123,0.5,6.02e23])for(const options of [{},{format:'engineering' as const},{format:'engineering' as const,engineeringOffset:-3},{format:'engineering' as const,engineeringOffset:3}]){
+      const shown=formatDisplayNumber(formatScientific(math.bignumber(value),options))
+      expect(shown).not.toMatch(/\^|x10|e[+-]?\d|×\s*10⁰(?![⁰-⁹])/)
+    }
   })
 })

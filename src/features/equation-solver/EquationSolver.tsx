@@ -1,3 +1,4 @@
+import { formatDisplayNumber } from '../../engine/formatResult'
 import { useState } from 'react'
 import { localize } from '../../i18n/locale'
 import ToolFrame from '../shared/ToolFrame'
@@ -120,7 +121,7 @@ export default function EquationSolver({ onReturn }: { onReturn: () => void }) {
                 {solution.roots.length > 0 && (
                   <div className="solution-roots" dir="ltr">
                     {solution.roots.map((root, index) => (
-                      <span key={`${root}-${index}`}><small>{solution.roots.length > 1 ? `x${index + 1}` : 'x'}</small><strong>{root}</strong></span>
+                      <span key={`${root}-${index}`}><small>{solution.roots.length > 1 ? `x${index + 1}` : 'x'}</small><strong dir="ltr">{formatDisplayNumber(root)}</strong></span>
                     ))}
                   </div>
                 )}

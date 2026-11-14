@@ -30,3 +30,20 @@ export function formatScientific(value:BigNumber,options:FormatOptions={}):strin
   }
   return decimal(value)
 }
+
+const SUPERSCRIPT:Record<string,string>={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'}
+const toSuperscript=(exponent:number)=>String(exponent).split('').map(char=>SUPERSCRIPT[char]??char).join('')
+// Number tokens such as 1.2e+13, -392×10^0 or 123.456×10^3 inside a result string.
+const SCIENTIFIC_TOKEN=/(-?\d+(?:\.\d+)?)(?:×10\^|e)([+-]?\d+)(?![\d.])/g
+/**
+ * Presentation-only formatting for the calculator screen and history: scientific and
+ * engineering notation become "3.92 × 10²" (never "x10^" or "e+"), and a zero exponent
+ * collapses to the plain decimal. Engine strings stay unchanged for parsing and recall.
+ */
+export function formatDisplayNumber(text:string):string {
+  return text.replace(SCIENTIFIC_TOKEN,(_,mantissa:string,exponentText:string)=>{
+    const exponent=Number(exponentText)
+    if(!Number.isFinite(exponent)||exponent===0)return mantissa
+    return `${mantissa} × 10${toSuperscript(exponent)}`
+  })
+}
