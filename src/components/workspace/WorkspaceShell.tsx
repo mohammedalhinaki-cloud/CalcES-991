@@ -1,18 +1,20 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { localize } from '../../i18n/locale'
 import { useLanguage } from '../../i18n/LanguageGate'
 import CalculatorShell from '../CalculatorShell'
 import HistoryPanel from '../HistoryPanel'
-import FormulasTool from '../../features/formulas/FormulasTool'
 import QuickAccessDrawer from './QuickAccessDrawer'
+import ToolLoadingSkeleton from './ToolLoadingSkeleton'
 import ThemeToggle from './ThemeToggle'
 import type { WorkspaceTheme } from './ThemeToggle'
 import WorkspaceNavigation from './WorkspaceNavigation'
 import type { WorkspaceToolId } from './WorkspaceNavigation'
 import { useCalculator } from '../../state/CalculatorProvider'
-import EquationSolver from '../../features/equation-solver/EquationSolver'
-import GraphingTool from '../../features/graphing/GraphingTool'
-import UnitConverter from '../../features/unit-converter/UnitConverter'
+
+const EquationSolver = lazy(() => import('../../features/equation-solver/EquationSolver'))
+const GraphingTool = lazy(() => import('../../features/graphing/GraphingTool'))
+const UnitConverter = lazy(() => import('../../features/unit-converter/UnitConverter'))
+const FormulasTool = lazy(() => import('../../features/formulas/FormulasTool'))
 
 const THEME_STORAGE_KEY = 'calces_theme'
 
@@ -55,11 +57,21 @@ function CalculatorGuide() {
 export default function WorkspaceShell() {
   const { language } = useLanguage()
   const [activeTool, setActiveTool] = useState<WorkspaceToolId>('calculator')
+  const [loadedTools, setLoadedTools] = useState<Set<WorkspaceToolId>>(() => new Set(['calculator']))
   const [theme, setTheme] = useState<WorkspaceTheme>(readTheme)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [quickAccessOpen, setQuickAccessOpen] = useState(false)
   const { insertFromWorkspace, history, state } = useCalculator()
   const lastTextInput = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+  const selectTool = (tool: WorkspaceToolId) => {
+    setActiveTool(tool)
+    setLoadedTools(current => {
+      if (current.has(tool)) return current
+      const next = new Set(current)
+      next.add(tool)
+      return next
+    })
+  }
   useEffect(() => {
     const rememberInput = (event: FocusEvent) => {
       const target = event.target
@@ -69,9 +81,9 @@ export default function WorkspaceShell() {
     document.addEventListener('focusin', rememberInput)
     return () => document.removeEventListener('focusin', rememberInput)
   }, [])
-  const returnToCalculator = () => setActiveTool('calculator')
+  const returnToCalculator = () => selectTool('calculator')
   const insertConstant = (latex: string) => {
-    setActiveTool('calculator')
+    selectTool('calculator')
     insertFromWorkspace(latex)
   }
   const insertQuickConstant = (latex: string, value: string) => {
@@ -137,7 +149,7 @@ export default function WorkspaceShell() {
 
       <div className="workspace-frame">
         <aside className="workspace-sidebar" aria-label={localize('التنقل بين الأدوات')}>
-          <WorkspaceNavigation activeTool={activeTool} onSelect={setActiveTool} />
+          <WorkspaceNavigation activeTool={activeTool} onSelect={selectTool} />
           <div className="workspace-sidebar-note">
             <span className="sidebar-note-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -182,7 +194,11 @@ export default function WorkspaceShell() {
             tabIndex={0}
             hidden={activeTool !== 'equation-solver'}
           >
-            <EquationSolver onReturn={returnToCalculator} />
+            {loadedTools.has('equation-solver') && (
+              <Suspense fallback={<ToolLoadingSkeleton />}>
+                <EquationSolver onReturn={returnToCalculator} />
+              </Suspense>
+            )}
           </section>
 
           <section
@@ -193,7 +209,11 @@ export default function WorkspaceShell() {
             tabIndex={0}
             hidden={activeTool !== 'graphing'}
           >
-            <GraphingTool onReturn={returnToCalculator} />
+            {loadedTools.has('graphing') && (
+              <Suspense fallback={<ToolLoadingSkeleton />}>
+                <GraphingTool onReturn={returnToCalculator} />
+              </Suspense>
+            )}
           </section>
 
           <section
@@ -204,7 +224,11 @@ export default function WorkspaceShell() {
             tabIndex={0}
             hidden={activeTool !== 'unit-converter'}
           >
-            <UnitConverter onReturn={returnToCalculator} onInsertConstant={insertConstant} />
+            {loadedTools.has('unit-converter') && (
+              <Suspense fallback={<ToolLoadingSkeleton />}>
+                <UnitConverter onReturn={returnToCalculator} onInsertConstant={insertConstant} />
+              </Suspense>
+            )}
           </section>
 
           <section
@@ -215,12 +239,16 @@ export default function WorkspaceShell() {
             tabIndex={0}
             hidden={activeTool !== 'formulas'}
           >
-            <FormulasTool onReturn={returnToCalculator} onInsert={insertConstant} />
+            {loadedTools.has('formulas') && (
+              <Suspense fallback={<ToolLoadingSkeleton />}>
+                <FormulasTool onReturn={returnToCalculator} onInsert={insertConstant} />
+              </Suspense>
+            )}
           </section>
 
         </section>
       </div>
-      <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} onRecall={() => setActiveTool('calculator')} />
+      <HistoryPanel open={historyOpen} onClose={() => setHistoryOpen(false)} onRecall={() => selectTool('calculator')} />
       <QuickAccessDrawer open={quickAccessOpen} onClose={() => setQuickAccessOpen(false)} onInsert={insertQuickConstant} />
     </main>
   )

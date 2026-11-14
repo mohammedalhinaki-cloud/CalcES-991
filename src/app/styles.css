@@ -537,6 +537,25 @@ math-field::part(menu-toggle) { display: none; }
 .graph-canvas-wrap .graph-canvas { height: 100%; min-height: inherit; }
 .graph-loading-shimmer { position: absolute; z-index: 1; inset: 0; pointer-events: none; background: linear-gradient(108deg, transparent 18%, color-mix(in srgb, var(--accent-strong) 13%, transparent) 42%, color-mix(in srgb, #fff 18%, transparent) 50%, color-mix(in srgb, var(--teal) 12%, transparent) 58%, transparent 82%); background-size: 230% 100%; animation: graph-shimmer 1.25s ease-in-out infinite; }
 @keyframes graph-shimmer { 0% { background-position: 100% 0; opacity: .35; } 50% { opacity: .9; } 100% { background-position: -100% 0; opacity: .35; } }
+.tool-loading-skeleton { display: grid; align-content: start; gap: 17px; width: min(100%, 1240px); min-height: 100%; margin-inline: auto; padding: 20px 6px 24px; }
+.tool-loading-skeleton-heading { display: grid; gap: 9px; padding-inline: 2px; }
+.tool-skeleton-block { position: relative; display: block; overflow: hidden; border-radius: 7px; background: var(--surface-raised); }
+.tool-skeleton-block::after { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 20%, color-mix(in srgb, var(--accent-strong) 16%, transparent) 46%, color-mix(in srgb, #fff 19%, transparent) 52%, color-mix(in srgb, var(--teal) 12%, transparent) 58%, transparent 82%); background-size: 220% 100%; content: ''; animation: workspace-skeleton-shimmer 1.25s ease-in-out infinite; }
+@keyframes workspace-skeleton-shimmer { from { background-position: 110% 0; } to { background-position: -110% 0; } }
+.tool-skeleton-eyebrow { width: 84px; height: 8px; }
+.tool-skeleton-title { width: min(46vw, 330px); height: 24px; border-radius: 8px; }
+.tool-skeleton-copy { width: min(58vw, 450px); height: 10px; }
+.tool-loading-skeleton-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 14px; }
+.tool-skeleton-card { display: grid; align-content: start; gap: 14px; min-width: 0; min-height: 300px; padding: 16px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+.tool-skeleton-short { width: 22%; min-width: 70px; height: 9px; }
+.tool-skeleton-medium { width: 54%; height: 16px; margin-bottom: 2px; }
+.tool-skeleton-field { width: 100%; height: 43px; border: 1px solid var(--line); border-radius: 9px; }
+.tool-skeleton-action { width: 74%; height: 38px; margin-top: 2px; }
+.tool-skeleton-chart-card { grid-template-rows: minmax(220px, 1fr) 24px; }
+.tool-skeleton-chart { position: relative; min-height: 220px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background-color: var(--surface-raised); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 36px 36px; }
+.tool-skeleton-chart::after { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 20%, color-mix(in srgb, var(--accent-strong) 16%, transparent) 46%, color-mix(in srgb, #fff 19%, transparent) 52%, color-mix(in srgb, var(--teal) 12%, transparent) 58%, transparent 82%); background-size: 220% 100%; content: ''; animation: workspace-skeleton-shimmer 1.25s ease-in-out infinite; }
+.tool-skeleton-legend { display: flex; align-items: center; gap: 10px; }
+.tool-skeleton-legend-line { width: 27%; height: 8px; }
 .graph-floating-controls { position: absolute; z-index: 3; top: 78px; inset-inline-end: 20px; display: flex; align-items: center; gap: 5px; padding: 5px; border: 1px solid var(--line-strong); border-radius: 12px; background: color-mix(in srgb, var(--surface) 88%, transparent); box-shadow: 0 8px 22px #0002; backdrop-filter: blur(12px); }
 .graph-pan-controls { display: inline-flex; gap: 3px; padding-inline-end: 5px; border-inline-end: 1px solid var(--line); }
 .graph-pan-controls button, .graph-export-button, .graph-fullscreen-button { display: grid; place-items: center; width: 33px; height: 34px; border: 1px solid transparent; border-radius: 8px; color: var(--text); background: transparent; font: 650 14px ui-monospace, SFMono-Regular, Consolas, monospace; touch-action: manipulation; }
@@ -802,11 +821,15 @@ math-field::part(menu-toggle) { display: none; }
 .guide-links a { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 900px) {
-  .equation-workbench, .unit-converter-layout, .graphing-layout { grid-template-columns: minmax(0, 1fr); }
+  .equation-workbench, .unit-converter-layout, .graphing-layout, .tool-loading-skeleton-grid { grid-template-columns: minmax(0, 1fr); }
   .tool-empty-state { min-height: 130px; }
 }
 
 @media (max-width: 639px) {
+  .tool-loading-skeleton { gap: 12px; padding: 13px 2px 18px; }
+  .tool-skeleton-card { min-height: 220px; padding: 12px; }
+  .tool-skeleton-chart-card { grid-template-rows: minmax(165px, 1fr) 20px; }
+  .tool-skeleton-chart { min-height: 165px; }
   .learning-tool { padding: 15px 10px 24px; }
   .learning-tool-header { flex-direction: column; gap: 11px; margin-bottom: 14px; }
   .learning-tool-back { min-height: 36px; }
@@ -832,4 +855,5 @@ math-field::part(menu-toggle) { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .tool-skeleton-block::after, .tool-skeleton-chart::after { animation: none; }
 }

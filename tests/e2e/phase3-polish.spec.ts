@@ -66,6 +66,32 @@ test('Quick Access inserts a constant at the remembered cursor in the active too
   await expect(page.getByRole('tab', { name: /الرسم البياني/ })).toHaveAttribute('aria-selected', 'true')
 })
 
+test('shows a shimmering skeleton while the Graph module chunk is loading', async ({ page }) => {
+  await page.goto('/')
+
+  let announceChunkStart!: () => void
+  let releaseChunk!: () => void
+  const chunkStarted = new Promise<void>(resolve => { announceChunkStart = resolve })
+  const heldChunk = new Promise<void>(resolve => { releaseChunk = resolve })
+  await page.route(/\/assets\/.*\.js$/, async route => {
+    if (route.request().resourceType() === 'script') {
+      announceChunkStart()
+      await heldChunk
+    }
+    await route.continue()
+  })
+
+  await page.getByRole('tab', { name: /الرسم البياني/ }).click()
+  await chunkStarted
+  const skeleton = page.getByRole('status', { name: 'جارٍ تحميل الأداة' })
+  await expect(skeleton).toBeVisible()
+  expect(await skeleton.locator('.tool-skeleton-title').evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('workspace-skeleton-shimmer')
+
+  releaseChunk()
+  await expect(page.getByRole('textbox', { name: 'الدالة 1' })).toBeVisible()
+  await expect(skeleton).not.toBeVisible()
+})
+
 test('graph has floating pan and export controls and downloads a styled SVG', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('tab', { name: /الرسم البياني/ }).click()
