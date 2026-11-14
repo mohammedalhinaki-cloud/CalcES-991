@@ -1,257 +1,143 @@
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { localize } from '../../i18n/locale'
+import { lazy, Suspense, useCallback, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useLanguage } from '../../i18n/LanguageGate'
 import DeskLayout from '../../app/DeskLayout'
+import { useCalculator } from '../../state/CalculatorProvider'
 import CalculatorShell from '../CalculatorShell'
 import HistoryPanel from '../HistoryPanel'
+import AboutDialog from '../menu/AboutDialog'
+import AppMenu, { AppMenuButton } from '../menu/AppMenu'
+import CalculatorGuide, { CalculatorIntro } from './CalculatorGuide'
 import QuickAccessDrawer from './QuickAccessDrawer'
 import ToolLoadingSkeleton from './ToolLoadingSkeleton'
-import AppMenu, { AppMenuButton } from '../menu/AppMenu'
-import type { WorkspaceTheme } from '../menu/AppMenu'
-import AboutDialog from '../menu/AboutDialog'
-import WorkspaceTabs, { WorkspaceToolsButton } from './WorkspaceTabs'
+import { useQuickConstantInsertion } from './useQuickConstantInsertion'
+import { useWorkspaceTheme } from './useWorkspaceTheme'
+import WorkspaceTabs, { WORKSPACE_TOOLS, WorkspaceToolsButton } from './WorkspaceTabs'
 import type { WorkspaceToolId } from './WorkspaceTabs'
-import { useCalculator } from '../../state/CalculatorProvider'
 
 const EquationSolver = lazy(() => import('../../features/equation-solver/EquationSolver'))
 const GraphingTool = lazy(() => import('../../features/graphing/GraphingTool'))
 const UnitConverter = lazy(() => import('../../features/unit-converter/UnitConverter'))
 const FormulasTool = lazy(() => import('../../features/formulas/FormulasTool'))
 
-const THEME_STORAGE_KEY = 'calces_theme'
-
-function readTheme(): WorkspaceTheme {
-  try {
-    return window.localStorage.getItem(THEME_STORAGE_KEY) === 'light' ? 'light' : 'dark'
-  } catch {
-    return 'dark'
-  }
+interface ToolActions {
+  /** Back to the calculator. */
+  returnToCalculator: () => void
+  /** Switch to the calculator and insert LaTeX at the editor caret. */
+  insertIntoCalculator: (latex: string) => void
 }
 
-function CalculatorGuide() {
-  return (
-    <div className="calculator-guide">
-      <div className="guide-card-heading">
-        <span className="guide-card-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-2-5.8L4 11l6-2.2L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
-        </span>
-        <div>
-          <span className="guide-eyebrow">{localize('مساحة تعلّم')}</span>
-          <h3>{localize('ابدأ بخطوة صغيرة')}</h3>
-        </div>
-      </div>
-
-      <p className="guide-intro">{localize('اكتب التعبير كما تراه، ثم استكشف الوظائف العلمية من لوحة المفاتيح.')}</p>
-
-      <div className="guide-layer-list">
-        <div className="guide-layer-row"><kbd>SHIFT</kbd><span>{localize('للوظائف الثانوية مثل العكسية والجذر التكعيبي')}</span></div>
-        <div className="guide-layer-row"><kbd className="guide-alpha-key">ALPHA</kbd><span>{localize('للمتغيرات والرموز الإضافية')}</span></div>
-      </div>
-
-      <div className="guide-precision">
-        <span className="precision-mark" aria-hidden="true">64</span>
-        <div><strong>{localize('دقة عشرية عالية')}</strong><span>{localize('محرك الحساب يعمل محليًا على جهازك')}</span></div>
-      </div>
-    </div>
-  )
+/** Secondary tools load on first open, then stay mounted so their inputs survive switching. */
+const LAZY_TOOLS: Record<Exclude<WorkspaceToolId, 'calculator'>, (actions: ToolActions) => ReactNode> = {
+  'equation-solver': ({ returnToCalculator }) => <EquationSolver onReturn={returnToCalculator} />,
+  graphing: ({ returnToCalculator }) => <GraphingTool onReturn={returnToCalculator} />,
+  'unit-converter': ({ returnToCalculator, insertIntoCalculator }) => <UnitConverter onReturn={returnToCalculator} onInsertConstant={insertIntoCalculator} />,
+  formulas: ({ returnToCalculator, insertIntoCalculator }) => <FormulasTool onReturn={returnToCalculator} onInsert={insertIntoCalculator} />,
 }
 
+/** Only one modal is ever open: the settings menu or one of the dialogs it launches. */
+type OpenDialog = 'menu' | 'history' | 'constants' | 'about' | null
+
+/**
+ * Application shell: an ultra-minimal header (logo + Tools · settings icon), the five
+ * workspaces as tab panels, and the dialogs reachable from the corner settings menu.
+ */
 export default function WorkspaceShell() {
   const { language } = useLanguage()
-  const [activeTool, setActiveTool] = useState<WorkspaceToolId>('calculator')
-  const [loadedTools, setLoadedTools] = useState<Set<WorkspaceToolId>>(() => new Set(['calculator']))
-  const [theme, setTheme] = useState<WorkspaceTheme>(readTheme)
-  const [toolsOpen, setToolsOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [historyOpen, setHistoryOpen] = useState(false)
-  const [quickAccessOpen, setQuickAccessOpen] = useState(false)
-  const [aboutOpen, setAboutOpen] = useState(false)
+  const { theme, toggleTheme } = useWorkspaceTheme()
   const { insertFromWorkspace, history, state } = useCalculator()
-  const lastTextInput = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+
+  const [activeTool, setActiveTool] = useState<WorkspaceToolId>('calculator')
+  const [loadedTools, setLoadedTools] = useState<ReadonlySet<WorkspaceToolId>>(() => new Set(['calculator']))
+  const [toolsOpen, setToolsOpen] = useState(false)
+  const [openDialog, setOpenDialog] = useState<OpenDialog>(null)
   const toolsButton = useRef<HTMLButtonElement>(null)
   const menuButton = useRef<HTMLButtonElement>(null)
 
-  /** Dialogs opened from the menu return focus to the visible corner icon, not the closed menu. */
-  const focusMenuButton = useCallback(() => window.requestAnimationFrame(() => {
-    const active = document.activeElement
-    if (!document.querySelector('dialog[open]') && (!active || active === document.body)) menuButton.current?.focus()
-  }), [])
-  const closeTools = () => {
+  const selectTool = useCallback((tool: WorkspaceToolId) => {
+    setActiveTool(tool)
+    setLoadedTools(current => (current.has(tool) ? current : new Set(current).add(tool)))
+  }, [])
+  const returnToCalculator = useCallback(() => selectTool('calculator'), [selectTool])
+  const insertIntoCalculator = useCallback((latex: string) => {
+    selectTool('calculator')
+    insertFromWorkspace(latex)
+  }, [insertFromWorkspace, selectTool])
+  const insertQuickConstant = useQuickConstantInsertion(insertIntoCalculator)
+
+  const closeTools = useCallback(() => {
     setToolsOpen(false)
+    // Return focus to the trigger only when it is visible (it is hidden on desktop).
     window.requestAnimationFrame(() => {
       const trigger = toolsButton.current
       if (trigger && trigger.offsetParent !== null && document.activeElement?.closest('.workspace-sidebar')) trigger.focus()
     })
-  }
-  const selectTool = (tool: WorkspaceToolId) => {
-    setActiveTool(tool)
-    setLoadedTools(current => {
-      if (current.has(tool)) return current
-      const next = new Set(current)
-      next.add(tool)
-      return next
-    })
-  }
-  useEffect(() => {
-    const rememberInput = (event: FocusEvent) => {
-      const target = event.target
-      if (target instanceof HTMLInputElement && target.type !== 'search' && !target.closest('.quick-access-dialog')) lastTextInput.current = target
-      if (target instanceof HTMLTextAreaElement && !target.closest('.quick-access-dialog')) lastTextInput.current = target
-    }
-    document.addEventListener('focusin', rememberInput)
-    return () => document.removeEventListener('focusin', rememberInput)
   }, [])
-  const returnToCalculator = () => selectTool('calculator')
-  const insertConstant = (latex: string) => {
-    selectTool('calculator')
-    insertFromWorkspace(latex)
-  }
-  const insertQuickConstant = (latex: string, value: string) => {
-    const target = lastTextInput.current
-    const activePanel = target?.closest<HTMLElement>('[role="tabpanel"]')
-    if (target?.isConnected && !activePanel?.hidden) {
-      const start = target.selectionStart ?? target.value.length
-      const end = target.selectionEnd ?? start
-      const next = `${target.value.slice(0, start)}${value}${target.value.slice(end)}`
-      const prototype = target instanceof HTMLInputElement ? HTMLInputElement.prototype : HTMLTextAreaElement.prototype
-      const setter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set
-      if (setter) setter.call(target, next)
-      else target.value = next
-      target.dispatchEvent(new Event('input', { bubbles: true }))
-      target.setSelectionRange(start + value.length, start + value.length)
-      setQuickAccessOpen(false)
-      window.requestAnimationFrame(() => {
-        if (target.isConnected && !activePanel?.hidden) target.focus()
-      })
-      return
-    }
-    insertConstant(latex)
-  }
 
-  useLayoutEffect(() => {
-    document.documentElement.dataset.theme = theme
-    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    themeColor?.setAttribute('content', theme === 'light' ? '#f3f6fb' : '#0b1020')
-    try {
-      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
-    } catch {
-      // The current session still follows the selected theme when storage is unavailable.
-    }
-  }, [theme])
+  /** After a menu dialog closes, focus the visible corner icon unless focus already moved on. */
+  const focusMenuButton = useCallback(() => window.requestAnimationFrame(() => {
+    const active = document.activeElement
+    if (!document.querySelector('dialog[open]') && (!active || active === document.body)) menuButton.current?.focus()
+  }), [])
+  const closeDialog = useCallback(() => {
+    setOpenDialog(null)
+    focusMenuButton()
+  }, [focusMenuButton])
+
+  const toolActions: ToolActions = { returnToCalculator, insertIntoCalculator }
 
   return (
     <main className="app-shell" data-theme={theme} lang={language}>
       <DeskLayout
         activeView={activeTool}
         toolsControl={<WorkspaceToolsButton ref={toolsButton} activeTool={activeTool} open={toolsOpen} onToggle={() => setToolsOpen(current => !current)} />}
-        cornerControl={<AppMenuButton ref={menuButton} open={menuOpen} onClick={() => setMenuOpen(true)} />}
+        cornerControl={<AppMenuButton ref={menuButton} open={openDialog === 'menu'} onClick={() => setOpenDialog('menu')} />}
         navigation={<WorkspaceTabs activeTool={activeTool} onSelect={selectTool} open={toolsOpen} onClose={closeTools} />}
         navigationOpen={toolsOpen}
         onNavigationClose={closeTools}
         aside={<CalculatorGuide />}
       >
-        <section
-          id="tool-panel-calculator"
-          className="tool-panel tool-panel--calculator"
-          role="tabpanel"
-          aria-labelledby="tool-tab-calculator"
-          tabIndex={0}
-          hidden={activeTool !== 'calculator'}
-        >
-          <div className="calculator-view">
-            <header className="calculator-heading">
-              <div>
-                <span className="calculator-heading-eyebrow">{localize('حاسبة علمية')}</span>
-                <h2>{localize('فكّر بالأرقام، لا بالأزرار')}</h2>
-                <p>{localize('اكتب تعبيرًا طبيعيًا واستخدم الأدوات العلمية في مساحة واحدة.')}</p>
+        {WORKSPACE_TOOLS.map(({ id }) => (
+          <section
+            key={id}
+            id={`tool-panel-${id}`}
+            className={id === 'calculator' ? 'tool-panel tool-panel--calculator' : 'tool-panel'}
+            role="tabpanel"
+            aria-labelledby={`tool-tab-${id}`}
+            tabIndex={0}
+            hidden={activeTool !== id}
+          >
+            {id === 'calculator' ? (
+              <div className="calculator-view">
+                <CalculatorIntro />
+                <div className="calculator-main-grid">
+                  <CalculatorShell />
+                </div>
               </div>
-              <div className="calculator-heading-tags">
-                <span><i aria-hidden="true"/> {localize('عرض رياضي طبيعي')}</span>
-                <span>{localize('حساب محلي')}</span>
-              </div>
-            </header>
-            <div className="calculator-main-grid">
-              <CalculatorShell />
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="tool-panel-equation-solver"
-          className="tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-equation-solver"
-          tabIndex={0}
-          hidden={activeTool !== 'equation-solver'}
-        >
-          {loadedTools.has('equation-solver') && (
-            <Suspense fallback={<ToolLoadingSkeleton />}>
-              <EquationSolver onReturn={returnToCalculator} />
-            </Suspense>
-          )}
-        </section>
-
-        <section
-          id="tool-panel-graphing"
-          className="tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-graphing"
-          tabIndex={0}
-          hidden={activeTool !== 'graphing'}
-        >
-          {loadedTools.has('graphing') && (
-            <Suspense fallback={<ToolLoadingSkeleton />}>
-              <GraphingTool onReturn={returnToCalculator} />
-            </Suspense>
-          )}
-        </section>
-
-        <section
-          id="tool-panel-unit-converter"
-          className="tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-unit-converter"
-          tabIndex={0}
-          hidden={activeTool !== 'unit-converter'}
-        >
-          {loadedTools.has('unit-converter') && (
-            <Suspense fallback={<ToolLoadingSkeleton />}>
-              <UnitConverter onReturn={returnToCalculator} onInsertConstant={insertConstant} />
-            </Suspense>
-          )}
-        </section>
-
-        <section
-          id="tool-panel-formulas"
-          className="tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-formulas"
-          tabIndex={0}
-          hidden={activeTool !== 'formulas'}
-        >
-          {loadedTools.has('formulas') && (
-            <Suspense fallback={<ToolLoadingSkeleton />}>
-              <FormulasTool onReturn={returnToCalculator} onInsert={insertConstant} />
-            </Suspense>
-          )}
-        </section>
+            ) : loadedTools.has(id) && (
+              <Suspense fallback={<ToolLoadingSkeleton />}>
+                {LAZY_TOOLS[id](toolActions)}
+              </Suspense>
+            )}
+          </section>
+        ))}
       </DeskLayout>
 
       <AppMenu
-        open={menuOpen}
-        onClose={() => { setMenuOpen(false); focusMenuButton() }}
+        open={openDialog === 'menu'}
+        onClose={closeDialog}
         theme={theme}
-        onToggleTheme={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}
+        onToggleTheme={toggleTheme}
         historyCount={history.length}
         historyDisabled={state.off}
-        onOpenHistory={() => setHistoryOpen(true)}
-        onOpenConstants={() => setQuickAccessOpen(true)}
-        onOpenAbout={() => setAboutOpen(true)}
+        onOpenHistory={() => setOpenDialog('history')}
+        onOpenConstants={() => setOpenDialog('constants')}
+        onOpenAbout={() => setOpenDialog('about')}
         onReturnFocus={focusMenuButton}
       />
-      <HistoryPanel open={historyOpen} onClose={() => { setHistoryOpen(false); focusMenuButton() }} onRecall={() => selectTool('calculator')} />
-      <QuickAccessDrawer open={quickAccessOpen} onClose={() => { setQuickAccessOpen(false); focusMenuButton() }} onInsert={insertQuickConstant} />
-      <AboutDialog open={aboutOpen} onClose={() => { setAboutOpen(false); focusMenuButton() }} />
+      <HistoryPanel open={openDialog === 'history'} onClose={closeDialog} onRecall={returnToCalculator} />
+      <QuickAccessDrawer open={openDialog === 'constants'} onClose={closeDialog} onInsert={insertQuickConstant} />
+      <AboutDialog open={openDialog === 'about'} onClose={closeDialog} />
     </main>
   )
 }
