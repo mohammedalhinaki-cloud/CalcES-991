@@ -5,15 +5,14 @@ import { useAppActions } from '../../hooks/useAppActions'
 import Icon from './Icon'
 import { isAndroidApp } from '../../native/platform'
 import AndroidPrivacyButton from './AndroidPrivacyButton'
-export default function AppToolbar({onHistory}:{onHistory:()=>void}){
- const {state,history,workspaceOpen,setWorkspaceOpen,dispatch}=useCalculator()
+export default function AppToolbar(){
+ const {state,workspaceOpen,setWorkspaceOpen,dispatch}=useCalculator()
  const {share,install,installed,notice,help,setHelp,url}=useAppActions()
  const dialog=useRef<HTMLDialogElement>(null)
  useEffect(()=>{if(help&&!dialog.current?.open)dialog.current?.showModal();if(!help&&dialog.current?.open)dialog.current.close()},[help])
  return <>
   <nav className="app-toolbar" aria-label={localize("أدوات الحاسبة")} dir="ltr">
    <button type="button" className="toolbar-button workspace-toggle" aria-label={localize("مساحة العمل")} aria-expanded={workspaceOpen} aria-controls="workspace" disabled={state.off} onClick={()=>setWorkspaceOpen(!workspaceOpen)} title={localize("مساحة العمل")}><Icon name="workspace"/><span>{localize("الأدوات")}</span></button>
-   <button type="button" className="toolbar-button" aria-label={localize(`السجل (${history.length})`)} disabled={state.off} onClick={onHistory} title={localize("سجل الحسابات")}><Icon name="history"/><span>{localize("السجل")}</span></button>
    <button type="button" className="toolbar-button angle-button" aria-label={localize("إعداد وحدة الزوايا")} disabled={state.off} onClick={()=>dispatch({type:'OPEN_MENU',menu:'setup'})} title={localize("وحدة الزوايا")}><b>{localize(state.angle)}</b><span>{localize("الزاوية")}</span></button>
    <button type="button" className="toolbar-button" aria-label={localize("مشاركة الحاسبة")} onClick={()=>void share()} title={localize("مشاركة")}><Icon name="share"/><span>{localize("مشاركة")}</span></button>
    {localize(isAndroidApp()?<AndroidPrivacyButton/>:<button type="button" className="toolbar-button" aria-label={localize(installed?'التطبيق مثبت':'تثبيت التطبيق')} onClick={()=>void install()} title={localize(installed?'مثبت':'تثبيت')}><Icon name="install"/><span>{localize(installed?'مثبت':'تثبيت')}</span></button>)}

@@ -24,8 +24,11 @@ export function startAndroidAds():Promise<void>{
   document.documentElement.classList.add('native-android')
   const configuration=await AppConfiguration.getConfiguration()
   update({configuration})
+  if(!configuration.adsEnabled){
+   document.documentElement.style.setProperty('--native-banner-slot','0px')
+   return
+  }
   reserveNativeBanner(configuration.bannerHeight)
-  if(!configuration.adsEnabled)return
   const {AdMob,BannerAdPluginEvents}=await import('@capacitor-community/admob')
   sdk=AdMob
   const size=await AdMob.addListener(BannerAdPluginEvents.SizeChanged,info=>reserveNativeBanner(info.height))

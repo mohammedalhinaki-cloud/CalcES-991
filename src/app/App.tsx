@@ -1,12 +1,15 @@
 import LanguageGate from '../i18n/LanguageGate'
 import { CalculatorProvider } from '../state/CalculatorProvider'
-import CalculatorShell from '../components/CalculatorShell'
+import WorkspaceShell from '../components/workspace/WorkspaceShell'
 
-// Scientific evaluation stays separate from MathLive cursor/selection ownership.
+// The workspace composes tools around the existing scientific calculator.
+// Calculator state and the MathLive editor stay mounted while the user changes tabs.
 export default function App() {
   return (
-    <LanguageGate><main className="app-shell">
-      <CalculatorProvider><CalculatorShell /></CalculatorProvider>
-    </main></LanguageGate>
+    <LanguageGate>
+      <CalculatorProvider>
+        <WorkspaceShell />
+      </CalculatorProvider>
+    </LanguageGate>
   )
 }

@@ -8,7 +8,7 @@ export default function AndroidPrivacyButton(){
  const [open,setOpen]=useState(false)
  const {configuration,privacyRequired,message}=useNativeAdsState()
  const rate=()=>{
-  try{saveChoice(window.localStorage,'rate')}catch{/* A blocked preference store must not prevent opening Play. */}
+  try{saveChoice(window.localStorage,'rate')}catch{/* A blocked preference store must not prevent opening the store listing. */}
   void openStore()
  }
  return <>
@@ -16,7 +16,7 @@ export default function AndroidPrivacyButton(){
   <EngagementDialog open={open} onClose={()=>setOpen(false)} titleId="android-privacy-title">
    <h2 id="android-privacy-title">{localize("عن التطبيق والخصوصية 🛡️")}</h2>
    <p>{localize("تطبيق CalcES 991 (إصدار ")}{localize(configuration?.versionName??'1.0.0')})<br/>{localize("تطوير: Maaoun Studio")}</p>
-   <section><h3>{localize("سياسة الخصوصية")}</h3><p>{localize("نحن نحترم خصوصيتك تماماً. تعمل وظائف الحاسبة أوفلاين (بدون إنترنت)، ولا نرسل معادلاتك أو نتائجك إلى خادم للحساب. لا نطلب الوصول إلى موقعك الجغرافي أو ملفاتك الخاصة.")}</p><p>{localize("نحفظ محلياً على جهازك اللغة المختارة وعدد العمليات وتفضيلات تذكير التقييم فقط. لا تُرسل هذه التفضيلات إلينا. عند تفعيل إعلانات Google، يحتاج الإعلان إلى الإنترنت وقد تعالج خدمات Google بيانات الإعلان وفق سياسة الخصوصية وخيارات الموافقة المتاحة في منطقتك. لا توجد إعلانات كاملة الشاشة.")}</p>
+   <section><h3>{localize("سياسة الخصوصية")}</h3><p>{localize("نحن نحترم خصوصيتك تماماً. تعمل وظائف الحاسبة أوفلاين (بدون إنترنت)، ولا نرسل معادلاتك أو نتائجك إلى خادم للحساب. لا نطلب الوصول إلى موقعك الجغرافي أو ملفاتك الخاصة.")}</p><p>{localize("نحفظ محلياً على جهازك اللغة المختارة وعدد العمليات وتفضيلات تذكير التقييم فقط. لا تُرسل هذه التفضيلات إلينا.")}</p>{localize(configuration?.adsEnabled&&<p>{localize("عند تفعيل إعلانات Google، يحتاج الإعلان إلى الإنترنت وقد تعالج خدمات Google بيانات الإعلان وفق سياسة الخصوصية وخيارات الموافقة المتاحة في منطقتك. لا توجد إعلانات كاملة الشاشة.")}</p>)}
     {localize(configuration?.privacyPolicyUrl&&<a href={configuration.privacyPolicyUrl} target="_blank" rel="noreferrer">{localize("سياسة الخصوصية التفصيلية")}</a>)}
     {localize(privacyRequired&&<button type="button" className="utility-button" onClick={()=>void showAdPrivacyOptions()}>{localize("خيارات خصوصية الإعلانات")}</button>)}
    </section>

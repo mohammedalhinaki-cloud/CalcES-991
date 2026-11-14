@@ -1,6 +1,6 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
-// Confirm this applicationId before the first Play upload; it identifies the app permanently.
+// Confirm this applicationId before the first store submission; it identifies the app permanently.
 const config:CapacitorConfig={
  appId:'calces991.calculator',
  appName:'CalcES 991 - حاسبة علمية',

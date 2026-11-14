@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { GOOGLE_TEST_BANNER, openBannerSession } from '../../native/bannerSession'
 import type { BannerSdk } from '../../native/bannerSession'
 import type { AndroidConfiguration } from '../../native/platform'
-const config:AndroidConfiguration={debug:false,adsEnabled:true,bannerId:'ca-app-pub-1234567890123456/1234567890',audience:'general',bannerHeight:50,privacyPolicyUrl:'https://example.com/privacy',supportEmail:'support@example.com',versionName:'1.0.0'}
+const config:AndroidConfiguration={debug:false,adsEnabled:true,bannerId:'ca-app-pub-1234567890123456/1234567890',audience:'general',bannerHeight:50,privacyPolicyUrl:'https://example.com/privacy',supportEmail:'support@example.com',storeListingUrl:'https://appgallery.huawei.com/',versionName:'1.0.0'}
 function mocks(){
  const info={status:'NOT_REQUIRED',canRequestAds:true,privacyOptionsRequirementStatus:'NOT_REQUIRED'}
  const sdk={requestConsentInfo:vi.fn().mockResolvedValue(info),showConsentForm:vi.fn(),showPrivacyOptionsForm:vi.fn().mockResolvedValue(undefined),initialize:vi.fn().mockResolvedValue(undefined),showBanner:vi.fn().mockResolvedValue(undefined),hideBanner:vi.fn().mockResolvedValue(undefined),resumeBanner:vi.fn().mockResolvedValue(undefined),removeBanner:vi.fn().mockResolvedValue(undefined),setApplicationMuted:vi.fn().mockResolvedValue(undefined)}

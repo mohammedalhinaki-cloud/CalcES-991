@@ -31,6 +31,7 @@ function useCalculatorController(){
   const [tool,updateTool]=useState<string|null>(null)
   const setTool=useCallback((value:string|null)=>{updateTool(value);if(value!==null)setWorkspaceOpen(true)},[])
   const dataTarget=useRef<EditorHandle|null>(null)
+  const pendingWorkspaceInsert=useRef<string|null>(null)
   const submit=useRef<(()=>void)|null>(null)
   const registerDataTarget=useCallback((handle:EditorHandle)=>{dataTarget.current=handle;return ()=>{if(dataTarget.current===handle)dataTarget.current=null}},[])
   const registerSubmit=useCallback((handler:()=>void)=>{submit.current=handler;return ()=>{if(submit.current===handler)submit.current=null}},[])
@@ -98,6 +99,22 @@ function useCalculatorController(){
     }
     editor.current?.insert(latex)
   }
+  const insertFromWorkspace=(latex:string)=>{
+    setMode('COMP')
+    pendingWorkspaceInsert.current=latex
+    if(state.off){dispatch({type:'POWER',off:false});return}
+    if(!editor.current)return
+    pendingWorkspaceInsert.current=null
+    if(state.committedValue!==null&&!state.editingCommitted)editor.current.clear()
+    editor.current.insert(latex)
+  }
+  useEffect(()=>{
+    const latex=pendingWorkspaceInsert.current
+    if(!latex||!ready||state.off||!editor.current)return
+    pendingWorkspaceInsert.current=null
+    if(state.committedValue!==null&&!state.editingCommitted)editor.current.clear()
+    editor.current.insert(latex)
+  },[ready,state.off])
   const startCalculus=(kind:LinearCalculusKind)=>{
     advanced.cancel();dataTarget.current=null;updateTool(null);setWorkspaceOpen(false)
     const append=kind==='integrate'&&(isLinearCalculus(state.latex)&&state.committedValue===null||/[+\-]\s*$|\\(?:times|div)\s*$/.test(state.latex))
@@ -176,7 +193,7 @@ function useCalculatorController(){
       dispatch({type:'CONSUME_LAYER'})
     }catch(error){dispatch({type:'NOTICE',notice:error instanceof Error?error.message:'خطأ رياضي'})}
   }
-  return {linearScreen,startCalculus,submitLinearCalculation,workspaceOpen,setWorkspaceOpen,history,recalled,recallHistory,clearHistory,advanced,tool,setTool,runAdvanced,registerDataTarget,registerSubmit,state,result,beginEdit,dispatch,ready,registerEditor,edit,setMode,press}
+  return {linearScreen,startCalculus,submitLinearCalculation,workspaceOpen,setWorkspaceOpen,history,recalled,recallHistory,clearHistory,advanced,tool,setTool,runAdvanced,registerDataTarget,registerSubmit,state,result,beginEdit,dispatch,ready,registerEditor,edit,setMode,insertFromWorkspace,press}
 }
 const CalculatorContext=createContext<ReturnType<typeof useCalculatorController>|null>(null)
 export function CalculatorProvider({children}:{children:ReactNode}){

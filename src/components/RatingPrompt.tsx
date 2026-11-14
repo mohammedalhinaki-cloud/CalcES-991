@@ -33,7 +33,7 @@ export default function RatingPrompt(){
  },[])
  return <EngagementDialog open={open} onClose={()=>choose('later')} titleId="rating-title">
   <h2 id="rating-title">{localize("رأيك يصنع الفارق! ⭐️")}</h2>
-  <p>{localize("أهلاً بك! 👋 نحن فريق عمل صغير (Maaoun Studio) نسعى لتقديم أدوات تعليمية مجانية عالية الجودة. إذا كان التطبيق يعجبك ويساعدك، فإن تقييمك بـ 5 نجوم على متجر قوقل بلاي يدعمنا كثيراً ويصنع فارقاً حقيقياً في استمرارنا وتحديث الأداة باستمرار. شكرًا لدعمك وثقتك!")}</p>
+  <p>{localize("أهلاً بك! 👋 نحن فريق عمل صغير (Maaoun Studio) نسعى لتقديم أدوات تعليمية مجانية عالية الجودة. إذا كان التطبيق يعجبك ويساعدك، فإن تقييمك للتطبيق في متجر التطبيقات يدعمنا كثيراً ويصنع فارقاً حقيقياً في استمرارنا وتحديث الأداة باستمرار. شكرًا لدعمك وثقتك!")}</p>
   <div className="engagement-actions"><button type="button" className="utility-button rating-primary" onClick={()=>choose('rate')}>{localize("تقييم التطبيق الآن ⭐️")}</button><button type="button" className="utility-button" onClick={()=>choose('later')}>{localize("ذكرني لاحقاً ⏰")}</button></div>
  </EngagementDialog>
 }

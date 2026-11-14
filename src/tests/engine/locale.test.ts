@@ -8,10 +8,23 @@ it('persists language and translates static and dynamic labels without changing 
  expect(translate('معامل x^2')).toBe('Coefficient of x^2')
  expect(localize('123.45')).toBe('123.45');expect(localize(5)).toBe(5)
 })
+it('translates the Phase 3 tools and dynamic search counts',()=>{
+ selectLanguage('en')
+ expect(translate('القوانين والصيغ')).toBe('Formulas')
+ expect(translate('عدد النتائج: 6')).toBe('Results: 6')
+ expect(translate('تصدير الرسم بصيغة SVG')).toBe('Export graph as SVG')
+})
 it('translates worker messages at the presentation boundary',()=>{
  selectLanguage('en')
  expect(translate('المصفوفة منفردة؛ لا يوجد معكوس')).toBe('The matrix is singular; no inverse exists')
  expect(translate('الاشتقاق الرمزي')).toBe('Symbolic differentiation')
+})
+it('keeps short glossary tokens exact-only and disambiguates size from volume',()=>{
+ selectLanguage('en')
+ expect(translate('من')).toBe('From')
+ expect(translate('اليوم')).toBe('اليوم')
+ expect(translate('الحجم')).toBe('Size')
+ expect(translate('الحجم والسعة')).toBe('Volume')
 })
 it('retains the Arabic UI unchanged and tolerates corrupt preferences',()=>{
  selectLanguage('ar');expect(translate('النتيجة')).toBe('النتيجة')

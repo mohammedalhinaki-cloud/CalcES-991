@@ -8,6 +8,8 @@ ADMOB_APP_ID=
 ADMOB_BANNER_ID=
 # Choose general or children. Mixed-age ad targeting needs a neutral age gate first.
 APP_AUDIENCE=general
+# Set the public Huawei AppGallery listing URL before release.
+APP_STORE_URL=
 PRIVACY_POLICY_URL=https://study-tools-calculator.pages.dev/privacy.html
 SUPPORT_EMAIL=jy906675@gmail.com
 # Use an existing upload key or create one in Android Studio. Never commit it or these passwords.
