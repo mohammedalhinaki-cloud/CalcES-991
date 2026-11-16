@@ -1,0 +1,136 @@
+name: Build Huawei AppGallery AAB
+
+# Builds the ad-free `appGallery` Android App Bundle on a GitHub runner (JDK 21 + Android SDK 36).
+# Signing uses the existing upload key when these repository secrets exist (Settings → Secrets → Actions):
+#   UPLOAD_KEYSTORE_BASE64   base64 of the .jks/.keystore file (base64 -w0 upload.jks)
+#   UPLOAD_KEY_ALIAS, UPLOAD_KEYSTORE_PASSWORD, UPLOAD_KEY_PASSWORD
+# Without them an UNSIGNED bundle is produced for verification only; AppGallery Connect rejects unsigned bundles.
+# The keystore is written to the runner temp directory and never committed or uploaded as an artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: 'versionCode (must increase for every AppGallery upload)'
+        required: true
+        default: '9'
+      version_name:
+        description: 'versionName shown to users'
+        required: true
+        default: '1.0.5'
+      store_url:
+        description: 'Public AppGallery listing URL (https://appgallery.huawei.com/app/C…); empty = publisher website'
+        required: false
+        default: ''
+  push:
+    tags: ['appgallery-v*']
+    branches: ['arena/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: appgallery-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      APP_VERSION_CODE: ${{ inputs.version_code || vars.APPGALLERY_VERSION_CODE || '9' }}
+      APP_VERSION_NAME: ${{ inputs.version_name || vars.APPGALLERY_VERSION_NAME || '1.0.5' }}
+      APP_STORE_URL: ${{ inputs.store_url || vars.APPGALLERY_STORE_URL || 'https://calculator.maaoun.com/' }}
+      ADS_ENABLED: 'false'
+      APP_AUDIENCE: general
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Install Android SDK 36
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Restore upload keystore
+        id: keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          STORE_PASSWORD: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "::warning::UPLOAD_KEYSTORE_BASE64 secret is not set — building an UNSIGNED bundle (not uploadable)."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          keystore="$RUNNER_TEMP/upload.keystore"
+          echo "$KEYSTORE_B64" | base64 -d > "$keystore"
+          {
+            echo "UPLOAD_KEYSTORE_PATH=$keystore"
+            echo "UPLOAD_KEY_ALIAS=$KEY_ALIAS"
+            echo "UPLOAD_KEYSTORE_PASSWORD=$STORE_PASSWORD"
+            echo "UPLOAD_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build web app and sync Capacitor
+        run: npm run android:sync
+
+      - name: Build appGallery bundle
+        run: node scripts/android-gradle.mjs bundleAppGallery --appgallery
+
+      - name: Verify bundle
+        env:
+          SIGNED: ${{ steps.keystore.outputs.signed }}
+        run: |
+          set -euo pipefail
+          aab=build/android/calces-991-appgallery.aab
+          curl -sSfL -o "$RUNNER_TEMP/bundletool.jar" https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
+          manifest=$(java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle "$aab")
+          echo "$manifest" | head -20
+          echo "$manifest" | grep -q 'package="calces991.calculator"'
+          echo "$manifest" | grep -q "android:versionCode=\"$APP_VERSION_CODE\""
+          echo "$manifest" | grep -q "android:versionName=\"$APP_VERSION_NAME\""
+          if echo "$manifest" | grep -Eq 'gms\.ads|AD_ID|ADSERVICES'; then echo "::error::Google ads entries found in the AppGallery manifest"; exit 1; fi
+          mkdir -p "$RUNNER_TEMP/aab" && unzip -q -o "$aab" -d "$RUNNER_TEMP/aab"
+          if grep -rlq 'com/google/android/gms/ads' "$RUNNER_TEMP/aab/base/dex"; then echo "::error::Google Mobile Ads classes found in the AppGallery bundle"; exit 1; fi
+          if grep -q 'capacitor-community/admob' "$RUNNER_TEMP/aab/base/assets/capacitor.plugins.json"; then echo "::error::AdMob plugin still registered"; exit 1; fi
+          if [ "$SIGNED" = "true" ]; then
+            jarsigner -verify -strict "$aab"
+            keytool -printcert -jarfile "$aab" | grep -E 'Owner|SHA256'
+          fi
+          final="CalcES-991-${APP_VERSION_NAME}-build${APP_VERSION_CODE}-appgallery$([ "$SIGNED" = "true" ] && echo -signed || echo -UNSIGNED).aab"
+          mv "$aab" "build/android/$final"
+          sha256sum "build/android/$final" | tee build/android/SHA256SUMS.txt
+          {
+            echo "### AppGallery bundle"
+            echo "- File: \`$final\`"
+            echo "- Package: calces991.calculator · versionCode $APP_VERSION_CODE · versionName $APP_VERSION_NAME"
+            echo "- Signed with upload key: $SIGNED"
+            echo "- Store URL in app: $APP_STORE_URL"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appgallery-aab
+          path: |
+            build/android/*.aab
+            build/android/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
