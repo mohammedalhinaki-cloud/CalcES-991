@@ -1,0 +1,98 @@
+name: Huawei AppGallery Release Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-appgallery:
+    name: Build AppGallery AAB & APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit & workspace tests
+        run: npm run test
+
+      - name: Build web application
+        run: npm run build
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configure signing & build AppGallery bundle
+        env:
+          KEYSTORE_BASE64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+          APP_STORE_URL: ${{ secrets.APP_STORE_URL || 'https://appgallery.huawei.com/app/C123456789' }}
+          ADS_ENABLED: 'false'
+          APP_VERSION_CODE: '9'
+          APP_VERSION_NAME: '1.1.0'
+        run: |
+          chmod +x android/gradlew
+          
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Signing secret detected. Setting up release keystore..."
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/upload-release.keystore
+            export UPLOAD_KEYSTORE_PATH="upload-release.keystore"
+            
+            # Run official AppGallery check and bundle build
+            npm run android:appgallery
+          else
+            echo "No UPLOAD_KEYSTORE_BASE64 secret provided. Building unsigned release bundle for AppGallery..."
+            # Run bundleAppGallery without strict pre-check
+            node scripts/android-gradle.mjs bundleAppGallery --appgallery
+          fi
+
+      - name: Build AppGallery APK (for device testing)
+        run: |
+          cd android
+          ./gradlew :app:assembleAppGallery --no-daemon --console=plain
+
+      - name: Stage release artifacts
+        run: |
+          mkdir -p build/android
+          # Copy generated AppGallery artifacts if present
+          find android/app/build/outputs/bundle/appGallery/ -name "*.aab" -exec cp {} build/android/calces-991-appgallery.aab \; 2>/dev/null || true
+          find android/app/build/outputs/apk/appGallery/ -name "*.apk" -exec cp {} build/android/calces-991-appgallery.apk \; 2>/dev/null || true
+          ls -la build/android/
+
+      - name: Upload AppGallery Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: calces-991-appgallery-release
+          path: |
+            build/android/calces-991-appgallery.aab
+            build/android/calces-991-appgallery.apk
+          if-no-files-found: warn
+          retention-days: 14
