@@ -16,6 +16,8 @@ jobs:
   build-appgallery:
     name: Build AppGallery AAB & APK
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
 
     steps:
       - name: Checkout repository
@@ -44,9 +46,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Configure signing & build AppGallery bundle
         env:
